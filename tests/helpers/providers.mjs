@@ -1,3 +1,4 @@
+import {forecastIntervals} from './weather-fixture.mjs';
 import dns from 'node:dns/promises';
 import {syncBuiltinESMExports} from 'node:module';
 dns.lookup=async(host)=>{if(['feeds.bbci.co.uk','outlook.live.com','p00-sharedstreams.icloud.com','cvws.icloud-content.com'].includes(host))return [{address:'151.101.0.81',family:4}];if(host==='127.0.0.1')return [{address:'127.0.0.1',family:4}];throw Error('Unmocked DNS: '+host);};
@@ -25,7 +26,8 @@ globalThis.fetch=async(input,options={})=>{
  if(u.hostname==='graph.microsoft.com'){
   if(options.headers.Authorization!=='Bearer secret-ms-access')throw Error('Missing Microsoft bearer token');
   if(u.pathname.endsWith('/calendars'))return ok({value:[{id:'work',name:'Work',isDefaultCalendar:true}]});
-  msPages++;return ok(msPages%2?{value:[{id:'ms-event',subject:'Work meeting',start:{dateTime:'2026-10-09T08:00:00',timeZone:'UTC'},end:{dateTime:'2026-10-09T09:00:00',timeZone:'UTC'},sensitivity:'private'}],'@odata.nextLink':'https://graph.microsoft.com/v1.0/me/calendar/calendarView?page=2'}:{value:[{id:'ms-all-day',subject:'Holiday',isAllDay:true,start:{dateTime:'2026-10-10T00:00:00',timeZone:'UTC'},end:{dateTime:'2026-10-11T00:00:00',timeZone:'UTC'}}]});
+  if(control.cancelMicrosoft&&!u.searchParams.get('$select')?.split(',').includes('isCancelled'))throw Error('Missing Microsoft cancellation flag selection');
+  msPages++;return ok(msPages%2?{value:[{id:'ms-event',subject:'Work meeting',start:{dateTime:'2026-10-09T08:00:00',timeZone:'UTC'},end:{dateTime:'2026-10-09T09:00:00',timeZone:'UTC'},sensitivity:'private',isCancelled:!!control.cancelMicrosoft}],'@odata.nextLink':u.origin+u.pathname+'?'+new URLSearchParams({page:'2','$select':u.searchParams.get('$select')||''})}:{value:[{id:'ms-all-day',subject:'Holiday',isAllDay:true,start:{dateTime:'2026-10-10T00:00:00',timeZone:'UTC'},end:{dateTime:'2026-10-11T00:00:00',timeZone:'UTC'}}]});
  }
  if(u.hostname==='www.googleapis.com'){
   if(options.headers.Authorization!=='Bearer secret-google-access')throw Error('Missing Google bearer token');
@@ -35,6 +37,9 @@ globalThis.fetch=async(input,options={})=>{
  }
  if(u.hostname==='api.openweathermap.org'){
   if(u.searchParams.get('appid')!=='fake-weather-key')throw Error('Missing weather key');
+  if(u.pathname.includes('/geo/1.0/zip'))return ok({name:'London',country:'GB',lat:51.5,lon:-.1});
+  if(control.denyOneCall&&u.pathname.includes('4.0'))return new Response(JSON.stringify({message:'One Call subscription required'}),{status:401});
+  if(u.pathname.includes('/data/2.5/forecast'))return ok({city:{timezone:3600},list:forecastIntervals()});
   if(u.pathname.includes('/geo/'))return ok([{name:'London',country:'GB',lat:51.5,lon:-.1}]);
   return ok({timezone:'Europe/London',data:Array.from({length:7},(_,i)=>({dt:1791504000+i*86400,temp:{min:8+i,max:15+i},pop:.2,wind_speed:3,humidity:70,weather:[{id:800,description:'clear sky',icon:'01d'}]}))});
  }

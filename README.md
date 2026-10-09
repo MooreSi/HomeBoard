@@ -1,7 +1,6 @@
 # HomeBoard
 
-A self-hosted family dashboard with a separate settings page, Microsoft 365 and
-Google calendars, sixteen themes, a photo slideshow, OpenWeather forecasts and RSS news.
+A self-hosted family dashboard with a separate settings page, read-only Calendar Links from Outlook, Google or Apple calendars, sixteen themes, a photo slideshow, OpenWeather forecasts and RSS news.
 Open `/` for the display and `/settings` to configure it. Settings are shared
 across displays and persist on the server. The dashboard has no upload controls.
 
@@ -122,51 +121,25 @@ verified on a Proxmox host; this Mac is not a Proxmox host.
 
 ## Settings
 
-### Microsoft 365 / Office 365
+### Calendar Link
 
-Use Microsoft Entra app registration to obtain your application client ID. Enable
-public client flows and delegated `Calendars.ReadBasic` permission. Select the
-supported account types for work/school and personal accounts as needed. Enter
-the ID and tenant choice in settings, then **Save & connect Microsoft**. Enter
-the device code on Microsoft's verification page. Organisation policy may need
-admin consent or a specific tenant. The default `common` tenant supports work,
-school and personal accounts. Choose which calendars to display after consent.
+Paste an ICS / iCalendar subscription URL into **Settings → Calendar Link** and
+choose **Save & check calendar link**. Microsoft and Google login are unnecessary
+for a published subscription, so their setup controls have been removed.
 
-The server keeps access/refresh tokens, refreshes them, pages calendarView results
-and expands recurring occurrences for the displayed date range. Disconnect
-clears local tokens/cache; revoke consent separately in your Microsoft account.
-[Microsoft device-code flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-device-code),
-[calendarView API](https://learn.microsoft.com/en-us/graph/api/calendar-list-calendarview?view=graph-rest-1.0).
+- Outlook: Settings → Calendar → Shared calendars → Publish a calendar; copy ICS.
+- Google Calendar: Settings for the calendar → Integrate calendar → Secret address
+  in iCal format. [Google's subscription instructions](https://support.google.com/calendar/answer/37648).
+- Apple Calendar/iCloud: share the calendar publicly and copy the subscription
+  link. `webcal://` links are converted to HTTPS.
+  [Apple's calendar sharing instructions](https://support.apple.com/en-gb/guide/icloud/mm6b1a9479/icloud).
 
-### Google / Gmail Calendar
-
-Enable Google Calendar API in Google Cloud. Configure the OAuth consent screen
-and create a **Web application** OAuth client. Enter its ID and secret in
-settings and register the exact authorised callback URL, by default:
-
-```text
-http://localhost:8080/api/calendar/google/callback
-```
-
-Connect from a browser on the host for localhost callbacks. A tablet cannot use
-that localhost callback to reach the server. Google permits HTTP loopback for
-local testing; a remote callback requires an approved HTTPS domain, not a bare
-LAN-IP HTTP URL. For LXC, an SSH tunnel to the host can provide localhost access:
-`ssh -L 8080:CONTAINER_IP:8080 USER@PROXMOX_HOST`, then open
-`http://localhost:8080/settings` on that computer. Alternatively configure your
-own authenticated HTTPS reverse proxy and its exact callback domain.
-
-The app requests `calendar.readonly`, uses browser-bound state plus PKCE, stores
-tokens server-side and renews access tokens. Google testing-mode clients can
-have seven-day refresh-token expiry; add test users and reconnect or publish
-your consent configuration as appropriate. Select calendars after connecting.
-[Google OAuth server flow](https://developers.google.com/identity/protocols/oauth2/web-server),
-[Google event expansion/pagination](https://developers.google.com/workspace/calendar/api/v3/reference/events/list).
-
-Both providers can be connected at once. Events are combined. Private titles are
-masked server-side; Hide all titles masks every title. Failed sync reports the
-provider and shows cached data when available. Demo appointments are displayed
-only when no calendar account is connected and are labelled as demo.
+The link stays in the server's private credentials file. Anyone with it may be
+able to read the published details; revoke or replace it in your calendar service
+when needed. Calendar changes are checked every five minutes. Recurring events,
+all-day dates and privacy masking are supported. Cancelled statuses, cancellation
+messages, recurring cancellations and whole-word cancelled/canceled title markers
+are omitted, including publishers that keep a cancelled appointment CONFIRMED.
 
 ### Themes
 
@@ -206,16 +179,29 @@ process to read the folder. Docker/LXC need a mount visible inside their contain
 
 ### Weather
 
-Add your OpenWeather API key, search a city and choose a location. Enable weather
-and select Celsius/m/s or Fahrenheit/mph. A seven-day forecast shows weather
-symbols, highs/lows, precipitation probability, wind and a temperature trend.
-One Call 4.0 is the default; 3.0 is available for existing accounts. These APIs
-require the corresponding One Call subscription, **not just a basic free API key**.
-Check your billing limits in OpenWeather. Keys are never returned to the browser.
-Forecasts are cached for ten minutes and stale results are labelled.
+Enter an OpenWeather API key, start typing a town or postcode, then select a
+suggestion. Selection saves the location and checks the forecast automatically.
+Choose Celsius/m/s or Fahrenheit/mph and turn on weather to show it on the display.
+Full UK postcodes and outward codes use OpenWeather's postcode geocoder; towns
+use its location search. Five suggestions at most are shown, with country/state
+information to distinguish places.
+
+**Automatic** uses seven-day One Call access when available and falls back to the
+standard five-day forecast when that subscription is unavailable. Your standard
+key can therefore work without adding a paid One Call plan. **Standard five-day**
+always uses the basic API. One Call 4.0/3.0 remain explicit choices for compatible
+subscriptions. New keys can take time to activate; errors identify key rejection,
+subscription access and request limits.
+
+Standard daily lows/highs and precipitation chances aggregate the available
+three-hour forecast intervals; today can be partial. The widget shows the actual
+five or seven days available. Forecasts are cached for ten minutes, keyed by
+location, units, API, timezone and a private key fingerprint; replacing a key
+cannot reuse the previous key's successful cache. Failed updates label any cached
+forecast. Keys are never returned to the browser.
+[Standard forecast API](https://openweathermap.org/api/forecast5),
 [One Call 4.0](https://openweathermap.org/api/one-call-4),
-[One Call 3.0](https://openweathermap.org/api/one-call-3),
-[pricing](https://openweathermap.org/price).
+[geocoding](https://openweathermap.org/api/geocoding-api).
 
 ### Date/time, news and display
 
@@ -223,7 +209,11 @@ Select an IANA timezone, long/DMY/MDY/ISO date, digital/analog/both clock and 12
 hour time. Calendar day boundaries use that timezone, including DST; all-day
 appointments retain their calendar dates.
 
-Toggle RSS/Atom headlines, enter a public feed URL and choose a headline count.
+Toggle RSS/Atom headlines, choose a news source or Custom RSS / Atom, and set a
+headline count. Presets include BBC, CNBC, CNN via Google News, Fox News, Sky News,
+GB News, The Guardian, NPR and Al Jazeera. CNN’s legacy RSS feed was stale, so its
+preset clearly identifies the Google News aggregator. See the
+[checked news sources](docs/NEWS-SOURCES.md).
 Feeds are fetched on the server, cached, and rendered as safe text with HTTP(S)
 links in a scrolling bottom ticker. Pause it with its button; keyboard focus and
 hover also pause movement. Reduced-motion preferences switch to static scrolling. Local/private-network destinations, unsafe redirects, XML entity/DOCTYPE
@@ -266,7 +256,8 @@ boundaries. The original ZIP regression assertions remain intact. The
 review requirements and verification checks. See [DEVELOPMENT.md](DEVELOPMENT.md)
 for the Node.js workflow.
 [Release validation record](docs/testing/VALIDATION-release-v0.2.md) and
-[Metro layout validation](docs/testing/VALIDATION-metro.md) record actual checks and limits.
+[Metro layout validation](docs/testing/VALIDATION-metro.md), and
+[settings/weather validation](docs/testing/VALIDATION-simple-settings.md) record actual checks and limits.
 GitHub Actions installs dependencies, checks syntax, runs the entire suite,
 checks installer shell syntax, builds Docker and repeats tests in the image.
 
@@ -276,28 +267,7 @@ accounts/devices/host. Automated provider fixtures establish request/response
 wiring and failure behaviour; they do not establish successful live authentication.
 
 
-## Calendar and photo connections
-
-For Outlook.com, use **Settings → Calendar connections → Outlook calendar link**.
-In Outlook on the web open Settings → Calendar → Shared calendars → Publish a
-calendar, choose the details to publish and copy the **ICS** link. HomeBoard
-handles recurring events and date-only appointments and stores the link in its
-private credential file. Anyone with the published link can read those details;
-revoke it from Outlook when no longer needed. Organisation policy can disable
-publishing. The authenticated Microsoft device sign-in remains available.
-
-A personal-account tenant mismatch requires a HomeBoard app registration that
-supports personal Microsoft accounts, and public client flows enabled. Select
-Personal Microsoft accounts in HomeBoard for Outlook.com/Hotmail. A work-only or
-single-tenant registration cannot become personal-account compatible just by
-changing the local tenant dropdown. Do not use another service's client ID.
-
-If the error names application `74658136-14ec-4630-ad9b-26e160ff0fc6`,
-[Microsoft identifies the same failure during Azure portal access](https://learn.microsoft.com/en-us/answers/questions/1346227/the-selected-user-account-does-not-exist-in-the-mi).
-That points to the Azure/Entra setup step, before HomeBoard authentication. Use
-your own accessible Azure tenant/account for registration, or choose the Outlook
-ICS-link option, which does not require the Azure portal.
-
+## Shared albums and news transport
 
 For Apple Photos, enable **Public Website** on a Shared Album and paste its
 `https://www.icloud.com/sharedalbum/#…` URL into Settings → Photos. Select

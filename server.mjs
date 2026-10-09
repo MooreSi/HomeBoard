@@ -1,3 +1,4 @@
+import {newsFeeds} from './lib/news-feeds.mjs';
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -32,6 +33,7 @@ async function body(req,limit=12*1024*1024){let size=0,chunks=[];for await(const
 async function payload(req){return JSON.parse((await body(req,65536)).toString());}
 function json(res,status,value){res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(value));}
 async function update(patch){const nextSecrets={...secrets},clean={...patch};for(const k of ['googleClientSecret','weatherApiKey','calendarFeedUrl','icloudAlbumUrl'])if(Object.hasOwn(clean,k)){if(typeof clean[k]!=='string'||clean[k].length>2048)throw Error('Invalid credential');nextSecrets[k]=clean[k];delete clean[k];}
+ if(Object.hasOwn(patch,'calendarFeedUrl'))nextSecrets.calendarFeedUrl=nextSecrets.calendarFeedUrl.trim().replace(/^webcal:\/\//i,'https://');
  if(nextSecrets.icloudAlbumUrl)albumToken(nextSecrets.icloudAlbumUrl);
  if(Object.hasOwn(patch,'calendarFeedUrl')&&nextSecrets.calendarFeedUrl){const u=await publicURL(nextSecrets.calendarFeedUrl);if(u.protocol!=='https:')throw Error('Use an HTTPS ICS calendar link');}
  const next=validateSettings(clean,settings);
@@ -60,6 +62,7 @@ const server=http.createServer(async(req,res)=>{try{
  const calendarList=u.pathname.match(/^\/api\/calendar\/(microsoft|google)\/list$/);if(calendarList&&req.method==='GET')return json(res,200,await calendars.calendars(calendarList[1]));
  if(u.pathname==='/api/weather/locations'&&req.method==='GET')return json(res,200,await weather.locations(u.searchParams.get('q')));
  if(u.pathname==='/api/weather'&&req.method==='GET')return json(res,200,await weather.forecast());
+ if(u.pathname==='/api/news/feeds'&&req.method==='GET')return json(res,200,newsFeeds);
  if(u.pathname==='/api/news'&&req.method==='GET')return json(res,200,await news.headlines());
  if(u.pathname==='/api/photos/icloud'&&req.method==='POST')return json(res,200,await album.scan(true));
  if(u.pathname.startsWith('/icloud-photos/')&&req.method==='GET'){const photo=await album.read(u.pathname.slice(15));res.writeHead(200,{'Content-Type':photo.type,'X-Content-Type-Options':'nosniff','Cache-Control':'private, max-age=300'});return res.end(photo.body);}

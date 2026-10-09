@@ -1,0 +1,16 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import {Weather} from '../lib/weather.mjs';
+async function service(t,api='auto'){const data=await fs.mkdtemp(path.join(os.tmpdir(),'homeboard-weather-'));t.after(()=>fs.rm(data,{recursive:true,force:true}));const weather=new Weather(data,()=>({weatherEnabled:true,weatherApi:api,weatherLocation:{name:'London',lat:51.5,lon:-.1},weatherUnits:'metric',timezone:'Europe/London'}),()=>({weatherApiKey:'test-only-key'}));await weather.init();return {weather,data};}
+import {forecastIntervals as rows} from './helpers/weather-fixture.mjs';
+test('automatic weather falls back from subscription denial to five real aggregated forecast days',async t=>{
+ const {weather,data}=await service(t),requests=[];t.mock.method(globalThis,'fetch',async input=>{const u=new URL(input);assert.equal(u.searchParams.get('appid'),'test-only-key');requests.push(u.pathname);return u.pathname.includes('4.0')?new Response(JSON.stringify({message:'One Call subscription required'}),{status:401}):new Response(JSON.stringify({city:{timezone:3600},list:rows()}),{status:200});});
+ const r=await weather.forecast();assert.deepEqual(requests,['/data/4.0/onecall/timeline/1day','/data/2.5/forecast']);assert.equal(r.days.length,5);assert.equal(r.api,'basic');assert.equal(r.days[0].min,8);assert.equal(r.days[0].max,17);assert.equal(r.days[0].rain,40);assert.equal(r.timezoneOffset,3600);assert.equal(Object.values(JSON.parse(await fs.readFile(path.join(data,'weather.json'),'utf8')))[0].api,'basic');
+});
+test('basic weather avoids subscription endpoints and caches the five-day response',async t=>{
+ const {weather}=await service(t,'basic'),requests=[];t.mock.method(globalThis,'fetch',async input=>{const u=new URL(input);requests.push(u.pathname);assert.equal(u.pathname,'/data/2.5/forecast');return new Response(JSON.stringify({city:{timezone:3600},list:rows()}),{status:200});});const first=await weather.forecast();assert.equal(first.days.length,5);assert.deepEqual(await weather.forecast(),first);assert.equal(requests.length,1);
+});
+test('typing a full UK postcode uses postcode geocoding and returns a selectable location',async t=>{
+ const {weather}=await service(t);t.mock.method(globalThis,'fetch',async input=>{const u=new URL(input);assert.equal(u.pathname,'/geo/1.0/zip');assert.equal(u.searchParams.get('zip'),'W1A 1AA,GB');return new Response(JSON.stringify({name:'Westminster',country:'GB',lat:51.5,lon:-.1}),{status:200});});assert.deepEqual(await weather.locations('w1a 1aa'),[{name:'Westminster, GB',lat:51.5,lon:-.1}]);
+});
+test('replacing a weather key cannot reuse a successful response from the previous key',async t=>{
+ const {weather}=await service(t,'basic');let calls=0;t.mock.method(globalThis,'fetch',async input=>{calls++;return new URL(input).searchParams.get('appid')==='test-only-key'?new Response(JSON.stringify({city:{timezone:3600},list:rows()}),{status:200}):new Response(JSON.stringify({message:'invalid API key'}),{status:401});});assert.equal((await weather.forecast()).days.length,5);weather.secrets=()=>({weatherApiKey:'different-invalid-key'});await assert.rejects(weather.forecast(),/rejected the API key/);assert.equal(calls,2);
+});

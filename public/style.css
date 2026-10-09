@@ -103,3 +103,5 @@ body[data-theme=metro] .dashboard .clockCard{border:0}
 body[data-theme=metro] .dashboard .photo:after{z-index:3}
 body[data-theme=metro] .dashboard .photo button{z-index:4}
 body[data-theme=metro] .weatherWidget .empty{color:#fff;padding:12px 0;margin:0}
+
+body .dashboard .weatherWidget .forecastDays{grid-template-columns:repeat(var(--forecast-count,7),minmax(0,1fr))}.locationResults button[role=option]{text-align:left;justify-content:flex-start}.locationResults button[role=option]:focus{outline:3px solid var(--sage);outline-offset:2px}

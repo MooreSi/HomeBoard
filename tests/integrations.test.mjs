@@ -61,3 +61,6 @@ test('calendar selections reach each provider event endpoint',async t=>{
 test('Google sign-in uses the HomeBoard browser session cookie',async t=>{
  const a=await app(t,{fake:true});await a.post('/api/settings',{googleClientId:'fake-client',googleClientSecret:'fake-secret'});const response=await a.post('/api/calendar/google/connect',{});assert.equal(response.status,200);assert.match(response.headers.get('set-cookie'),/^homeboard_oauth=/);
 });
+test('legacy Microsoft event requests include cancellation flags and hide cancelled appointments',async t=>{
+ const a=await app(t,{fake:true});await microsoft(a);await fs.writeFile(path.join(a.data,'provider-control.json'),JSON.stringify({cancelMicrosoft:true}));const r=await a.json(range);assert.equal(r.events.length,1);assert.equal(r.events[0].id,'microsoft:default:ms-all-day');
+});

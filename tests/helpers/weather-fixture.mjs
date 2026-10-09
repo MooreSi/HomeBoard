@@ -1,0 +1,1 @@
+export const forecastIntervals=()=>Array.from({length:40},(_,i)=>({dt:Date.parse('2026-10-09T00:00:00Z')/1000+i*10800,main:{temp_min:8+i%8,temp_max:10+i%8,humidity:75},pop:.4,wind:{speed:3},weather:[{id:800,description:'clear sky'}]}));
