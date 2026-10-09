@@ -1,0 +1,22 @@
+name: Checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm run verify
+      - run: docker compose build
+      - name: Test production image
+        run: |
+          docker compose run --rm --no-deps \
+            -v "$PWD/test.mjs:/app/test.mjs:ro" \
+            -v "$PWD/tests:/app/tests:ro" \
+            dashboard node --test test.mjs tests/server.test.mjs

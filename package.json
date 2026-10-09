@@ -1,0 +1,16 @@
+{
+  "name": "hearth-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test.mjs tests/*.test.mjs",
+    "check": "node --check server.mjs && node --check public/app.js && node --check test.mjs && node --check tests/server.test.mjs",
+    "verify": "npm run check && npm test",
+    "build": "docker compose build"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,7 @@
+.env
+data/*
+!data/.gitkeep
+node_modules/
+*.zip
+.DS_Store
+artifacts/

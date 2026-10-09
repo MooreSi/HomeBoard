@@ -1,0 +1,8 @@
+data
+.env
+.git
+node_modules
+*.zip
+docs
+.github
+artifacts

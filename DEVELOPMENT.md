@@ -1,0 +1,49 @@
+# Development and testing rules
+
+The authoritative Forex testing rules have been imported unchanged into
+[docs/testing/forex-gold](docs/testing/forex-gold/README.md). Read the protocol
+and test-review rules before changing behaviour. This file maps those rules to
+Dakboard's Node.js application; Forex's Python paths and trading-specific gates
+are source-repository examples, not runnable Dakboard commands.
+
+1. State expected behaviour from the requirement first. For behaviour changes,
+   write the smallest regression test, run it red for the expected reason,
+   implement the smallest fix, and run it green. Run the full suite before commit.
+2. Test observable behaviour with specific assertions. Cover success, rejection
+   and boundaries. Verify filesystem persistence for writes and deletions. Give
+   scanners negative controls and prove gates fail when their inputs are absent.
+3. Do not delete, skip, weaken or widen failing assertions to make a change pass.
+   Characterization tests preserve their contract when code moves.
+4. Keep each new test focused on a single behaviour. Use arrange/act/assert,
+   await asynchronous calls, assert errors explicitly, and avoid conditional
+   assertions. Use faithful fixtures and mock only external boundaries.
+5. Give each test fresh temporary data and an isolated local server port. Never
+   use personal calendars, credentials, photos, or Forex accounts in automation.
+   Pin calendar dates; do not depend on execution speed or import-time timestamps.
+6. Keep synthetic calendar appointments clearly labelled as demo data. Keep
+   secrets and cached personal data out of source control and browser responses.
+7. Keep tests under `tests/` named for their subject (`server.test.mjs`); the
+   ZIP's original API regression remains in `test.mjs` without weakened assertions.
+   Never run simultaneous full suites. No test-only production APIs.
+8. Run `npm run verify` (syntax plus full isolated API suite) before committing.
+   Run `npm run build` for the Docker image and smoke-test boot/static assets/API
+   after server or packaging changes. CI repeats syntax, tests and Docker build.
+9. Record checks and real results. Dakboard has no coverage ratchet yet; do not
+   claim Forex's coverage/architecture gates ran here. If one is introduced,
+   record and enforce its baseline without lowering it to bypass a failure.
+10. Before a release, verify day/week/month navigation, all-day/recurring events,
+    timezone/DST edges, cache behaviour, privacy masking, Microsoft consent
+    denial/expiry, portrait/landscape scrolling, photo upload/delete/restart
+    persistence and Docker restart. Safari/iPad, Chrome/Android and live Outlook
+    require explicit device/account verification; report anything unverified.
+
+## Commands
+
+- `npm start`: run locally on port 8080; set `PORT` and `DATA_DIR` if needed.
+- `npm run verify`: JavaScript syntax checks and all automated tests (Node 22+).
+- `npm run build`: build the production container with Docker Compose.
+- `docker compose up -d`: run the built dashboard on port 8080.
+
+Node needs no npm dependencies or compilation step. Docker produces the runnable
+build. `npm start` does not load `.env`; Docker Compose reads it. For direct Node
+execution set environment variables explicitly or use `node --env-file=.env server.mjs`.

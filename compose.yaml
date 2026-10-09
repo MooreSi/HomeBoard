@@ -1,0 +1,14 @@
+services:
+  dashboard:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID:-}
+      DATA_DIR: /app/data
+      TZ: Europe/London
+    volumes:
+      - dashboard-data:/app/data
+    restart: unless-stopped
+volumes:
+  dashboard-data:
