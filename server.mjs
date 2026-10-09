@@ -10,8 +10,10 @@ import {Photos} from './lib/photos.mjs';
 import {Weather} from './lib/weather.mjs';
 import {ICloudAlbum,albumToken} from './lib/icloud.mjs';
 import {publicURL} from './lib/http.mjs';
+import {updateRequest} from './lib/update-channel.mjs';
 import {News} from './lib/news.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url)),data=path.resolve(process.env.DATA_DIR||path.join(root,'data'));
+const packageInfo=JSON.parse(await fs.readFile(path.join(root,'package.json'),'utf8'));
 await fs.mkdir(path.join(data,'photos'),{recursive:true});
 let settings={...defaults,...await readJSON(data,'settings.json',{})};
 if(!themes.some(theme=>theme.id===settings.theme)){settings.theme=defaults.theme;await saveJSON(data,'settings.json',settings);}
@@ -42,6 +44,8 @@ async function update(patch){const nextSecrets={...secrets},clean={...patch};for
 const server=http.createServer(async(req,res)=>{try{
  const u=new URL(req.url,'http://localhost');
  if(req.method==='POST'&&req.headers.origin&&new URL(req.headers.origin).host!==req.headers.host)return json(res,403,{error:'Cross-origin request rejected'});
+ if(u.pathname==='/api/update/status'&&req.method==='GET')return json(res,200,await updateRequest('status'));
+ if(['/api/update/check','/api/update/install'].includes(u.pathname)&&req.method==='POST'){if(req.headers['content-type']!=='application/json')throw Error('Update requests require application/json');return json(res,u.pathname.endsWith('/install')?202:200,await updateRequest(u.pathname.endsWith('/install')?'install':'check'));}
  if(u.pathname==='/api/settings'&&req.method==='GET')return json(res,200,publicSettings());
  if(u.pathname==='/api/settings'&&req.method==='POST')return json(res,200,await update(await payload(req)));
  if(u.pathname==='/api/themes'&&req.method==='GET')return json(res,200,themes);
@@ -65,7 +69,7 @@ const server=http.createServer(async(req,res)=>{try{
  if(u.pathname.startsWith('/folder-photos/')&&req.method==='GET'){const photo=await photos.read(u.pathname.slice(15));res.writeHead(200,{'Content-Type':photo.type,'X-Content-Type-Options':'nosniff','Cache-Control':'no-cache'});return res.end(photo.body);}
  if(u.pathname==='/api/photos'&&req.method==='POST'){const b=await body(req);if(b[0]!==0xff||b[1]!==0xd8)throw Error('Upload a JPEG image');const name=crypto.randomUUID()+'.jpg';await fs.writeFile(path.join(data,'photos',name),b,{mode:0o600});return json(res,201,{url:'/photos/'+name});}
  if(u.pathname==='/api/photos/delete'&&req.method==='POST'){const {url}=await payload(req);if(!/^\/photos\/[a-f0-9-]+\.jpg$/.test(url))throw Error('Invalid photo (folder photos are read-only)');await fs.rm(path.join(data,url.slice(1)),{force:true});return json(res,200,{ok:true});}
- if(u.pathname==='/api/system'&&req.method==='GET'){const port=server.address().port;return json(res,200,{version:'0.3.0',urls:[...new Set([`http://${req.headers.host||'localhost:'+port}`,...(process.env.LAN_URLS?process.env.LAN_URLS.split(',').filter(x=>/^https?:\/\/[^\s]+$/.test(x)):Object.values(os.networkInterfaces()).flat().filter(x=>x&&!x.internal&&x.family==='IPv4').map(x=>`http://${x.address}:${port}`))])]});}
+ if(u.pathname==='/api/system'&&req.method==='GET'){const port=server.address().port;return json(res,200,{version:packageInfo.version,commit:process.env.HOMEBOARD_COMMIT||null,urls:[...new Set([`http://${req.headers.host||'localhost:'+port}`,...(process.env.LAN_URLS?process.env.LAN_URLS.split(',').filter(x=>/^https?:\/\/[^\s]+$/.test(x)):Object.values(os.networkInterfaces()).flat().filter(x=>x&&!x.internal&&x.family==='IPv4').map(x=>`http://${x.address}:${port}`))])]});}
  if(u.pathname.startsWith('/api/'))return json(res,req.method==='GET'?404:405,{error:'Unknown API route or method'});
  if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});
  const isPhoto=u.pathname.startsWith('/photos/'),base=isPhoto?data:path.join(root,'public');
@@ -76,4 +80,4 @@ const server=http.createServer(async(req,res)=>{try{
  const b=await fs.readFile(file),ext=path.extname(file),types={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.svg':'image/svg+xml','.jpg':'image/jpeg'};
  res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'self'"});res.end(b);
  }catch(e){json(res,e.code==='ENOENT'?404:400,{error:e.code==='ENOENT'?'Not found':e.message});}});
-server.listen(Number(process.env.PORT||8080),process.env.HOST||'0.0.0.0',()=>{console.log('HomeBoard listening on port '+server.address().port);});
+server.listen(Number(process.env.PORT||8080),process.env.HOST||'0.0.0.0',()=>{console.log('HomeBoard listening on port '+server.address().port);if(process.send)process.send({type:'ready',port:server.address().port});});

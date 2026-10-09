@@ -42,5 +42,5 @@ Read the [HomeBoard testing protocol and review rules](docs/testing/homeboard/RE
 
 Run `npm ci` after cloning. Runtime dependencies are the XML feed parser and
 Undici for DNS-validated outbound feed requests. No compilation step is needed.
-Docker produces the runnable build. `npm start` does not load `.env`; Docker Compose reads it. For direct Node
-execution set environment variables explicitly or use `node --env-file=.env server.mjs`.
+Docker produces the runnable build. `npm start` launches the managed update supervisor. `npm start` does not load `.env`; Docker Compose reads it. For direct Node
+execution set environment variables explicitly or use `node --env-file=.env scripts/runner.mjs`.

@@ -15,6 +15,7 @@ const source = fileURLToPath(new URL('../', import.meta.url));
 test('dashboard assets are served from a project directory containing spaces', { timeout: 10000 }, async t => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'homeboard project '));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
+  await fs.copyFile(path.join(source, 'package.json'), path.join(root, 'package.json'));
   await fs.copyFile(path.join(source, 'server.mjs'), path.join(root, 'server.mjs'));
   await fs.cp(path.join(source, 'lib'), path.join(root, 'lib'), { recursive: true });
   await fs.symlink(path.join(source, 'node_modules'), path.join(root, 'node_modules'), 'dir');

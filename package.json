@@ -1,22 +1,23 @@
 {
   "name": "homeboard",
-  "version": "0.3.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.mjs",
+    "start": "node scripts/runner.mjs",
     "test": "node --test test.mjs tests/*.test.mjs",
     "check": "node scripts/check.mjs",
     "verify": "npm run check && npm test",
-    "build": "docker compose build",
+    "build": "node scripts/build.mjs",
     "setup": "node scripts/setup.mjs"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.19.0"
   },
   "dependencies": {
     "fast-xml-parser": "^5.11.2",
     "node-ical": "^0.27.3",
     "undici": "^8.11.2"
-  }
+  },
+  "license": "MIT"
 }

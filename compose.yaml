@@ -1,7 +1,10 @@
 name: homeboard
 services:
   dashboard:
-    build: .
+    build:
+      context: .
+      args:
+        HOMEBOARD_COMMIT: ${HOMEBOARD_BUILD_COMMIT:-unknown}
     ports:
       - "${DASHBOARD_PORT:-8080}:8080"
     environment:

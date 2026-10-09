@@ -29,6 +29,9 @@ ip link show "$bridge" >/dev/null || { echo 'Selected bridge does not exist' >&2
 pvesm path "$template" >/dev/null
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
+# Record provenance when packing a Git checkout; this travels without .git.
+source_commit=$(git -C "$root" rev-parse HEAD 2>/dev/null || true)
+if [[ "$source_commit" =~ ^[a-f0-9]{40}$ ]]; then printf '{"commit":"%s"}\n' "$source_commit" > "$root/build-info.json"; fi
 # Copy only app source, never credentials, photos, archives or local Git history.
 tar --exclude=.git --exclude=node_modules --exclude=data --exclude=.env --exclude=artifacts --exclude='*.zip' -C "$root" -czf "$work/homeboard.tar.gz" .
 pct create "$ctid" "$template" --hostname homeboard-dashboard --unprivileged 1 --cores 1 --memory 768 --swap 256 --rootfs "$storage:6" --onboot 1 --net0 "name=eth0,bridge=$bridge,ip=dhcp,ip6=auto,firewall=1"
@@ -48,7 +51,7 @@ IN ACCEPT -source 172.16.0.0/12 -p tcp -dport $port
 IN ACCEPT -source 192.168.0.0/16 -p tcp -dport $port
 RULES
 pct start "$ctid"
-pct exec "$ctid" -- bash -c 'apt-get update && apt-get install -y ca-certificates curl xz-utils'
+pct exec "$ctid" -- bash -c 'apt-get update && apt-get install -y ca-certificates curl xz-utils git'
 pct exec "$ctid" -- mkdir -p /opt/homeboard
 pct push "$ctid" "$work/homeboard.tar.gz" /tmp/homeboard.tar.gz
 pct exec "$ctid" -- bash -c 'tar -xzf /tmp/homeboard.tar.gz -C /opt/homeboard && rm /tmp/homeboard.tar.gz && bash /opt/homeboard/scripts/install-node.sh'

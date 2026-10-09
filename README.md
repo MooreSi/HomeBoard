@@ -5,9 +5,19 @@ Google calendars, sixteen themes, a photo slideshow, OpenWeather forecasts and R
 Open `/` for the display and `/settings` to configure it. Settings are shared
 across displays and persist on the server. The dashboard has no upload controls.
 
+## Screenshots
+
+Screenshots use an isolated demo calendar, without personal calendar data or photos.
+
+![Compact weekly dashboard and RSS news ticker](docs/screenshots/dashboard.png)
+
+![Tide theme with a three-week calendar and news ticker](docs/screenshots/tide.png)
+
+![Settings update controls and version information](docs/screenshots/updates.png)
+
 ## Installation
 
-Clone this repository and open a terminal in its folder. Node 22+ is needed for
+Clone this repository and open a terminal in its folder. Node 22.19+ (Node 24 recommended) is needed for
 the setup CLI; Docker Desktop/Engine is needed for the Docker option. Folder
 names containing spaces are supported. No npm compilation step is needed.
 
@@ -49,7 +59,7 @@ npm run setup -- docker --photos "/Users/you/Pictures/HomeBoard Photos"
 In photo settings choose `/apple-photos` and the Folder or combined source.
 The installer sets the host port and LAN URLs, builds and starts the container,
 and checks readiness. Photo uploads, credentials, caches and preferences persist
-in the `dashboard-data` named volume. Folder originals are mounted read-only.
+in the `homeboard-data` named volume. Folder originals are mounted read-only.
 The image runs as the `node` user and includes a healthcheck.
 
 If Node is not installed on the Docker host, Docker Compose works directly:
@@ -205,7 +215,8 @@ appointments retain their calendar dates.
 
 Toggle RSS/Atom headlines, enter a public feed URL and choose a headline count.
 Feeds are fetched on the server, cached, and rendered as safe text with HTTP(S)
-links. Local/private-network destinations, unsafe redirects, XML entity/DOCTYPE
+links in a scrolling bottom ticker. Pause it with its button; keyboard focus and
+hover also pause movement. Reduced-motion preferences switch to static scrolling. Local/private-network destinations, unsafe redirects, XML entity/DOCTYPE
 payloads and oversized feeds are rejected.
 
 Extra features inspired by other dashboards: selected-calendar filtering,
@@ -229,7 +240,7 @@ without details about that network. Settings lists available addresses. Test fro
 a second device and reserve addresses in DHCP to keep display URLs stable.
 Environment values in `.env` take precedence on restart; when managing credentials
 in settings, leave the corresponding environment variables empty. `npm start`
-does not load `.env`; use the installer or `node --env-file=.env server.mjs`.
+does not load `.env`; use the installer or `node --env-file=.env scripts/runner.mjs`.
 
 ## Development and validation
 
@@ -244,7 +255,7 @@ boundaries. The original ZIP regression assertions remain intact. The
 [HomeBoard testing rules](docs/testing/homeboard/README.md) define the protocol,
 review requirements and verification checks. See [DEVELOPMENT.md](DEVELOPMENT.md)
 for the Node.js workflow.
-[Validation record](docs/testing/VALIDATION-v0.2.md) records actual checks and limits.
+[Release validation record](docs/testing/VALIDATION-release-v0.2.md) records actual checks and limits.
 GitHub Actions installs dependencies, checks syntax, runs the entire suite,
 checks installer shell syntax, builds Docker and repeats tests in the image.
 
@@ -254,7 +265,7 @@ accounts/devices/host. Automated provider fixtures establish request/response
 wiring and failure behaviour; they do not establish successful live authentication.
 
 
-## Easier connections in v0.3
+## Calendar and photo connections
 
 For Outlook.com, use **Settings → Calendar connections → Outlook calendar link**.
 In Outlook on the web open Settings → Calendar → Shared calendars → Publish a
@@ -294,3 +305,41 @@ Six new themes add gradient wall calendars, photo/weather rails, glass panels,
 an editorial planner and a portrait photo layout. Selecting a new style also
 selects its suggested calendar view; you can override that view before saving.
 The rolling three-week view crosses month boundaries and advances by a week.
+
+
+## Automatic updates
+
+Open **Settings → Updates & about → Check for updates**. HomeBoard compares its
+running Git commit with `MooreSi/HomeBoard`'s `main` branch. If a newer commit is
+available, **Update & restart** downloads it into a separate version directory,
+installs dependencies and runs verification before switching. It restarts the
+application and update controller automatically. A failed verification keeps the
+current process running; a failed boot restores the previous code and JSON
+preferences/credentials from a private backup. Uploaded photos stay in place.
+
+Use `npm start` or the installer to start the managed launcher. Direct
+`node server.mjs` starts show a clear setup message instead of offering a restart
+that cannot work. Source changes in a native checkout block installation rather
+than overwriting your work. One managed instance should own each data directory.
+
+Git is included in the Docker image and LXC bootstrap. The local installer checks
+Git and installs it on Debian/Ubuntu, or via Homebrew when available on macOS.
+Without Homebrew, install Apple's Xcode Command Line Tools first. GitHub access
+uses the public repository and requires no GitHub token. Docker updates run inside
+the container; the Docker socket is not mounted. Installed versions, update
+state and backups live under `data/updates`, so they survive container recreation.
+A newer image/base checkout takes precedence when you explicitly reinstall.
+
+Updates cover application source and npm dependencies. A release requiring a
+newer Node runtime stops with an actionable message; run the installer/rebuild
+Docker to upgrade the runtime and OS packages. Offline GitHub access also leaves
+the current app running and reports the failure. Updates follow `main`, not just
+release tags, and run only when you click the install button.
+
+## Release and licence
+
+The public release is **[HomeBoard v0.2](https://github.com/MooreSi/HomeBoard/releases/tag/v0.2)**.
+Earlier validation files retain their development-build labels. HomeBoard is
+licensed under the [MIT licence](LICENSE), copyright © 2026 Simon Moore.
+Third-party npm dependencies retain their own licences in their installed
+packages, including node-ical (Apache-2.0), Undici and fast-xml-parser (MIT).
