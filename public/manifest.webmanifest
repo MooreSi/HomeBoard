@@ -1,8 +1,8 @@
 {
-  "id": "/family",
+  "id": "/",
   "name": "HomeBoard",
   "short_name": "HomeBoard",
-  "start_url": "/family",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f6f4ee",
