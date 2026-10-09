@@ -44,6 +44,7 @@ are source-repository examples, not runnable Dakboard commands.
 - `npm run build`: build the production container with Docker Compose.
 - `docker compose up -d`: run the built dashboard on port 8080.
 
-Node needs no npm dependencies or compilation step. Docker produces the runnable
-build. `npm start` does not load `.env`; Docker Compose reads it. For direct Node
+Run `npm ci` after cloning. Runtime dependencies are the XML feed parser and
+Undici for DNS-validated outbound feed requests. No compilation step is needed.
+Docker produces the runnable build. `npm start` does not load `.env`; Docker Compose reads it. For direct Node
 execution set environment variables explicitly or use `node --env-file=.env server.mjs`.

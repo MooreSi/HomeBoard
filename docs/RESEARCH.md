@@ -1,0 +1,44 @@
+# Research and inspiration — 9 October 2026
+
+Google Images was searched for “dakboard screen themes” in the browser. Its
+results included DAKboard's template gallery, community templates, monthly
+calendars, photo-backed portrait screens, dark information hubs and seasonal
+screens. We inspected the result thumbnails. This supplies visual inspiration,
+not usage counts; no public top-ten popularity ranking was found.
+
+The ten themes use original CSS, native fonts and CSS-generated previews.
+Hearth/Minimal: light family planning; Midnight/Chalkboard: high-contrast displays;
+Coastal/Lavender: soft accent planners; Forest/Sunset: photo backdrops;
+Aurora: dark information dashboard; Gallery: photo-forward layout.
+
+Primary project sources:
+
+- [DAKboard overview](https://dakboard.com/site): modular calendars/photos/weather/news.
+- [DAKboard community setups](https://blog.dakboard.com/think-outside-the-grid-customizing-your-dakboard/): monthly and agenda views, varied visual styles.
+- [DAKboard calendar settings](https://dakboard.freshdesk.com/support/solutions/articles/35000099436): calendar colours, high contrast, display choices.
+- [MagicMirror default modules](https://docs.magicmirror.builders/modules/introduction.html): separate weather, calendar and news modules.
+- [MagicMirror calendar module](https://github.com/MagicMirrorOrg/MagicMirror-Documentation/blob/master/modules/calendar.md): multiple calendars and source selection.
+- [magicmirror-home-dashcalendar](https://github.com/unnuslatif/magicmirror-home-dashcalendar): configurable themes, slideshow and guided installer.
+
+Adopted useful ideas: shared remote settings, calendar selection, accessible
+light/dark palettes, slideshow options, module toggles, scheduled dimming,
+fullscreen, cached-data indicators and preference export/import. These are
+original implementations; no project source code/assets were copied.
+
+Integration references:
+
+- [Microsoft OAuth device flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-device-code)
+- [Microsoft calendarView](https://learn.microsoft.com/en-us/graph/api/calendar-list-calendarview?view=graph-rest-1.0)
+- [Google OAuth web server flow](https://developers.google.com/identity/protocols/oauth2/web-server)
+- [Google events list](https://developers.google.com/workspace/calendar/api/v3/reference/events/list)
+- [Apple Photos export](https://support.apple.com/en-kg/guide/photos/pht6e157c5f/mac)
+- [OpenWeather One Call 4.0](https://openweathermap.org/api/one-call-4)
+- [OpenWeather One Call 3.0](https://openweathermap.org/api/one-call-3)
+- [OpenWeather pricing](https://openweathermap.org/price)
+- [Proxmox container documentation](https://pve.proxmox.com/pve-docs/pct.1.html)
+
+Apple folder access deliberately uses local/mounted files rather than pretending
+the app has a supported Apple-account OAuth integration. Google remote redirects
+require approved HTTPS domains or a host-side localhost tunnel. OpenWeather weekly
+forecasts need One Call access. These requirements are surfaced in settings and
+README so configuration and live verification can be completed honestly.

@@ -16,6 +16,8 @@ test('dashboard assets are served from a project directory containing spaces', {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dakboard project '));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
   await fs.copyFile(path.join(source, 'server.mjs'), path.join(root, 'server.mjs'));
+  await fs.cp(path.join(source, 'lib'), path.join(root, 'lib'), { recursive: true });
+  await fs.symlink(path.join(source, 'node_modules'), path.join(root, 'node_modules'), 'dir');
   await fs.cp(path.join(source, 'public'), path.join(root, 'public'), { recursive: true });
   // A separate ephemeral socket reserves a port for this process, matching the
   // original regression harness without changing the production startup API.

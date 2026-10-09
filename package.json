@@ -1,16 +1,21 @@
 {
   "name": "hearth-dashboard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
     "test": "node --test test.mjs tests/*.test.mjs",
-    "check": "node --check server.mjs && node --check public/app.js && node --check test.mjs && node --check tests/server.test.mjs",
+    "check": "node scripts/check.mjs",
     "verify": "npm run check && npm test",
-    "build": "docker compose build"
+    "build": "docker compose build",
+    "setup": "node scripts/setup.mjs"
   },
   "engines": {
     "node": ">=22"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.11.2",
+    "undici": "^8.11.2"
   }
 }

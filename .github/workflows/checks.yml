@@ -12,11 +12,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: npm
+      - run: npm ci
       - run: npm run verify
+      - run: bash -n scripts/install-lxc.sh scripts/install-node.sh
       - run: docker compose build
       - name: Test production image
         run: |
           docker compose run --rm --no-deps \
             -v "$PWD/test.mjs:/app/test.mjs:ro" \
             -v "$PWD/tests:/app/tests:ro" \
-            dashboard node --test test.mjs tests/server.test.mjs
+            dashboard npm run verify
