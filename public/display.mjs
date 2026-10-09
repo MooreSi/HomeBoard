@@ -12,3 +12,5 @@ export async function api(url,options){const response=await fetch(url,options);c
 export const post=(url,value={})=>api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value)});
 export function applyTheme(theme){document.body.dataset.theme=theme;}
 export function weatherIcon(code){if(code<300)return '⛈';if(code<600)return '☂';if(code<700)return '❄';if(code<800)return '≋';if(code===800)return '☀';return '☁';}
+
+export function nextCalendarPage(cursor,view){if(view==='month'){const d=new Date(cursor+'T12:00:00Z');return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1)).toISOString().slice(0,10);}return addDays(cursor,view==='agenda'?14:view==='week'?7:view==='rolling'?21:1);}

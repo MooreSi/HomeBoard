@@ -1,8 +1,17 @@
 # HomeBoard
 
-A self-hosted family dashboard with a separate settings page, read-only Calendar Links from Outlook, Google or Apple calendars, sixteen themes, a photo slideshow, OpenWeather forecasts and RSS news.
+A self-hosted family dashboard with a separate settings page, read-only Calendar Links from Outlook, Google or Apple calendars, sixteen themes plus a visual Custom Design editor, a photo slideshow, OpenWeather forecasts and RSS news.
 Open `/` for the display and `/settings` to configure it. Settings are shared
 across displays and persist on the server. The dashboard has no upload controls.
+
+## v0.21
+
+- Continuous calendar browsing: scroll or select **Continue to later dates** in Upcoming, Day, Week, Month and 3 weeks. Each page fetches its own dates, including recurring appointments and month-grid overflow days. Today and previous/next navigation remain available.
+- **Settings → Custom Design**: drag or use arrow keys to position five panels; Shift + arrows resizes them. Set exact grid dimensions, visibility and layers, with undo/redo and three starting layouts.
+- Choose body/heading fonts, sizes, weight, spacing, colours, borders, shadows, corner radius, opacity and solid/gradient/photo backgrounds. Check contrast and preview the actual dashboard before saving. Portrait displays stack panels.
+- Export/import named HomeBoard theme JSON files to share styles. Imports are validated and previewed before saving. Exports contain no calendar links, credentials, photos or personal preferences.
+
+See [design format and guide](docs/CUSTOM-DESIGN.md) and [release notes](CHANGELOG.md).
 
 ## Screenshots
 
@@ -14,6 +23,8 @@ The Metro image uses an original landscape illustration and a labelled synthetic
 ![Metro full-screen photo rail, upcoming agenda and weather overlay](docs/screenshots/metro.jpg)
 
 ![Tide theme with a three-week calendar and news ticker](docs/screenshots/tide.png)
+
+![Custom Design placement editor](docs/screenshots/custom-design.jpg)
 
 ![Settings update controls and version information](docs/screenshots/updates.png)
 

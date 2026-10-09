@@ -1,7 +1,7 @@
 import {esc,onDay,addDays,range,stamp} from './display.mjs';
 // Calendar-day grouping retains all-day dates and local DST boundaries.
 export function agendaHTML(events,cursor,pref){
- const [start,end]=range(cursor,'agenda'),days=[];
+ const [start,defaultEnd]=range(cursor,'agenda'),end=pref.end||defaultEnd,days=[];
  for(let key=start;key<end;key=addDays(key,1)){
   const items=onDay(events,key,pref.timezone).filter(e=>key!==pref.today||!pref.now||e.isAllDay||stamp(e,'end')>new Date(pref.now));if(!items.length)continue;
   const name=key===pref.today?'Today':key===addDays(pref.today,1)?'Tomorrow':new Date(key+'T12:00:00Z').toLocaleDateString('en-GB',{timeZone:'UTC',weekday:'long'});
