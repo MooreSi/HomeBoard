@@ -59,3 +59,9 @@ information layout. Glasshouse, Folio and Portrait extend these with transparent
 panels, editorial paper typography and a vertical photo-first composition.
 These are original CSS layouts; no third-party screenshots or proprietary
 artwork are shipped as themes. The favicon combines a home and calendar.
+
+The exact application ID in the reported Microsoft error matches the Azure
+portal case discussed by Microsoft staff in [this support record](https://learn.microsoft.com/en-us/answers/questions/1346227/the-selected-user-account-does-not-exist-in-the-mi).
+Combined with the absent HomeBoard client ID, this suggests the user was blocked
+at the Azure/Entra registration step. The ICS option avoids that portal; the
+personal-account audience guidance applies once a HomeBoard app is registered.

@@ -31,7 +31,8 @@
   retained its three-week view. Tide rendered three rows over the gradient.
   Portrait at 768 × 1024 had document width equal to viewport width (768), with
   42 month cells. Preview data was isolated; user display preferences retained.
-- Docker replacement preserved the existing volume and configured BBC feed.
+- Docker replacement and a subsequent restart preserved all public display
+  preferences and the configured BBC feed. GitHub CI passed the full checks.
 
 ## Testing rules
 
@@ -43,9 +44,11 @@ repository was modified.
 
 ## Live limits
 
-Microsoft direct sign-in remains disconnected: the reported registration must
-support personal Microsoft accounts and public client flows, or a published
-Outlook ICS link is needed. No Microsoft client ID is currently saved. Automated
+Microsoft direct sign-in remains disconnected. The exact reported application
+ID matches Microsoft's Azure portal support case, suggesting portal access
+blocked the registration setup step. A HomeBoard registration must support
+personal Microsoft accounts and public client flows; alternatively a published
+Outlook ICS link avoids Azure setup. No Microsoft client ID is currently saved. Automated
 fixtures verify authenticated flows and ICS recurrence/exclusions/privacy;
 no claim of live Microsoft account connection is made.
 

@@ -270,6 +270,13 @@ Personal Microsoft accounts in HomeBoard for Outlook.com/Hotmail. A work-only or
 single-tenant registration cannot become personal-account compatible just by
 changing the local tenant dropdown. Do not use another service's client ID.
 
+If the error names application `74658136-14ec-4630-ad9b-26e160ff0fc6`,
+[Microsoft identifies the same failure during Azure portal access](https://learn.microsoft.com/en-us/answers/questions/1346227/the-selected-user-account-does-not-exist-in-the-mi).
+That points to the Azure/Entra setup step, before HomeBoard authentication. Use
+your own accessible Azure tenant/account for registration, or choose the Outlook
+ICS-link option, which does not require the Azure portal.
+
+
 For Apple Photos, enable **Public Website** on a Shared Album and paste its
 `https://www.icloud.com/sharedalbum/#…` URL into Settings → Photos. Select
 Apple iCloud shared album, or All connected photo sources. HomeBoard checks the
