@@ -58,3 +58,6 @@ test('provider outages retain cached appointments and explicitly report stale da
 test('calendar selections reach each provider event endpoint',async t=>{
  const a=await app(t,{fake:true});await microsoft(a);assert.equal((await a.json('/api/calendar/microsoft/list'))[0].id,'work');await a.post('/api/settings',{microsoftCalendarIds:['work']});assert.equal((await a.json(range)).events.length,2);const calls=(await fs.readFile(path.join(a.data,'provider-requests.jsonl'),'utf8')).trim().split('\n').map(x=>JSON.parse(x));assert.ok(calls.some(x=>x.url.endsWith('/calendars/work/calendarView')));
 });
+test('Google sign-in uses the HomeBoard browser session cookie',async t=>{
+ const a=await app(t,{fake:true});await a.post('/api/settings',{googleClientId:'fake-client',googleClientSecret:'fake-secret'});const response=await a.post('/api/calendar/google/connect',{});assert.equal(response.status,200);assert.match(response.headers.get('set-cookie'),/^homeboard_oauth=/);
+});

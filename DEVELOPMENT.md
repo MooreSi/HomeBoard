@@ -3,8 +3,8 @@
 The authoritative Forex testing rules have been imported unchanged into
 [docs/testing/forex-gold](docs/testing/forex-gold/README.md). Read the protocol
 and test-review rules before changing behaviour. This file maps those rules to
-Dakboard's Node.js application; Forex's Python paths and trading-specific gates
-are source-repository examples, not runnable Dakboard commands.
+HomeBoard's Node.js application; Forex's Python paths and trading-specific gates
+are source-repository examples, not runnable HomeBoard commands.
 
 1. State expected behaviour from the requirement first. For behaviour changes,
    write the smallest regression test, run it red for the expected reason,
@@ -28,7 +28,7 @@ are source-repository examples, not runnable Dakboard commands.
 8. Run `npm run verify` (syntax plus full isolated API suite) before committing.
    Run `npm run build` for the Docker image and smoke-test boot/static assets/API
    after server or packaging changes. CI repeats syntax, tests and Docker build.
-9. Record checks and real results. Dakboard has no coverage ratchet yet; do not
+9. Record checks and real results. HomeBoard has no coverage ratchet yet; do not
    claim Forex's coverage/architecture gates ran here. If one is introduced,
    record and enforce its baseline without lowering it to bypass a failure.
 10. Before a release, verify day/week/month navigation, all-day/recurring events,

@@ -49,3 +49,9 @@ test('Apple folder refuses symbolic links to files outside the source',async t=>
 test('reported LAN addresses use installer-supplied host addresses instead of container IPs',async t=>{
  const a=await app(t,{env:{LAN_URLS:'http://192.168.0.53:8080,http://192.168.5.2:8080'}});const s=await a.json('/api/system');assert.ok(s.urls.includes('http://192.168.0.53:8080'));assert.ok(s.urls.includes('http://192.168.5.2:8080'));
 });
+test('HomeBoard branding appears on the dashboard and settings page',async t=>{
+ const a=await app(t);assert.match(await(await a.request('/')).text(),/<title>HomeBoard ·/);assert.match(await(await a.request('/settings')).text(),/<title>HomeBoard ·/);
+});
+test('a retired theme identifier migrates to the HomeBoard default on startup',async t=>{
+ const a=await app(t);await fs.writeFile(path.join(a.data,'settings.json'),JSON.stringify({theme:'retired-default',name:'Family'}));await a.restart();const s=await a.json('/api/settings');assert.equal(s.theme,'homeboard');assert.equal(s.name,'Family');assert.equal(JSON.parse(await fs.readFile(path.join(a.data,'settings.json'),'utf8')).theme,'homeboard');
+});

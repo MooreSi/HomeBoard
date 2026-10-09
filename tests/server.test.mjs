@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 const source = fileURLToPath(new URL('../', import.meta.url));
 
 test('dashboard assets are served from a project directory containing spaces', { timeout: 10000 }, async t => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'dakboard project '));
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'homeboard project '));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
   await fs.copyFile(path.join(source, 'server.mjs'), path.join(root, 'server.mjs'));
   await fs.cp(path.join(source, 'lib'), path.join(root, 'lib'), { recursive: true });

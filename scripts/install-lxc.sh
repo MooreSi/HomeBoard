@@ -30,8 +30,8 @@ pvesm path "$template" >/dev/null
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 # Copy only app source, never credentials, photos, archives or local Git history.
-tar --exclude=.git --exclude=node_modules --exclude=data --exclude=.env --exclude=artifacts --exclude='*.zip' -C "$root" -czf "$work/hearth.tar.gz" .
-pct create "$ctid" "$template" --hostname hearth-dashboard --unprivileged 1 --cores 1 --memory 768 --swap 256 --rootfs "$storage:6" --onboot 1 --net0 "name=eth0,bridge=$bridge,ip=dhcp,ip6=auto,firewall=1"
+tar --exclude=.git --exclude=node_modules --exclude=data --exclude=.env --exclude=artifacts --exclude='*.zip' -C "$root" -czf "$work/homeboard.tar.gz" .
+pct create "$ctid" "$template" --hostname homeboard-dashboard --unprivileged 1 --cores 1 --memory 768 --swap 256 --rootfs "$storage:6" --onboot 1 --net0 "name=eth0,bridge=$bridge,ip=dhcp,ip6=auto,firewall=1"
 # Protect the new container while allowing dashboard traffic from private LANs.
 # Existing host network and firewall files are left in place.
 [ ! -e "/etc/pve/firewall/$ctid.fw" ] || { echo 'Firewall file already exists; inspect it before continuing' >&2; exit 1; }
@@ -49,9 +49,9 @@ IN ACCEPT -source 192.168.0.0/16 -p tcp -dport $port
 RULES
 pct start "$ctid"
 pct exec "$ctid" -- bash -c 'apt-get update && apt-get install -y ca-certificates curl xz-utils'
-pct exec "$ctid" -- mkdir -p /opt/hearth
-pct push "$ctid" "$work/hearth.tar.gz" /tmp/hearth.tar.gz
-pct exec "$ctid" -- bash -c 'tar -xzf /tmp/hearth.tar.gz -C /opt/hearth && rm /tmp/hearth.tar.gz && bash /opt/hearth/scripts/install-node.sh'
-pct exec "$ctid" -- node /opt/hearth/scripts/setup.mjs local --service --port "$port"
-echo "Container $ctid installed. Logs: pct exec $ctid -- journalctl -u hearth-dashboard"
+pct exec "$ctid" -- mkdir -p /opt/homeboard
+pct push "$ctid" "$work/homeboard.tar.gz" /tmp/homeboard.tar.gz
+pct exec "$ctid" -- bash -c 'tar -xzf /tmp/homeboard.tar.gz -C /opt/homeboard && rm /tmp/homeboard.tar.gz && bash /opt/homeboard/scripts/install-node.sh'
+pct exec "$ctid" -- node /opt/homeboard/scripts/setup.mjs local --service --port "$port"
+echo "Container $ctid installed. Logs: pct exec $ctid -- journalctl -u homeboard-dashboard"
 echo 'Reserve its DHCP address on your router so tablets keep the same URL.'

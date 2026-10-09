@@ -7,7 +7,7 @@ import {once} from 'node:events';
 import {fileURLToPath} from 'node:url';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 export async function app(t,{fake=false,env={}}={}) {
-  const data=await fs.mkdtemp(path.join(os.tmpdir(),'hearth-test-'));
+  const data=await fs.mkdtemp(path.join(os.tmpdir(),'homeboard-test-'));
   const probe=net.createServer();await new Promise(r=>probe.listen(0,'127.0.0.1',r));
   const port=probe.address().port;await new Promise(r=>probe.close(r));
   let child,exited;

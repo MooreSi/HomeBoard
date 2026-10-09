@@ -1,4 +1,4 @@
-# Hearth · Dakboard Clone
+# HomeBoard
 
 A self-hosted family dashboard with a separate settings page, Microsoft 365 and
 Google calendars, ten themes, a photo slideshow, OpenWeather forecasts and RSS news.
@@ -16,7 +16,7 @@ names containing spaces are supported. No npm compilation step is needed.
 ```bash
 npm run setup -- local
 # Choose another port or an Apple Photos export folder:
-npm run setup -- local --port 8090 --photos "/Users/you/Pictures/Hearth Photos"
+npm run setup -- local --port 8090 --photos "/Users/you/Pictures/HomeBoard Photos"
 ```
 
 The installer runs `npm ci`, creates a private `.env`, binds to `0.0.0.0`, checks
@@ -26,14 +26,14 @@ active UFW/firewalld gets a rule limited to connected local IPv4 subnets. The
 installer does not disable a firewall or configure router port forwarding.
 
 For a Linux boot service, put the checkout at a service-readable location such
-as `/opt/hearth` and run:
+as `/opt/homeboard` and run:
 
 ```bash
 sudo node scripts/setup.mjs local --service
-journalctl -u hearth-dashboard
+journalctl -u homeboard-dashboard
 ```
 
-This creates the unprivileged `hearth` service account and enables a systemd
+This creates the unprivileged `homeboard` service account and enables a systemd
 service. macOS foreground mode is supported; for automatic startup use Docker's
 restart policy and enable Docker Desktop at login. `--dry-run` prints a setup
 plan without changing files, firewall rules or starting services.
@@ -43,7 +43,7 @@ plan without changing files, firewall rules or starting services.
 ```bash
 npm run setup -- docker
 # With a host folder mounted read-only for photos:
-npm run setup -- docker --photos "/Users/you/Pictures/Hearth Photos"
+npm run setup -- docker --photos "/Users/you/Pictures/HomeBoard Photos"
 ```
 
 In photo settings choose `/apple-photos` and the Folder or combined source.
@@ -101,7 +101,7 @@ path in photo settings. Apple Photos needs a Mac to download/export photos first
 LXC cannot run the Mac Photos app. Log access:
 
 ```bash
-pct exec 120 -- journalctl -u hearth-dashboard
+pct exec 120 -- journalctl -u homeboard-dashboard
 ```
 
 The LXC script's syntax and plan are tested. Creating a real guest remains to be
@@ -157,7 +157,7 @@ only when no calendar account is connected and are labelled as demo.
 
 ### Themes
 
-Hearth, Midnight, Chalkboard, Coastal, Forest, Sunset, Minimal, Lavender, Aurora,
+HomeBoard, Midnight, Chalkboard, Coastal, Forest, Sunset, Minimal, Lavender, Aurora,
 and Gallery are original CSS themes with previews. They include light/dark,
 calendar-led, photo-backdrop and gallery layouts. Google Images and DAKboard's
 community gallery informed the styles; there is no publicly verifiable popularity

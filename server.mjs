@@ -12,6 +12,7 @@ import {News} from './lib/news.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url)),data=path.resolve(process.env.DATA_DIR||path.join(root,'data'));
 await fs.mkdir(path.join(data,'photos'),{recursive:true});
 let settings={...defaults,...await readJSON(data,'settings.json',{})};
+if(!themes.some(theme=>theme.id===settings.theme)){settings.theme=defaults.theme;await saveJSON(data,'settings.json',settings);}
 let secrets=await readJSON(data,'secrets.json',{});
 settings.microsoftClientId=process.env.MICROSOFT_CLIENT_ID||settings.microsoftClientId;
 settings.microsoftTenant=process.env.MICROSOFT_TENANT||settings.microsoftTenant;
@@ -46,7 +47,7 @@ const server=http.createServer(async(req,res)=>{try{
  if(['/api/poll','/api/calendar/microsoft/poll'].includes(u.pathname)&&req.method==='POST')return json(res,200,await calendars.pollMicrosoft());
  if(['/api/disconnect','/api/calendar/microsoft/disconnect'].includes(u.pathname)&&req.method==='POST'){await calendars.disconnect('microsoft');return json(res,200,{ok:true});}
  if(u.pathname==='/api/calendar/google/connect'&&req.method==='POST'){const result=calendars.connectGoogle();res.setHeader('Set-Cookie',result.cookie);return json(res,200,{url:result.url});}
- if(u.pathname==='/api/calendar/google/callback'&&req.method==='GET'){res.setHeader('Referrer-Policy','no-referrer');await calendars.callbackGoogle(u,req.headers.cookie);res.writeHead(303,{Location:'/settings?connected=google','Set-Cookie':'hearth_oauth=; HttpOnly; SameSite=Lax; Path=/api/calendar/google/callback; Max-Age=0'});return res.end();}
+ if(u.pathname==='/api/calendar/google/callback'&&req.method==='GET'){res.setHeader('Referrer-Policy','no-referrer');await calendars.callbackGoogle(u,req.headers.cookie);res.writeHead(303,{Location:'/settings?connected=google','Set-Cookie':'homeboard_oauth=; HttpOnly; SameSite=Lax; Path=/api/calendar/google/callback; Max-Age=0'});return res.end();}
  if(u.pathname==='/api/calendar/google/disconnect'&&req.method==='POST'){await calendars.disconnect('google');return json(res,200,{ok:true});}
  const calendarList=u.pathname.match(/^\/api\/calendar\/(microsoft|google)\/list$/);if(calendarList&&req.method==='GET')return json(res,200,await calendars.calendars(calendarList[1]));
  if(u.pathname==='/api/weather/locations'&&req.method==='GET')return json(res,200,await weather.locations(u.searchParams.get('q')));
@@ -69,4 +70,4 @@ const server=http.createServer(async(req,res)=>{try{
  const b=await fs.readFile(file),ext=path.extname(file),types={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.svg':'image/svg+xml','.jpg':'image/jpeg'};
  res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'self'"});res.end(b);
  }catch(e){json(res,e.code==='ENOENT'?404:400,{error:e.code==='ENOENT'?'Not found':e.message});}});
-server.listen(Number(process.env.PORT||8080),process.env.HOST||'0.0.0.0',()=>{console.log('Hearth listening on port '+server.address().port);});
+server.listen(Number(process.env.PORT||8080),process.env.HOST||'0.0.0.0',()=>{console.log('HomeBoard listening on port '+server.address().port);});

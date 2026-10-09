@@ -7,7 +7,7 @@ screens. We inspected the result thumbnails. This supplies visual inspiration,
 not usage counts; no public top-ten popularity ranking was found.
 
 The ten themes use original CSS, native fonts and CSS-generated previews.
-Hearth/Minimal: light family planning; Midnight/Chalkboard: high-contrast displays;
+HomeBoard/Minimal: light family planning; Midnight/Chalkboard: high-contrast displays;
 Coastal/Lavender: soft accent planners; Forest/Sunset: photo backdrops;
 Aurora: dark information dashboard; Gallery: photo-forward layout.
 

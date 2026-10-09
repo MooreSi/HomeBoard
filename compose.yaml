@@ -1,3 +1,4 @@
+name: homeboard
 services:
   dashboard:
     build: .
@@ -25,3 +26,4 @@ services:
     restart: unless-stopped
 volumes:
   dashboard-data:
+    name: homeboard-data

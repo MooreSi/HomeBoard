@@ -40,4 +40,4 @@ Live Outlook consent/token refresh/Graph pagination, recurrence/all-day data,
 DST boundaries, offline calendar caching, browser photo conversion/HEIC support,
 privacy controls and physical Safari/iPad or Chrome/Android behaviour remain
 unverified. No coverage baseline or Forex Python architecture gates ran here;
-those need Dakboard-specific implementations before being claimed.
+those need HomeBoard-specific implementations before being claimed.
