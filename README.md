@@ -8,8 +8,11 @@ across displays and persist on the server. The dashboard has no upload controls.
 ## Screenshots
 
 Screenshots use an isolated demo calendar, without personal calendar data or photos.
+The Metro image uses an original landscape illustration and a labelled synthetic forecast.
 
 ![Compact weekly dashboard and RSS news ticker](docs/screenshots/dashboard.png)
+
+![Metro full-screen photo rail, upcoming agenda and weather overlay](docs/screenshots/metro.jpg)
 
 ![Tide theme with a three-week calendar and news ticker](docs/screenshots/tide.png)
 
@@ -170,7 +173,14 @@ only when no calendar account is connected and are labelled as demo.
 Tide, Observatory, Glasshouse, Folio, Metro and Portrait add wall-display layouts
 to the original HomeBoard, Midnight, Chalkboard, Coastal, Forest, Sunset, Minimal, Lavender, Aurora,
 and Gallery are original CSS themes with previews. They include light/dark,
-calendar-led, photo-backdrop and gallery layouts. Google Images and DAKboard's
+calendar-led, photo-backdrop and gallery layouts. **Metro** fills the viewport with
+a 38% photo rail on the left, a light Roboto clock with seconds, a seven-day
+weather overlay and a black upcoming agenda on the right. Its 14-day agenda
+groups appointments by day, shows start/end times and locations, masks private
+details and omits finished appointments today. The RSS ticker sits below the
+agenda. Portrait screens stack the photo rail above the calendar. Select Metro
+and save to apply its suggested Upcoming view; other calendar views still work.
+Roboto is served locally under its [SIL Open Font License](public/fonts/OFL.txt). Google Images and DAKboard's
 community gallery informed the styles; there is no publicly verifiable popularity
 ranking, so these are **ten curated starting themes**, not a claimed statistical
 "top ten". No third-party screen images or proprietary theme code are copied.
@@ -255,7 +265,8 @@ boundaries. The original ZIP regression assertions remain intact. The
 [HomeBoard testing rules](docs/testing/homeboard/README.md) define the protocol,
 review requirements and verification checks. See [DEVELOPMENT.md](DEVELOPMENT.md)
 for the Node.js workflow.
-[Release validation record](docs/testing/VALIDATION-release-v0.2.md) records actual checks and limits.
+[Release validation record](docs/testing/VALIDATION-release-v0.2.md) and
+[Metro layout validation](docs/testing/VALIDATION-metro.md) record actual checks and limits.
 GitHub Actions installs dependencies, checks syntax, runs the entire suite,
 checks installer shell syntax, builds Docker and repeats tests in the image.
 

@@ -77,7 +77,7 @@ const server=http.createServer(async(req,res)=>{try{
  const file=path.resolve(base,'.'+decodeURIComponent(route));if(!file.startsWith(base+path.sep))return json(res,403,{error:'Forbidden'});
  // Only the public tree and uploaded photos are available, never runtime data.
  if(isPhoto&&!/^\/photos\/[a-f0-9-]+\.jpg$/.test(u.pathname))return json(res,404,{error:'Photo not found'});
- const b=await fs.readFile(file),ext=path.extname(file),types={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.svg':'image/svg+xml','.jpg':'image/jpeg'};
+ const b=await fs.readFile(file),ext=path.extname(file),types={'.ttf':'font/ttf','.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.svg':'image/svg+xml','.jpg':'image/jpeg'};
  res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'self'"});res.end(b);
  }catch(e){json(res,e.code==='ENOENT'?404:400,{error:e.code==='ENOENT'?'Not found':e.message});}});
 server.listen(Number(process.env.PORT||8080),process.env.HOST||'0.0.0.0',()=>{console.log('HomeBoard listening on port '+server.address().port);if(process.send)process.send({type:'ready',port:server.address().port});});

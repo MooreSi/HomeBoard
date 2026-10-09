@@ -65,3 +65,23 @@ portal case discussed by Microsoft staff in [this support record](https://learn.
 Combined with the absent HomeBoard client ID, this suggests the user was blocked
 at the Azure/Entra registration step. The ICS option avoids that portal; the
 personal-account audience guidance applies once a HomeBoard app is registered.
+
+## Metro full-screen revision — 9 October 2026
+
+Inspected the user's linked DAKboard predefined screen in the browser. Its loaded
+frontend included jQuery 3.6, Moment/Moment Timezone, ProgressBar, a custom panel
+script, custom app/layout CSS, Roboto/Rubik Google Fonts and Font Awesome 5.
+This observation identifies this particular screen's frontend, not every DAKboard
+product or its server architecture. The personal screen URL, photographs and
+calendar records are not included in this repository.
+
+The reference's appearance primarily comes from its full-height left photo rail,
+light clock/date typography, weather overlay, borderless black right panel,
+large per-day agenda headings and blue appointment rows. HomeBoard's existing
+HTML/CSS/JavaScript frontend supports the same composition without adding legacy
+utility dependencies. Metro implements these layout proportions using original
+CSS and inline outline weather glyphs, retaining HomeBoard's timezone/recurrence
+handling, privacy masking, slideshow and RSS ticker. Roboto is bundled from
+[Google Fonts' official source](https://github.com/google/fonts/tree/main/ofl/roboto)
+under OFL-1.1, with its licence alongside the font. No DAKboard JavaScript, CSS,
+paid icons, branding or personal images are copied.
