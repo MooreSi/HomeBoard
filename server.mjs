@@ -8,6 +8,8 @@ import {defaults,themes,readJSON,saveJSON,validateSettings} from './lib/settings
 import {Calendars} from './lib/calendar.mjs';
 import {Photos} from './lib/photos.mjs';
 import {Weather} from './lib/weather.mjs';
+import {ICloudAlbum,albumToken} from './lib/icloud.mjs';
+import {publicURL} from './lib/http.mjs';
 import {News} from './lib/news.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url)),data=path.resolve(process.env.DATA_DIR||path.join(root,'data'));
 await fs.mkdir(path.join(data,'photos'),{recursive:true});
@@ -21,17 +23,19 @@ settings.googleRedirectUri=process.env.GOOGLE_REDIRECT_URI||settings.googleRedir
 settings.photoFolder=process.env.PHOTO_FOLDER||settings.photoFolder;
 secrets.googleClientSecret=process.env.GOOGLE_CLIENT_SECRET||secrets.googleClientSecret||'';
 secrets.weatherApiKey=process.env.OPENWEATHER_API_KEY||secrets.weatherApiKey||'';
-const calendars=new Calendars(data,()=>settings,()=>secrets),photos=new Photos(data,()=>settings),weather=new Weather(data,()=>settings,()=>secrets),news=new News(data,()=>settings);
+const calendars=new Calendars(data,()=>settings,()=>secrets),album=new ICloudAlbum(()=>secrets),photos=new Photos(data,()=>settings,album),weather=new Weather(data,()=>settings,()=>secrets),news=new News(data,()=>settings);
 await Promise.all([calendars.init(),weather.init(),news.init()]);
-function publicSettings(){return {...settings,googleSecretConfigured:!!secrets.googleClientSecret,weatherKeyConfigured:!!secrets.weatherApiKey};}
+function publicSettings(){return {...settings,calendarFeedConfigured:!!secrets.calendarFeedUrl,icloudAlbumConfigured:!!secrets.icloudAlbumUrl,googleSecretConfigured:!!secrets.googleClientSecret,weatherKeyConfigured:!!secrets.weatherApiKey};}
 async function body(req,limit=12*1024*1024){let size=0,chunks=[];for await(const c of req){size+=c.length;if(size>limit)throw Error('Maximum upload size is 12 MB');chunks.push(c);}return Buffer.concat(chunks);}
 async function payload(req){return JSON.parse((await body(req,65536)).toString());}
 function json(res,status,value){res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(value));}
-async function update(patch){const nextSecrets={...secrets},clean={...patch};for(const k of ['googleClientSecret','weatherApiKey'])if(Object.hasOwn(clean,k)){if(typeof clean[k]!=='string'||clean[k].length>2048)throw Error('Invalid credential');nextSecrets[k]=clean[k];delete clean[k];}
+async function update(patch){const nextSecrets={...secrets},clean={...patch};for(const k of ['googleClientSecret','weatherApiKey','calendarFeedUrl','icloudAlbumUrl'])if(Object.hasOwn(clean,k)){if(typeof clean[k]!=='string'||clean[k].length>2048)throw Error('Invalid credential');nextSecrets[k]=clean[k];delete clean[k];}
+ if(nextSecrets.icloudAlbumUrl)albumToken(nextSecrets.icloudAlbumUrl);
+ if(Object.hasOwn(patch,'calendarFeedUrl')&&nextSecrets.calendarFeedUrl){const u=await publicURL(nextSecrets.calendarFeedUrl);if(u.protocol!=='https:')throw Error('Use an HTTPS ICS calendar link');}
  const next=validateSettings(clean,settings);
  if(next.microsoftClientId!==settings.microsoftClientId||next.microsoftTenant!==settings.microsoftTenant)await calendars.disconnect('microsoft');
  if(next.googleClientId!==settings.googleClientId||next.googleRedirectUri!==settings.googleRedirectUri||nextSecrets.googleClientSecret!==secrets.googleClientSecret)await calendars.disconnect('google');
- if(next.privacy!==settings.privacy)await calendars.clearCache();
+ if(next.privacy!==settings.privacy||nextSecrets.calendarFeedUrl!==secrets.calendarFeedUrl)await calendars.clearCache();
  await saveJSON(data,'secrets.json',nextSecrets);await saveJSON(data,'settings.json',next);secrets=nextSecrets;settings=next;
  return publicSettings();
 }
@@ -53,13 +57,15 @@ const server=http.createServer(async(req,res)=>{try{
  if(u.pathname==='/api/weather/locations'&&req.method==='GET')return json(res,200,await weather.locations(u.searchParams.get('q')));
  if(u.pathname==='/api/weather'&&req.method==='GET')return json(res,200,await weather.forecast());
  if(u.pathname==='/api/news'&&req.method==='GET')return json(res,200,await news.headlines());
+ if(u.pathname==='/api/photos/icloud'&&req.method==='POST')return json(res,200,await album.scan(true));
+ if(u.pathname.startsWith('/icloud-photos/')&&req.method==='GET'){const photo=await album.read(u.pathname.slice(15));res.writeHead(200,{'Content-Type':photo.type,'X-Content-Type-Options':'nosniff','Cache-Control':'private, max-age=300'});return res.end(photo.body);}
  if(u.pathname==='/api/photos/uploads'&&req.method==='GET')return json(res,200,(await fs.readdir(path.join(data,'photos'))).filter(x=>x.endsWith('.jpg')).sort().map(x=>'/photos/'+x));
  if(u.pathname==='/api/photos'&&req.method==='GET')return json(res,200,await photos.list());
  if(u.pathname==='/api/photos/folder'&&req.method==='GET'){await photos.scan();return json(res,200,photos.folderStatus);}
  if(u.pathname.startsWith('/folder-photos/')&&req.method==='GET'){const photo=await photos.read(u.pathname.slice(15));res.writeHead(200,{'Content-Type':photo.type,'X-Content-Type-Options':'nosniff','Cache-Control':'no-cache'});return res.end(photo.body);}
  if(u.pathname==='/api/photos'&&req.method==='POST'){const b=await body(req);if(b[0]!==0xff||b[1]!==0xd8)throw Error('Upload a JPEG image');const name=crypto.randomUUID()+'.jpg';await fs.writeFile(path.join(data,'photos',name),b,{mode:0o600});return json(res,201,{url:'/photos/'+name});}
  if(u.pathname==='/api/photos/delete'&&req.method==='POST'){const {url}=await payload(req);if(!/^\/photos\/[a-f0-9-]+\.jpg$/.test(url))throw Error('Invalid photo (folder photos are read-only)');await fs.rm(path.join(data,url.slice(1)),{force:true});return json(res,200,{ok:true});}
- if(u.pathname==='/api/system'&&req.method==='GET'){const port=server.address().port;return json(res,200,{version:'0.2.0',urls:[...new Set([`http://${req.headers.host||'localhost:'+port}`,...(process.env.LAN_URLS?process.env.LAN_URLS.split(',').filter(x=>/^https?:\/\/[^\s]+$/.test(x)):Object.values(os.networkInterfaces()).flat().filter(x=>x&&!x.internal&&x.family==='IPv4').map(x=>`http://${x.address}:${port}`))])]});}
+ if(u.pathname==='/api/system'&&req.method==='GET'){const port=server.address().port;return json(res,200,{version:'0.3.0',urls:[...new Set([`http://${req.headers.host||'localhost:'+port}`,...(process.env.LAN_URLS?process.env.LAN_URLS.split(',').filter(x=>/^https?:\/\/[^\s]+$/.test(x)):Object.values(os.networkInterfaces()).flat().filter(x=>x&&!x.internal&&x.family==='IPv4').map(x=>`http://${x.address}:${port}`))])]});}
  if(u.pathname.startsWith('/api/'))return json(res,req.method==='GET'?404:405,{error:'Unknown API route or method'});
  if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});
  const isPhoto=u.pathname.startsWith('/photos/'),base=isPhoto?data:path.join(root,'public');

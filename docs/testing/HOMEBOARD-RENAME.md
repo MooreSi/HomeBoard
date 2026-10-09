@@ -2,7 +2,7 @@
 
 The application, npm package, GitHub repository, local folder, installers,
 Google OAuth session cookie, preference exports, default theme and Docker project
-now use HomeBoard. Third-party research citations and the imported Forex protocol
+now use HomeBoard. Third-party research citations and the testing protocol
 retain their original attribution.
 
 Three focused regression tests failed before implementation: dashboard/settings

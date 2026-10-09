@@ -1,7 +1,7 @@
 # HomeBoard
 
 A self-hosted family dashboard with a separate settings page, Microsoft 365 and
-Google calendars, ten themes, a photo slideshow, OpenWeather forecasts and RSS news.
+Google calendars, sixteen themes, a photo slideshow, OpenWeather forecasts and RSS news.
 Open `/` for the display and `/settings` to configure it. Settings are shared
 across displays and persist on the server. The dashboard has no upload controls.
 
@@ -157,7 +157,8 @@ only when no calendar account is connected and are labelled as demo.
 
 ### Themes
 
-HomeBoard, Midnight, Chalkboard, Coastal, Forest, Sunset, Minimal, Lavender, Aurora,
+Tide, Observatory, Glasshouse, Folio, Metro and Portrait add wall-display layouts
+to the original HomeBoard, Midnight, Chalkboard, Coastal, Forest, Sunset, Minimal, Lavender, Aurora,
 and Gallery are original CSS themes with previews. They include light/dark,
 calendar-led, photo-backdrop and gallery layouts. Google Images and DAKboard's
 community gallery informed the styles; there is no publicly verifiable popularity
@@ -239,10 +240,10 @@ npm run build
 ```
 
 Tests use temporary data and isolated ports, with fakes only at external provider
-boundaries. The original ZIP regression assertions remain intact. The imported
-Forex test protocol/review/verification documents are preserved unchanged under
-[docs/testing/forex-gold](docs/testing/forex-gold/README.md).
-[DEVELOPMENT.md](DEVELOPMENT.md) maps those rules to Node.
+boundaries. The original ZIP regression assertions remain intact. The
+[HomeBoard testing rules](docs/testing/homeboard/README.md) define the protocol,
+review requirements and verification checks. See [DEVELOPMENT.md](DEVELOPMENT.md)
+for the Node.js workflow.
 [Validation record](docs/testing/VALIDATION-v0.2.md) records actual checks and limits.
 GitHub Actions installs dependencies, checks syntax, runs the entire suite,
 checks installer shell syntax, builds Docker and repeats tests in the image.
@@ -251,3 +252,38 @@ Live provider consent, actual Apple library permissions, physical Safari/iPad or
 Chrome/Android, and a real Proxmox installation need verification with the relevant
 accounts/devices/host. Automated provider fixtures establish request/response
 wiring and failure behaviour; they do not establish successful live authentication.
+
+
+## Easier connections in v0.3
+
+For Outlook.com, use **Settings → Calendar connections → Outlook calendar link**.
+In Outlook on the web open Settings → Calendar → Shared calendars → Publish a
+calendar, choose the details to publish and copy the **ICS** link. HomeBoard
+handles recurring events and date-only appointments and stores the link in its
+private credential file. Anyone with the published link can read those details;
+revoke it from Outlook when no longer needed. Organisation policy can disable
+publishing. The authenticated Microsoft device sign-in remains available.
+
+A personal-account tenant mismatch requires a HomeBoard app registration that
+supports personal Microsoft accounts, and public client flows enabled. Select
+Personal Microsoft accounts in HomeBoard for Outlook.com/Hotmail. A work-only or
+single-tenant registration cannot become personal-account compatible just by
+changing the local tenant dropdown. Do not use another service's client ID.
+
+For Apple Photos, enable **Public Website** on a Shared Album and paste its
+`https://www.icloud.com/sharedalbum/#…` URL into Settings → Photos. Select
+Apple iCloud shared album, or All connected photo sources. HomeBoard checks the
+album every five minutes, proxies images through local read-only routes and
+excludes the album URL from preference exports. No Apple password is needed.
+The public-album protocol is undocumented by Apple and can change. Folder and
+upload sources remain available without a public album.
+
+The BBC RSS feed works in the production Node 24 container. Public feed fetches
+use the installed Undici fetch and dispatcher together, revalidate DNS at socket
+connection, validate redirect destinations and cap downloaded bytes. Mixing the
+Node-bundled fetch with a different dispatcher version caused the previous error.
+
+Six new themes add gradient wall calendars, photo/weather rails, glass panels,
+an editorial planner and a portrait photo layout. Selecting a new style also
+selects its suggested calendar view; you can override that view before saving.
+The rolling three-week view crosses month boundaries and advances by a week.

@@ -1,6 +1,6 @@
 {
   "name": "homeboard",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "fast-xml-parser": "^5.11.2",
+    "node-ical": "^0.27.3",
     "undici": "^8.11.2"
   }
 }

@@ -1,10 +1,6 @@
 # Development and testing rules
 
-The authoritative Forex testing rules have been imported unchanged into
-[docs/testing/forex-gold](docs/testing/forex-gold/README.md). Read the protocol
-and test-review rules before changing behaviour. This file maps those rules to
-HomeBoard's Node.js application; Forex's Python paths and trading-specific gates
-are source-repository examples, not runnable HomeBoard commands.
+Read the [HomeBoard testing protocol and review rules](docs/testing/homeboard/README.md) before changing behaviour. These rules apply to this repository's Node.js server, browser application and installers.
 
 1. State expected behaviour from the requirement first. For behaviour changes,
    write the smallest regression test, run it red for the expected reason,
@@ -18,7 +14,7 @@ are source-repository examples, not runnable HomeBoard commands.
    await asynchronous calls, assert errors explicitly, and avoid conditional
    assertions. Use faithful fixtures and mock only external boundaries.
 5. Give each test fresh temporary data and an isolated local server port. Never
-   use personal calendars, credentials, photos, or Forex accounts in automation.
+   use personal calendars, credentials, photos in automation.
    Pin calendar dates; do not depend on execution speed or import-time timestamps.
 6. Keep synthetic calendar appointments clearly labelled as demo data. Keep
    secrets and cached personal data out of source control and browser responses.
@@ -29,7 +25,7 @@ are source-repository examples, not runnable HomeBoard commands.
    Run `npm run build` for the Docker image and smoke-test boot/static assets/API
    after server or packaging changes. CI repeats syntax, tests and Docker build.
 9. Record checks and real results. HomeBoard has no coverage ratchet yet; do not
-   claim Forex's coverage/architecture gates ran here. If one is introduced,
+   claim unconfigured coverage/architecture gates ran here. If one is introduced,
    record and enforce its baseline without lowering it to bypass a failure.
 10. Before a release, verify day/week/month navigation, all-day/recurring events,
     timezone/DST edges, cache behaviour, privacy masking, Microsoft consent

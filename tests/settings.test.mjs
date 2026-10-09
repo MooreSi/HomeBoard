@@ -22,8 +22,8 @@ test('invalid timezone rejects the entire preferences update',async t=>{
 test('slideshow timer rejects zero instead of silently accepting it',async t=>{
  const a=await app(t);assert.equal((await a.post('/api/settings',{photoInterval:0})).status,400);
 });
-test('ten distinct researched themes are available',async t=>{
- const a=await app(t);const r=await a.request('/api/themes');assert.equal(r.status,200);const themes=await r.json();assert.equal(themes.length,10);assert.equal(new Set(themes.map(x=>x.id)).size,10);
+test('sixteen distinct researched themes retain the ten original choices',async t=>{
+ const a=await app(t);const r=await a.request('/api/themes');assert.equal(r.status,200);const themes=await r.json();assert.equal(themes.length,16);assert.equal(new Set(themes.map(x=>x.id)).size,16);assert.deepEqual(themes.slice(0,10).map(x=>x.id),['homeboard','midnight','chalkboard','coastal','forest','sunset','minimal','lavender','aurora','gallery']);
 });
 test('API secrets are stored privately and omitted from settings responses',async t=>{
  const a=await app(t);assert.equal((await a.post('/api/settings',{googleClientSecret:'test-secret',weatherApiKey:'test-weather'})).status,200);

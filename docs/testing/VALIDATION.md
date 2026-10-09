@@ -39,5 +39,5 @@ with spaces. This is a small scaffold suite, not complete product coverage.
 Live Outlook consent/token refresh/Graph pagination, recurrence/all-day data,
 DST boundaries, offline calendar caching, browser photo conversion/HEIC support,
 privacy controls and physical Safari/iPad or Chrome/Android behaviour remain
-unverified. No coverage baseline or Forex Python architecture gates ran here;
+unverified. No coverage baseline or additional architecture gates ran here;
 those need HomeBoard-specific implementations before being claimed.

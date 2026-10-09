@@ -42,3 +42,20 @@ the app has a supported Apple-account OAuth integration. Google remote redirects
 require approved HTTPS domains or a host-side localhost tunnel. OpenWeather weekly
 forecasts need One Call access. These requirements are surfaced in settings and
 README so configuration and live verification can be completed honestly.
+
+
+## October v0.3 research
+
+- [Microsoft tenant mismatch diagnosis](https://learn.microsoft.com/en-us/troubleshoot/entra/entra-id/app-integration/error-code-aadsts50020-user-account-identity-provider-does-not-exist): account audience must match app registration, not merely the local authority.
+- [Outlook view-only calendar publishing](https://support.microsoft.com/en-us/outlook/sharing/share-an-outlook-calendar-as-view-only-with-others): publishing yields an ICS subscription link; access can be revoked in Outlook.
+- [Apple Shared Albums](https://support.apple.com/en-gb/108314): enable Public Website to share with people without Apple devices.
+- [Shared-album protocol observations](https://github.com/simonchatts/icloud-biff/blob/main/PROTOCOL.md) and [partition routing implementation](https://github.com/llun/blog/blob/master/libs/apple/webstream.ts): public stream metadata and image URL requests; HomeBoard restricts returned hosts and proxies verified image bytes.
+- [node-ical](https://github.com/jens-maus/node-ical): recurrence expansion, exclusions, overrides and timezone handling.
+- [DAKboard calendar layouts](https://dakboard.freshdesk.com/support/solutions/articles/35000099436-custom-screen-calendar-layouts-and-settings) and [MagicMirror calendar](https://docs.magicmirror.builders/modules/calendar.html): compact event typography and calendar-focused display composition.
+
+The user's supplied examples informed Tide's large dates and gradient,
+Observatory's left photo/weather rail and three-week planner, and Metro's compact
+information layout. Glasshouse, Folio and Portrait extend these with transparent
+panels, editorial paper typography and a vertical photo-first composition.
+These are original CSS layouts; no third-party screenshots or proprietary
+artwork are shipped as themes. The favicon combines a home and calendar.

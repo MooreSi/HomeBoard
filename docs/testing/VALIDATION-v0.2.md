@@ -91,5 +91,5 @@ and creation of a real Proxmox guest were not exercised. The local Node server
 and Docker installer were exercised; local/Linux/LXC installer plans and shell
 syntax are checked, not represented as live host installations.
 
-There is no coverage ratchet yet. Forex-specific Python architecture/coverage
+There is no coverage ratchet yet. Additional architecture/coverage
 commands do not apply to this Node application and were not claimed to have run.
