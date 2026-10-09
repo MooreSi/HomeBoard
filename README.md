@@ -176,8 +176,8 @@ groups appointments by day, shows start/end times and locations, masks private
 details and omits finished appointments today. The RSS ticker sits below the
 agenda. Portrait screens stack the photo rail above the calendar. Select Metro
 and save to apply its suggested Upcoming view; other calendar views still work.
-Roboto is served locally under its [SIL Open Font License](public/fonts/OFL.txt). Google Images and DAKboard's
-community gallery informed the styles; there is no publicly verifiable popularity
+Roboto is served locally under its [SIL Open Font License](public/fonts/OFL.txt). Google Images and community
+wall-display galleries informed the styles; there is no publicly verifiable popularity
 ranking, so these are **ten curated starting themes**, not a claimed statistical
 "top ten". No third-party screen images or proprietary theme code are copied.
 See [research and inspiration](docs/RESEARCH.md).

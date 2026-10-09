@@ -1,6 +1,6 @@
 # Metro wall-display validation — 9 October 2026
 
-Inspected the user-supplied DAKboard predefined screen in the browser. Observed
+Inspected the user-supplied reference wall-display screen in the browser. Observed
 HTML/CSS, jQuery 3.6, Moment/Moment Timezone, Roboto/Rubik, Font Awesome 5 and
 custom app/layout scripts. Its appearance was reproduced using HomeBoard's
 existing HTML/CSS/JavaScript frontend, original CSS and weather SVG glyphs.

@@ -1,7 +1,7 @@
 # Research and inspiration — 9 October 2026
 
-Google Images was searched for “dakboard screen themes” in the browser. Its
-results included DAKboard's template gallery, community templates, monthly
+Google Images was searched for family wall-display screen themes in the browser.
+Its results included template galleries, community templates, monthly
 calendars, photo-backed portrait screens, dark information hubs and seasonal
 screens. We inspected the result thumbnails. This supplies visual inspiration,
 not usage counts; no public top-ten popularity ranking was found.
@@ -13,9 +13,6 @@ Aurora: dark information dashboard; Gallery: photo-forward layout.
 
 Primary project sources:
 
-- [DAKboard overview](https://dakboard.com/site): modular calendars/photos/weather/news.
-- [DAKboard community setups](https://blog.dakboard.com/think-outside-the-grid-customizing-your-dakboard/): monthly and agenda views, varied visual styles.
-- [DAKboard calendar settings](https://dakboard.freshdesk.com/support/solutions/articles/35000099436): calendar colours, high contrast, display choices.
 - [MagicMirror default modules](https://docs.magicmirror.builders/modules/introduction.html): separate weather, calendar and news modules.
 - [MagicMirror calendar module](https://github.com/MagicMirrorOrg/MagicMirror-Documentation/blob/master/modules/calendar.md): multiple calendars and source selection.
 - [magicmirror-home-dashcalendar](https://github.com/unnuslatif/magicmirror-home-dashcalendar): configurable themes, slideshow and guided installer.
@@ -51,7 +48,7 @@ README so configuration and live verification can be completed honestly.
 - [Apple Shared Albums](https://support.apple.com/en-gb/108314): enable Public Website to share with people without Apple devices.
 - [Shared-album protocol observations](https://github.com/simonchatts/icloud-biff/blob/main/PROTOCOL.md) and [partition routing implementation](https://github.com/llun/blog/blob/master/libs/apple/webstream.ts): public stream metadata and image URL requests; HomeBoard restricts returned hosts and proxies verified image bytes.
 - [node-ical](https://github.com/jens-maus/node-ical): recurrence expansion, exclusions, overrides and timezone handling.
-- [DAKboard calendar layouts](https://dakboard.freshdesk.com/support/solutions/articles/35000099436-custom-screen-calendar-layouts-and-settings) and [MagicMirror calendar](https://docs.magicmirror.builders/modules/calendar.html): compact event typography and calendar-focused display composition.
+- [MagicMirror calendar](https://docs.magicmirror.builders/modules/calendar.html): compact event typography and calendar-focused display composition.
 
 The user's supplied examples informed Tide's large dates and gradient,
 Observatory's left photo/weather rail and three-week planner, and Metro's compact
@@ -68,11 +65,11 @@ personal-account audience guidance applies once a HomeBoard app is registered.
 
 ## Metro full-screen revision — 9 October 2026
 
-Inspected the user's linked DAKboard predefined screen in the browser. Its loaded
+Inspected the user's linked reference wall-display screen in the browser. Its loaded
 frontend included jQuery 3.6, Moment/Moment Timezone, ProgressBar, a custom panel
 script, custom app/layout CSS, Roboto/Rubik Google Fonts and Font Awesome 5.
-This observation identifies this particular screen's frontend, not every DAKboard
-product or its server architecture. The personal screen URL, photographs and
+This observation identifies this particular screen's frontend, not any product's
+wider frontend or server architecture. The personal screen URL, photographs and
 calendar records are not included in this repository.
 
 The reference's appearance primarily comes from its full-height left photo rail,
@@ -83,5 +80,5 @@ utility dependencies. Metro implements these layout proportions using original
 CSS and inline outline weather glyphs, retaining HomeBoard's timezone/recurrence
 handling, privacy masking, slideshow and RSS ticker. Roboto is bundled from
 [Google Fonts' official source](https://github.com/google/fonts/tree/main/ofl/roboto)
-under OFL-1.1, with its licence alongside the font. No DAKboard JavaScript, CSS,
+under OFL-1.1, with its licence alongside the font. No third-party JavaScript, CSS,
 paid icons, branding or personal images are copied.
