@@ -1,5 +1,15 @@
 # Release notes
 
+## v0.22 · 9 October 2026
+
+- Added multiple ICS feeds, family colours and calendar/person filters while retaining simple read-only calendar setup.
+- Added a local family organiser for profiles, shared lists, notices, assigned recurring chores, completion points, visual routines, weekly meals, ingredients-to-shopping, bin schedules with exceptions, and annual countdowns.
+- Added scheduled named screens, ordered playlists and pinned screen links.
+- Extended Custom Design with seven family widgets, independent portrait placement, panel-specific fonts/colours/alignment, alignment tools, reusable panel templates and a Family organiser starter.
+- Added admin editing protection, rate-limited login, phone-friendly management, app icons and a PWA manifest.
+- Added connection diagnostics, encrypted backup/restore with pre-restore rollback copies and offline display caching with an explicit offline indicator.
+- Added regression tests, a demo screenshot and setup/operation documentation.
+
 ## v0.21 · 9 October 2026
 
 - Calendar scrolling continues beyond the original date window in Upcoming, Day, Week, Month and 3 weeks; date pages load on demand. Month grids now fetch appointments in their leading/trailing days too.

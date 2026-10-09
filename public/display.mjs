@@ -8,7 +8,7 @@ export function range(cursor,view){if(view==='agenda')return [cursor,addDays(cur
 export function stamp(event,which='start'){const p=event[which],s=p.dateTime;return new Date(s+(p.timeZone==='UTC'&&!/Z|[+-]\d\d:\d\d$/.test(s)?'Z':''));}
 export function onDay(events,key,timezone){const start=zonedMidnight(key,timezone),end=zonedMidnight(addDays(key,1),timezone);return events.filter(e=>e.isAllDay?e.start.dateTime.slice(0,10)<=key&&e.end.dateTime.slice(0,10)>key:stamp(e)<end&&stamp(e,'end')>start).sort((a,b)=>stamp(a)-stamp(b));}
 export function dateLabel(date,pref){const p=parts(date,pref.timezone);if(pref.dateFormat==='iso')return `${p.year}-${p.month}-${p.day}`;if(pref.dateFormat==='dmy')return `${p.day}/${p.month}/${p.year}`;if(pref.dateFormat==='mdy')return `${p.month}/${p.day}/${p.year}`;return date.toLocaleDateString('en-GB',{timeZone:pref.timezone,weekday:'long',day:'numeric',month:'long',year:'numeric'});}
-export async function api(url,options){const response=await fetch(url,options);const j=await response.json();if(!response.ok)throw Error(j.error||'Request failed');return j;}
+export async function api(url,options){const response=await fetch(url,options);const offline=document.getElementById('offlineStatus');if(offline&&response.headers.get('X-HomeBoard-Offline'))offline.hidden=false;const j=await response.json();if(!response.ok)throw Error(j.error||'Request failed');return j;}
 export const post=(url,value={})=>api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value)});
 export function applyTheme(theme){document.body.dataset.theme=theme;}
 export function weatherIcon(code){if(code<300)return '⛈';if(code<600)return '☂';if(code<700)return '❄';if(code<800)return '≋';if(code===800)return '☀';return '☁';}

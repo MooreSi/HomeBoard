@@ -1,0 +1,11 @@
+import {addDays,weekday} from './display.mjs';
+export function validDate(v){return typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&!Number.isNaN(Date.parse(v))&&new Date(v+'T12:00:00Z').toISOString().slice(0,10)===v;}
+export function taskOccurs(t,date){return date>=t.due&&(t.repeat==='once'?date===t.due:t.repeat==='daily'||t.weekdays.includes(weekday(date)));}
+export function completed(f,t,date,step=-1){return f.completions.some(x=>x.task===t.id&&x.date===date&&x.step===step);}
+export function nextBin(b,today){const result=[],offset=Math.max(0,Math.floor(daysBetween(b.date,today)/b.every)-1),start=addDays(b.date,offset*b.every);for(let date=start;date<=addDays(today,730);date=addDays(date,b.every)){const exception=b.exceptions.find(x=>x.from===date),actual=exception?exception.to:date;if(actual&&actual>=today)result.push(actual);}for(const exception of b.exceptions)if(exception.to>=today&&exception.from>=b.date&&daysBetween(b.date,exception.from)%b.every===0)result.push(exception.to);return result.sort()[0]||null;}
+export function countdownDate(c,today){if(!c.annual)return c.date;let target=today.slice(0,4)+c.date.slice(4);if(!validDate(target))target=today.slice(0,4)+'-03-01';if(target<today){target=String(Number(today.slice(0,4))+1)+c.date.slice(4);if(!validDate(target))target=target.slice(0,4)+'-03-01';}return target;}
+export const daysBetween=(a,b)=>Math.round((Date.parse(b+'T12:00:00Z')-Date.parse(a+'T12:00:00Z'))/86400000);
+export function activeScreens(f,now,timeZone){const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));const key=`${p.year}-${p.month}-${p.day}`,minutes=p.hour+':'+p.minute;
+ return f.screens.filter(s=>{if(!s.enabled)return false;const overnight=s.start>s.end,day=weekday(overnight&&minutes<s.end?addDays(key,-1):key);return s.weekdays.includes(day)&&(s.start===s.end||overnight?(s.start===s.end||minutes>=s.start||minutes<s.end):minutes>=s.start&&minutes<s.end);});}
+
+export function newId(){return crypto.randomUUID?.()||Array.from(crypto.getRandomValues(new Uint8Array(16)),v=>v.toString(16).padStart(2,'0')).join('');}

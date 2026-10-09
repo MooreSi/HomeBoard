@@ -4,6 +4,16 @@ A self-hosted family dashboard with a separate settings page, read-only Calendar
 Open `/` for the display and `/settings` to configure it. Settings are shared
 across displays and persist on the server. The dashboard has no upload controls.
 
+## v0.22 · Family organisation and dependable displays
+
+- Multiple private ICS Calendar Links with names, colours, family assignments and dashboard filters.
+- `/family`: profiles, shared shopping/checklists, notices, recurring chores with points, visual routines, weekly meals and ingredients-to-shopping, bin reminders with holiday exceptions, and annual countdowns.
+- Named scheduled screens, ordered playlists and pinned screen URLs. Custom Design adds independent portrait layouts, per-panel styling, alignment tools, reusable panel templates and a Family organiser starter layout.
+- Phone-friendly management and an installable web app. Set an admin password at `/login` to protect editing; viewing remains available on your home network. No password is preset. Sessions expire after eight hours and server restart.
+- Connection checks, encrypted full backup/restore with a private rollback copy, and offline display caching. Offline/PWA installation needs HTTPS or localhost; ordinary HTTP LAN viewing works online.
+
+See the [family and reliability guide](docs/FAMILY-AND-RELIABILITY.md). Native features work locally; extra Todoist, Mealie, council-specific and smart-home connectors are not required or included in this release.
+
 ## v0.21
 
 - Continuous calendar browsing: scroll or select **Continue to later dates** in Upcoming, Day, Week, Month and 3 weeks. Each page fetches its own dates, including recurring appointments and month-grid overflow days. Today and previous/next navigation remain available.
@@ -14,6 +24,8 @@ across displays and persist on the server. The dashboard has no upload controls.
 See [design format and guide](docs/CUSTOM-DESIGN.md) and [release notes](CHANGELOG.md).
 
 ## Screenshots
+
+![Family organiser with demo profiles and shared lists](docs/screenshots/family-organiser.jpg)
 
 Screenshots use an isolated demo calendar, without personal calendar data or photos.
 The Metro image uses an original landscape illustration and a labelled synthetic forecast.
