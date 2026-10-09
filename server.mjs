@@ -12,6 +12,9 @@ import {Weather} from './lib/weather.mjs';
 import {ICloudAlbum,albumToken} from './lib/icloud.mjs';
 import {publicURL} from './lib/http.mjs';
 import {updateRequest} from './lib/update-channel.mjs';
+import {Family} from './lib/family.mjs';
+import {Auth} from './lib/auth.mjs';
+import {Backup} from './lib/backup.mjs';
 import {News} from './lib/news.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url)),data=path.resolve(process.env.DATA_DIR||path.join(root,'data'));
 const packageInfo=JSON.parse(await fs.readFile(path.join(root,'package.json'),'utf8'));
@@ -19,6 +22,7 @@ await fs.mkdir(path.join(data,'photos'),{recursive:true});
 let settings={...defaults,...await readJSON(data,'settings.json',{})};
 if(!themes.some(theme=>theme.id===settings.theme)){settings.theme=defaults.theme;await saveJSON(data,'settings.json',settings);}
 let secrets=await readJSON(data,'secrets.json',{});
+function applyEnvironment(){
 settings.microsoftClientId=process.env.MICROSOFT_CLIENT_ID||settings.microsoftClientId;
 settings.microsoftTenant=process.env.MICROSOFT_TENANT||settings.microsoftTenant;
 settings.googleClientId=process.env.GOOGLE_CLIENT_ID||settings.googleClientId;
@@ -26,8 +30,11 @@ settings.googleRedirectUri=process.env.GOOGLE_REDIRECT_URI||settings.googleRedir
 settings.photoFolder=process.env.PHOTO_FOLDER||settings.photoFolder;
 secrets.googleClientSecret=process.env.GOOGLE_CLIENT_SECRET||secrets.googleClientSecret||'';
 secrets.weatherApiKey=process.env.OPENWEATHER_API_KEY||secrets.weatherApiKey||'';
+}
+applyEnvironment();
 const calendars=new Calendars(data,()=>settings,()=>secrets),album=new ICloudAlbum(()=>secrets),photos=new Photos(data,()=>settings,album),weather=new Weather(data,()=>settings,()=>secrets),news=new News(data,()=>settings);
-await Promise.all([calendars.init(),weather.init(),news.init()]);
+const family=new Family(data),auth=new Auth(data),backup=new Backup(data,()=>({settings,secrets}));
+await Promise.all([calendars.init(),weather.init(),news.init(),family.init(),auth.init()]);
 function publicSettings(){return {...settings,calendarFeedConfigured:!!secrets.calendarFeedUrl,icloudAlbumConfigured:!!secrets.icloudAlbumUrl,googleSecretConfigured:!!secrets.googleClientSecret,weatherKeyConfigured:!!secrets.weatherApiKey};}
 async function body(req,limit=12*1024*1024){let size=0,chunks=[];for await(const c of req){size+=c.length;if(size>limit)throw Error('Maximum upload size is 12 MB');chunks.push(c);}return Buffer.concat(chunks);}
 async function payload(req){return JSON.parse((await body(req,65536)).toString());}
@@ -36,16 +43,31 @@ async function update(patch){const nextSecrets={...secrets},clean={...patch};for
  if(Object.hasOwn(patch,'calendarFeedUrl'))nextSecrets.calendarFeedUrl=nextSecrets.calendarFeedUrl.trim().replace(/^webcal:\/\//i,'https://');
  if(nextSecrets.icloudAlbumUrl)albumToken(nextSecrets.icloudAlbumUrl);
  if(Object.hasOwn(patch,'calendarFeedUrl')&&nextSecrets.calendarFeedUrl){const u=await publicURL(nextSecrets.calendarFeedUrl);if(u.protocol!=='https:')throw Error('Use an HTTPS ICS calendar link');}
+ if(Object.hasOwn(clean,'feedConnections')){const items=clean.feedConnections;if(!Array.isArray(items)||items.length>20)throw Error('Invalid calendar connections');nextSecrets.calendarFeeds={};clean.calendarFeeds=[];for(const item of items){const id=item.id||crypto.randomUUID(),old=secrets.calendarFeeds?.[id],url=(item.url||old||'').trim().replace(/^webcal:\/\//i,'https://');if(url){const u=await publicURL(url);if(u.protocol!=='https:')throw Error('Use an HTTPS ICS calendar link');nextSecrets.calendarFeeds[id]=url;}else throw Error('A new calendar needs an ICS link');clean.calendarFeeds.push({id,name:item.name,color:item.color,person:item.person||'',enabled:item.enabled});}delete clean.feedConnections;}
  const next=validateSettings(clean,settings);
  if(next.microsoftClientId!==settings.microsoftClientId||next.microsoftTenant!==settings.microsoftTenant)await calendars.disconnect('microsoft');
  if(next.googleClientId!==settings.googleClientId||next.googleRedirectUri!==settings.googleRedirectUri||nextSecrets.googleClientSecret!==secrets.googleClientSecret)await calendars.disconnect('google');
- if(next.privacy!==settings.privacy||nextSecrets.calendarFeedUrl!==secrets.calendarFeedUrl)await calendars.clearCache();
+ if(next.privacy!==settings.privacy||nextSecrets.calendarFeedUrl!==secrets.calendarFeedUrl||JSON.stringify(next.calendarFeeds)!==JSON.stringify(settings.calendarFeeds)||JSON.stringify(nextSecrets.calendarFeeds)!==JSON.stringify(secrets.calendarFeeds))await calendars.clearCache();
  await saveJSON(data,'secrets.json',nextSecrets);await saveJSON(data,'settings.json',next);secrets=nextSecrets;settings=next;
  return publicSettings();
 }
-const server=http.createServer(async(req,res)=>{try{
+let mutationQueue=Promise.resolve();
+const server=http.createServer(async(req,res)=>{let unlock;try{
  const u=new URL(req.url,'http://localhost');
  if(req.method==='POST'&&req.headers.origin&&new URL(req.headers.origin).host!==req.headers.host)return json(res,403,{error:'Cross-origin request rejected'});
+ if(req.method==='POST'){const previous=mutationQueue;mutationQueue=new Promise(r=>unlock=r);await previous;}
+ if(u.pathname==='/api/auth/status'&&req.method==='GET')return json(res,200,auth.status(req));
+ if(['/api/auth/setup','/api/auth/login'].includes(u.pathname)&&req.method==='POST'){const {password}=await payload(req);res.setHeader('Set-Cookie',await (u.pathname.endsWith('setup')?auth.setup(req,password):auth.login(req,password)));return json(res,200,auth.status(req));}
+ if(u.pathname==='/api/auth/logout'&&req.method==='POST'){res.setHeader('Set-Cookie',auth.logout(req));return json(res,200,{ok:true});}
+ if(req.method==='POST')auth.require(req);
+ if(req.method==='GET'&&(u.pathname==='/api/settings'||/^\/api\/calendar\/(microsoft|google)\/list$/.test(u.pathname)||['/api/photos/uploads','/api/photos/folder'].includes(u.pathname)))auth.require(req);
+ if(u.pathname==='/api/family'&&req.method==='GET')return json(res,200,family.value);
+ if(u.pathname==='/api/family'&&req.method==='POST')return json(res,200,await family.mutate(await payload(req)));
+ if(u.pathname==='/api/display-settings'&&req.method==='GET'){const value=publicSettings();for(const k of ['photoFolder','microsoftClientId','microsoftTenant','googleClientId','googleRedirectUri','googleCalendarIds','microsoftCalendarIds'])delete value[k];return json(res,200,value);}
+ if(u.pathname==='/api/backup/create'&&req.method==='POST')return json(res,200,await backup.create((await payload(req)).password));
+ if(u.pathname==='/api/backup/restore'&&req.method==='POST'){const p=JSON.parse((await body(req,150*1024*1024)).toString()),result=await backup.restore(p.backup,p.password);settings={...defaults,...await readJSON(data,'settings.json',{})};secrets=await readJSON(data,'secrets.json',{});applyEnvironment();await Promise.all([family.init(),calendars.init(),weather.init(),news.init()]);await calendars.clearCache();return json(res,200,result);}
+ if(u.pathname==='/api/backup/list'&&req.method==='GET'){auth.require(req);return json(res,200,await backup.list());}
+ if(u.pathname==='/api/health'&&req.method==='GET'){auth.require(req);return json(res,200,{version:packageInfo.version,calendar:calendars.status(),weather:{enabled:settings.weatherEnabled,key:!!secrets.weatherApiKey,location:!!settings.weatherLocation},news:{enabled:settings.newsEnabled,configured:!!settings.newsUrl},photos:await photos.list().then(x=>({count:x.length})).catch(e=>({error:e.message})),backups:await backup.list(),offline:'Browser cache stores the last successful display responses; settings and edits are never cached.'});}
  if(u.pathname==='/api/update/status'&&req.method==='GET')return json(res,200,await updateRequest('status'));
  if(['/api/update/check','/api/update/install'].includes(u.pathname)&&req.method==='POST'){if(req.headers['content-type']!=='application/json')throw Error('Update requests require application/json');return json(res,u.pathname.endsWith('/install')?202:200,await updateRequest(u.pathname.endsWith('/install')?'install':'check'));}
  if(u.pathname==='/api/settings'&&req.method==='GET')return json(res,200,publicSettings());
@@ -76,11 +98,11 @@ const server=http.createServer(async(req,res)=>{try{
  if(u.pathname.startsWith('/api/'))return json(res,req.method==='GET'?404:405,{error:'Unknown API route or method'});
  if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});
  const isPhoto=u.pathname.startsWith('/photos/'),base=isPhoto?data:path.join(root,'public');
- const route=u.pathname==='/'?'/index.html':u.pathname==='/settings'||u.pathname==='/settings/'?'/settings.html':u.pathname;
+ const route=u.pathname==='/'?'/index.html':u.pathname==='/settings'||u.pathname==='/settings/'?'/settings.html':u.pathname==='/family'?'/family.html':u.pathname==='/login'?'/login.html':u.pathname;
  const file=path.resolve(base,'.'+decodeURIComponent(route));if(!file.startsWith(base+path.sep))return json(res,403,{error:'Forbidden'});
  // Only the public tree and uploaded photos are available, never runtime data.
  if(isPhoto&&!/^\/photos\/[a-f0-9-]+\.jpg$/.test(u.pathname))return json(res,404,{error:'Photo not found'});
- const b=await fs.readFile(file),ext=path.extname(file),types={'.ttf':'font/ttf','.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.svg':'image/svg+xml','.jpg':'image/jpeg'};
+ const b=await fs.readFile(file),ext=path.extname(file),types={'.png':'image/png','.webmanifest':'application/manifest+json','.json':'application/json','.ttf':'font/ttf','.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.svg':'image/svg+xml','.jpg':'image/jpeg'};
  res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'self'"});res.end(b);
- }catch(e){json(res,e.code==='ENOENT'?404:400,{error:e.code==='ENOENT'?'Not found':e.message});}});
+ }catch(e){json(res,e.status||(e.code==='ENOENT'?404:400),{error:e.code==='ENOENT'?'Not found':e.message});}finally{unlock?.();}});
 server.listen(Number(process.env.PORT||8080),process.env.HOST||'0.0.0.0',()=>{console.log('HomeBoard listening on port '+server.address().port);if(process.send)process.send({type:'ready',port:server.address().port});});
