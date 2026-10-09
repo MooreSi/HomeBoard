@@ -1,6 +1,6 @@
 # HomeBoard
 
-A self-hosted family dashboard with a separate settings page, read-only Calendar Links from Outlook, Google or Apple calendars, sixteen themes plus a visual Custom Design editor, a photo slideshow, OpenWeather forecasts and RSS news.
+A self-hosted family dashboard with a separate settings page, read-only Calendar Links from Outlook, Google or Apple calendars, seventeen themes plus a visual Custom Design editor, a photo slideshow, OpenWeather forecasts and RSS news.
 Open `/` for the display and `/settings` to configure it. Settings are shared
 across displays and persist on the server. The dashboard has no upload controls.
 
