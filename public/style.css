@@ -100,3 +100,6 @@ body[data-theme=metro] .forecastDay>strong{width:100%}
 body[data-theme=metro] .dashboard .clockCard{border:0}
 
 @media(hover:none){body[data-theme=metro] .calendar nav{opacity:1}}
+body[data-theme=metro] .dashboard .photo:after{z-index:3}
+body[data-theme=metro] .dashboard .photo button{z-index:4}
+body[data-theme=metro] .weatherWidget .empty{color:#fff;padding:12px 0;margin:0}
