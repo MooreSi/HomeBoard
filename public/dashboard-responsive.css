@@ -28,9 +28,9 @@ body[data-custom-design=true][data-clock-layout=custom] .clockCard>:is(#clockDat
 .newsSource span{overflow-wrap:anywhere}
 .newsWidget .tickerViewport{min-width:0;flex:1}
 @media(max-width:1440px){
- body:not(.designPreviewMode)[data-custom-design=true] .customDashboardGrid{gap:min(var(--design-gap),10px)!important}
- body:not(.designPreviewMode)[data-custom-design=true] .customDashboardGrid>[data-design-panel]{padding:min(var(--design-padding),12px)!important}
- body:not(.designPreviewMode)[data-custom-design=true] .dashboard .customDashboardGrid>[data-panel-styled=true]{padding:min(var(--panel-padding),12px)!important}
+ body[data-custom-design=true] .customDashboardGrid{gap:min(var(--design-gap),10px)!important}
+ body[data-custom-design=true] .customDashboardGrid>[data-design-panel]{padding:min(var(--design-padding),12px)!important}
+ body[data-custom-design=true] .dashboard .customDashboardGrid>[data-panel-styled=true]{padding:min(var(--panel-padding),12px)!important}
  .calendar nav{margin-bottom:6px!important}.calendarFilters{gap:6px;margin-bottom:6px}
  .calendar nav button{min-height:32px;padding:5px 8px}
  .newsSource{max-width:90px;padding-right:8px}.newsSource span{display:none}

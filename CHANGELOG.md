@@ -2,6 +2,11 @@
 
 ## Unreleased · Creative designer · 10 October 2026
 
+- Removed the redundant weather eyebrow and 3-week calendar choice. Old stored rolling preferences fall back to Week in the display and settings.
+- Designer previews now render at selectable native device resolutions and scale the complete screen, with matching placement/crop/resize overlays.
+- Added compact tablet Upcoming rows, a complete six-row Month grid, adaptive bin typography and ticker icons sized to their panel.
+- Smart charging prioritises schedules without a next-charge countdown or explanatory footer; stale/error states and current-slot labels remain.
+
 - Added responsive tablet dashboards, full-height custom canvases and calendar-toolbar settings/fullscreen controls. The dashboard family shortcut has been removed; use Settings.
 - Date/time text fits resized panels and individual slots; a right-click preset places date and time on one line without changing the portable design schema.
 - Bin collections now have stripe padding, matching wheelie-bin icons and ordinal month dates. News tickers identify the selected publisher with locally bundled icons.

@@ -121,7 +121,8 @@ test('Screen heading size changes are reflected by the live canvas typography',a
 test('Resize overlays align with the actual panel edges even when the design has gaps',async t=>{
  const a=await app(t),page=await browserPage(t,a);await page.locator('[data-starter=family]').click();
  await page.frameLocator('#designPreview').locator('[data-design-panel=calendar]').waitFor({state:'visible'});
- const difference=await page.evaluate(()=>{const overlay=document.querySelector('#designCanvas [data-panel=calendar]').getBoundingClientRect(),frame=document.querySelector('#designPreview').getBoundingClientRect(),actual=document.querySelector('#designPreview').contentDocument.querySelector('[data-design-panel=calendar]').getBoundingClientRect();return {x:Math.abs(overlay.x-frame.x-actual.x),width:Math.abs(overlay.width-actual.width)};});
+ await page.waitForFunction(()=>document.querySelector('#designPreview').contentDocument.querySelector('[data-design-panel=calendar]')?.style.gridRow==='1 / span 9');
+ const difference=await page.evaluate(()=>{const overlay=document.querySelector('#designCanvas [data-panel=calendar]').getBoundingClientRect(),frame=document.querySelector('#designPreview').getBoundingClientRect(),actual=document.querySelector('#designPreview').contentDocument.querySelector('[data-design-panel=calendar]').getBoundingClientRect();const scale=frame.width/document.querySelector('#designPreview').clientWidth;return {x:Math.abs(overlay.x-frame.x-actual.x*scale),width:Math.abs(overlay.width-actual.width*scale)};});
  assert.ok(difference.x<=1,'Selection should follow the rendered panel left edge');assert.ok(difference.width<=1,'Resize handles should follow the rendered panel width');
 });
 
@@ -236,4 +237,27 @@ test('All seven week columns fit inside a tablet calendar without horizontal scr
 test('Touch tablet calendar controls retain finger-sized targets',async t=>{
  const a=await app(t),d=await import('../../public/design.mjs');await a.post('/api/settings',{customDesign:d.chargingDesign(d.designStarter('family'))});const page=await browserPage(t,a,{width:1024,height:768},{hasTouch:true,isMobile:true});await page.goto(a.base+'/');await page.waitForLoadState('networkidle');assert.equal(await page.evaluate(()=>matchMedia('(pointer:coarse)').matches),true);
  for(const selector of ['#fullscreen','[aria-label="Open settings"]','.calendar button[data-view=week]']){const box=await page.locator(selector).boundingBox();assert.ok(box.width>=44&&box.height>=44,'At least 44px touch target: '+selector);}
+});
+test('Dashboard removes redundant forecast wording and three-week choices',async t=>{
+ const a=await app(t),page=await browserPage(t,a);assert.equal(await page.locator('#defaultView option[value=rolling]').count(),0);assert.equal((await a.post('/api/settings',{defaultView:'rolling'})).status,200);await page.reload();await page.waitForFunction(()=>document.querySelector('#saveStatus').textContent==='All changes saved');assert.equal(await page.locator('#defaultView').inputValue(),'week');await page.goto(a.base+'/');await page.locator('body[data-view=week]').waitFor();assert.equal(await page.locator('[data-view=rolling]').count(),0);assert.equal(await page.locator('#weatherWidget').textContent().then(x=>x.includes('THE WEEK AHEAD')),false);
+});
+test('Tablet Month shows all six calendar rows inside the visible calendar',async t=>{
+ const a=await app(t),d=await import('../../public/design.mjs');await a.post('/api/settings',{customDesign:d.chargingDesign(d.designStarter('family')),defaultView:'month'});const page=await browserPage(t,a,{width:1024,height:768});await page.goto(a.base+'/');await page.locator('.monthDay').last().waitFor();
+ const calendar=await page.locator('#calendar').boundingBox(),last=await page.locator('.monthDay').last().boundingBox();assert.ok(last.y+last.height<=calendar.y+calendar.height+1,'Last week remains visible');assert.equal(await page.locator('.monthDay').count(),42);
+});
+test('Designer device preview renders at the chosen native resolution and scales to its canvas',async t=>{
+ const a=await app(t),page=await browserPage(t,a);await page.locator('[data-starter=studio]').click();await page.getByLabel('Preview screen',{exact:true}).selectOption('ipad');await page.waitForFunction(()=>document.querySelector('#designPreview').contentWindow.innerWidth===1024);await page.locator('#designOrientation').selectOption('portrait');await page.waitForFunction(()=>document.querySelector('#designPreview').contentWindow.innerWidth===768&&document.querySelector('#designPreview').contentWindow.innerHeight===1024);const box=await page.locator('#designCanvas').boundingBox();assert.ok(Math.abs(box.width/box.height-.75)<.01);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+});
+test('Tablet bins and news icons fit short panels while Upcoming uses compact event rows',async t=>{
+ const a=await app(t,{fake:true}),d=await import('../../public/design.mjs'),design=d.chargingDesign(d.designStarter('family'));design.panels.news={x:4,y:11,w:8,h:1,visible:true,layer:1};design.panelStyles.bins.custom=true;design.panelStyles.bins.fontSize=30;design.panelStyles.bins.secondarySize=30;
+ await a.post('/api/settings',{customDesign:design,defaultView:'agenda',newsEnabled:true,newsUrl:'https://feeds.bbci.co.uk/news/rss.xml'});
+ for(let i=0;i<3;i++)assert.equal((await a.post('/api/family',{revision:i,collection:'bins',action:'save',item:{id:'demo-bin-'+i,title:'Demo bin '+i,color:'#557860',date:'2026-10-23',every:14,reminderDays:0,exceptions:[]}})).status,200);
+ const page=await browserPage(t,a,{width:1024,height:768});await page.goto(a.base+'/');await page.waitForLoadState('networkidle');
+ assert.equal(await page.locator('[data-family-panel=bins]').evaluate(el=>el.scrollHeight<=el.clientHeight+1),true,'Three collections fit their compact tablet card');
+ const panel=await page.locator('#newsWidget').boundingBox(),logo=await page.locator('#newsSource img').boundingBox();assert.ok(logo.y>=panel.y&&logo.y+logo.height<=panel.y+panel.height,'Source logo stays inside the ticker');
+ assert.equal(await page.locator('.agendaEvent strong').first().evaluate(el=>getComputedStyle(el).fontSize),'13px');
+});
+test('Tablet Upcoming displays at least five weekday headings in its initial viewport',async t=>{
+ const a=await app(t),d=await import('../../public/design.mjs');await a.post('/api/settings',{customDesign:d.chargingDesign(d.designStarter('family')),defaultView:'agenda'});const page=await browserPage(t,a,{width:1024,height:768});await page.clock.install({time:new Date('2026-10-05T06:00:00Z')});await page.goto(a.base+'/');await page.locator('.agendaDay').first().waitFor();
+ const visibleDays=()=>page.locator('#calendar').evaluate(el=>{const r=el.getBoundingClientRect();return [...el.querySelectorAll('.agendaDay>h3')].filter(h=>h.getBoundingClientRect().bottom<=r.bottom&&h.getBoundingClientRect().top>=r.top).length;});assert.ok(await visibleDays()>=5,'At least five day headings visible before scrolling');await page.locator('.agendaDay>h3').evaluateAll(els=>els.forEach(el=>el.style.transform='translateY(200vh)'));assert.equal(await visibleDays(),0,'Visible-day detector catches displaced headings');
 });

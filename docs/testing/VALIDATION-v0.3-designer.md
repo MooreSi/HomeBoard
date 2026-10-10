@@ -1,6 +1,29 @@
 # HomeBoard v0.3 validation · 9 October 2026
 
-## Tablet and panel refinement · 10 October 2026
+## Device preview and tablet density refinement · 10 October 2026
+
+- 77 JavaScript files checked; 136/136 tests passed locally and in the image.
+- Full Chrome and WebKit runs each passed 35/35 browser scenarios. The final
+  inline-time refinement also passed its strengthened five-visible-day check in
+  both engines using a pinned 5 October 2026 demo calendar.
+- Checks cover the removed weather wording and 3-week choices, legacy rolling
+  preferences displaying Week, all 42 Month cells inside the initial viewport,
+  three bin collections with oversized saved typography fitting a tablet card,
+  ticker icons staying inside their panels, and native iPad preview dimensions
+  swapping correctly with orientation. The visible-day detector was checked
+  with deliberately displaced headings.
+- Preview layout now renders at native device dimensions, then projects into
+  the canvas. The existing overlay alignment test therefore projects the native
+  bounds through the iframe scale, preserving its exact one-pixel tolerance.
+  Dragging, keyboard resize, cropping, layering, typography and restored clock
+  composition remain covered by the original assertions.
+- Docker build and disposable-container static assets/API/boot checks passed,
+  including two restarts with saved designs, settings and credential persistence.
+- Visual review used synthetic data in iPad portrait/landscape, Android portrait,
+  desktop, Month and native-resolution designer previews. Physical iPad and
+  Android hardware remains unverified.
+
+## Earlier tablet and panel refinement · 10 October 2026
 
 - Local verification: 76 JavaScript files checked; 135/135 API/unit tests passed.
 - Chrome and WebKit: 29/29 full browser scenarios plus the new touch-target

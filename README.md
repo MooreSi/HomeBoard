@@ -26,7 +26,7 @@ See the [family and reliability guide](docs/FAMILY-AND-RELIABILITY.md). Native f
 
 ## v0.21
 
-- Continuous calendar browsing: scroll or select **Continue to later dates** in Upcoming, Day, Week, Month and 3 weeks. Each page fetches its own dates, including recurring appointments and month-grid overflow days. Today and previous/next navigation remain available.
+- Continuous calendar browsing: scroll or select **Continue to later dates** in Upcoming, Day, Week and Month. Each page fetches its own dates, including recurring appointments and month-grid overflow days. Today and previous/next navigation remain available.
 - **Settings → Custom Design**: drag or use arrow keys to position five panels; Shift + arrows resizes them. Set exact grid dimensions, visibility and layers, with undo/redo and three starting layouts.
 - Choose body/heading fonts, sizes, weight, spacing, colours, borders, shadows, corner radius, opacity and solid/gradient/photo backgrounds. Check contrast and preview the actual dashboard before saving. Portrait displays stack panels.
 - Export/import named HomeBoard theme JSON files to share styles. Imports are validated and previewed before saving. Exports contain no calendar links, credentials, photos or personal preferences.
@@ -48,7 +48,7 @@ The Metro image uses an original landscape illustration and a labelled synthetic
 
 ![Metro full-screen photo rail, upcoming agenda and weather overlay](docs/screenshots/metro.jpg)
 
-![Tide theme with a three-week calendar and news ticker](docs/screenshots/tide.png)
+![Earlier Tide theme screenshot with a calendar and news ticker](docs/screenshots/tide.png)
 
 ![Custom Design placement editor](docs/screenshots/custom-design.jpg)
 
@@ -246,6 +246,8 @@ Select an IANA timezone, long/DMY/MDY/ISO date, digital/analog/both clock and 12
 hour time. Calendar day boundaries use that timezone, including DST; all-day
 appointments retain their calendar dates.
 
+Choose Preview screen in the custom designer to render at Desktop, iPad, iPad Pro, Android tablet or Phone resolution. The complete display scales to the canvas; Orientation switches the device dimensions and the saved layout together.
+
 In the custom designer, right-click Date and time → Arrange date/time items →
 Date and time on one line to place them side by side. Text automatically shrinks
 to fit its panel or individual item slots when resized, including after rotating
@@ -255,7 +257,9 @@ Dashboard settings and fullscreen controls sit in the calendar toolbar. The fami
 organiser opens through Settings. Custom designs use their saved portrait and
 landscape layouts; tablet themes reflow into the available browser height, with
 long panel contents scrolling within cards. All seven week/month columns fit
-the calendar width. Bin cards show matching wheelie bins and ordinal month dates.
+the calendar width. Tablet Upcoming uses compact rows, Month fits all six weeks,
+and bin typography and ticker icons adapt to their available card space.
+Bin cards show matching wheelie bins and ordinal month dates.
 
 Toggle RSS/Atom headlines, choose a news source or Custom RSS / Atom, and set a
 headline count. Presets include BBC, CNBC, CNN via Google News, Fox News, Sky News,
@@ -334,7 +338,7 @@ Node-bundled fetch with a different dispatcher version caused the previous error
 Six new themes add gradient wall calendars, photo/weather rails, glass panels,
 an editorial planner and a portrait photo layout. Selecting a new style also
 selects its suggested calendar view; you can override that view before saving.
-The rolling three-week view crosses month boundaries and advances by a week.
+The 3-week choice has been removed. Existing preferences using it display Week until saved again.
 
 
 ## Automatic updates

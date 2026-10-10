@@ -1,0 +1,51 @@
+/* Device previews use real dashboard typography, padding and controls. */
+body.designPreviewMode[data-custom-design=true] .dashboard{padding:8px!important}
+body.designPreviewMode .calendarTools{visibility:visible}
+body.designPreviewMode[data-custom-design=true] .clockCard:not([data-panel-styled=true]) .clock{font-size:clamp(24px,calc(var(--design-headingSize) * 2),96px)!important}
+body.designPreviewMode[data-custom-design=true] .agendaEvent{font-size:inherit!important}
+body.designPreviewMode .customDashboardGrid>[data-design-panel]{padding:var(--design-padding)!important}
+.designCanvas #designPreview{transform-origin:top left}
+.designerCard #designCanvas{max-width:100%;aspect-ratio:var(--preview-aspect,16/9)!important}
+.newsWidget .newsSource{min-width:0;max-width:100%;gap:4px;padding-right:6px}
+.newsWidget .newsSource img{width:var(--source-size,28px);height:var(--source-size,28px)}
+.newsWidget{gap:8px!important}
+.chargingSummary:empty{display:none}
+@media(max-width:1440px){
+ body .dashboard .calendar .period{padding:5px 0!important;gap:5px}
+ body .dashboard .calendar .period h2{font-size:16px!important}
+ body .dashboard .calendarFilters{font-size:11px!important;margin-bottom:5px}
+ body .dashboard .calendar #calendar{max-height:none!important}
+ body .dashboard #calendar .upcomingAgenda .agendaDay{margin-bottom:8px!important}
+ body .dashboard #calendar .upcomingAgenda .agendaDay>h3{margin:0 0 5px!important;padding:0!important;gap:6px;font-size:15px!important;line-height:1.2!important}
+ body .dashboard #calendar .upcomingAgenda .agendaDay>h3 time{font-size:22px!important}
+ body .dashboard #calendar .upcomingAgenda .agendaDay>h3 small{font-size:10px!important}
+ body .dashboard #calendar .upcomingAgenda .agendaEvent{padding:3px 8px!important;margin:0 0 4px!important;gap:8px!important;font-size:13px!important;line-height:1.2!important;min-height:0!important}
+ body .dashboard #calendar .upcomingAgenda .agendaEvent :is(strong,span,p){font-size:13px!important;line-height:1.2!important;margin:0!important}
+ body .dashboard #calendar .upcomingAgenda .agendaTime{width:54px!important;min-width:54px!important}
+ body .dashboard #calendar .upcomingAgenda .agendaDetails p{font-size:11px!important}
+ body[data-view=month] .dashboard #calendar>.calendarPage{height:100%;min-height:0}
+ body[data-view=month] .dashboard #calendar .month{height:100%!important;min-height:0!important;grid-template-rows:22px repeat(6,minmax(0,1fr))!important;gap:0!important}
+ body[data-view=month] .dashboard #calendar .monthDay{min-height:0!important;padding:3px!important;overflow:auto}
+ body[data-view=month] .dashboard #calendar .monthHead{padding:2px!important;font-size:11px!important}
+ body[data-view=month] .dashboard #calendar .monthDay button{font-size:16px!important;min-height:22px!important;width:22px!important;height:22px!important;margin:0!important}
+ body[data-view=month] .dashboard #calendar .monthDay .event{padding:2px 3px!important;margin:2px 0!important;font-size:10px!important;line-height:1.15!important}
+ body[data-view=month] .dashboard #calendar .monthDay .event :is(time,span,small){font-size:10px!important;line-height:1.15!important}
+ body .dashboard [data-family-panel=bins]>header{margin-bottom:5px!important}
+ body .dashboard [data-family-panel=bins]>header h2{font-size:16px!important;margin:0!important;line-height:1.2!important}
+ body .dashboard [data-family-panel=bins] .familyWidgetContent article.binCollection{padding-top:3px!important;padding-bottom:3px!important}
+ body .dashboard [data-family-panel=bins] .familyWidgetContent :is(h3,p,strong){font-size:var(--bin-font,13px)!important;line-height:1.2!important;margin:0!important}
+ body .dashboard [data-family-panel=bins] .wheelieBin{width:var(--bin-icon,22px);height:var(--bin-icon,22px);flex-basis:var(--bin-icon,22px)}
+ body .dashboard [data-family-panel=bins] .binDate{gap:6px}
+ body .dashboard #newsWidget{padding-top:5px!important;padding-bottom:5px!important}
+ body .dashboard #newsWidget .tickerLabel{display:none!important}
+}
+
+@media(max-width:1440px){
+ body[data-custom-design=true][data-design-version] .dashboard .customDashboardGrid>[data-family-panel=bins] .familyWidgetContent article.binCollection{padding-top:3px!important;padding-bottom:3px!important}
+ body[data-custom-design=true][data-design-version] .dashboard .customDashboardGrid>[data-family-panel=bins] .familyWidgetContent :is(h3,p,strong){font-size:var(--bin-font,13px)!important;line-height:1.2!important;margin:0!important}
+ body.designPreviewMode .customDashboardGrid>[data-design-panel]{padding:min(var(--design-padding),12px)!important}
+}
+@media(max-width:1440px){
+ body .dashboard #calendar .upcomingAgenda .agendaTime{display:flex!important;flex-direction:row!important;align-items:baseline;gap:5px;width:max-content!important;min-width:90px!important;flex:0 0 auto;white-space:nowrap}
+ body .dashboard #calendar .upcomingAgenda .agendaTime span::before{content:'–';margin-right:5px}
+}
