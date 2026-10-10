@@ -34,7 +34,7 @@ test('Left drag resizes a panel, right-click does not drag it, and one undo reve
  await page.mouse.move(p.x+p.width/2,p.y+p.height-1);await page.mouse.down();await page.mouse.move(p.x+p.width/2,p.y+p.height-1-canvas.height/6,{steps:10});await page.mouse.up();
  assert.equal(await page.locator('#designH').inputValue(),'7');await page.locator('#designUndo').click();assert.equal(await page.locator('#designH').inputValue(),'9');
  await page.locator('#designRedo').click();assert.equal(await page.locator('#designH').inputValue(),'7');
- await panel.click({button:'right',position:{x:100,y:60}});await page.getByRole('menuitem',{name:'Size: compact (3 × 3)',exact:true}).click();
+ await panel.click({button:'right',position:{x:100,y:60}});await page.getByRole('menuitem',{name:'More layout actions…',exact:true}).click();await page.getByRole('menuitem',{name:'Size: compact (3 × 3)',exact:true}).click();
  assert.equal(await page.locator('#designW').inputValue(),'3');assert.equal(await page.locator('#designH').inputValue(),'3');
 });
 test('Management themes remain separate, global timezones are selectable and Auto responds to device changes',async t=>{
@@ -123,4 +123,33 @@ test('Resize overlays align with the actual panel edges even when the design has
  await page.frameLocator('#designPreview').locator('[data-design-panel=calendar]').waitFor({state:'visible'});
  const difference=await page.evaluate(()=>{const overlay=document.querySelector('#designCanvas [data-panel=calendar]').getBoundingClientRect(),frame=document.querySelector('#designPreview').getBoundingClientRect(),actual=document.querySelector('#designPreview').contentDocument.querySelector('[data-design-panel=calendar]').getBoundingClientRect();return {x:Math.abs(overlay.x-frame.x-actual.x),width:Math.abs(overlay.width-actual.width)};});
  assert.ok(difference.x<=1,'Selection should follow the rendered panel left edge');assert.ok(difference.width<=1,'Resize handles should follow the rendered panel width');
+});
+
+test('Bin panel typography uses independent heading, body and secondary sizes and styles from right-click',async t=>{
+ const a=await app(t);await a.post('/api/family',{revision:0,collection:'bins',action:'save',item:{id:'demo-bin',title:'Demo recycling',date:'2026-10-10',every:14,color:'#557860',exceptions:[],reminderDays:1}});
+ const page=await browserPage(t,a);await page.locator('[data-starter=family]').click();await page.locator('#designCanvas [data-panel=bins]').click({button:'right',position:{x:50,y:30}});await page.getByRole('menuitem',{name:'Panel appearance…',exact:true}).click();
+ const heading=page.getByRole('combobox',{name:'Heading size',exact:true});assert.equal(await heading.count(),1,'Panel heading needs an independent font size');await heading.selectOption('16');
+ await page.getByRole('combobox',{name:'Panel text size',exact:true}).selectOption('12');await page.getByRole('combobox',{name:'Secondary text size',exact:true}).selectOption('10');await page.getByRole('combobox',{name:'Heading italic',exact:true}).selectOption('true');await page.getByRole('combobox',{name:'Body weight',exact:true}).selectOption('700');
+ await page.keyboard.press('Escape');await save(page);await page.goto(a.base+'/');await page.locator('[data-design-panel=bins]').waitFor({state:'visible'});
+ const sizes=await page.locator('[data-design-panel=bins]').evaluate(el=>({heading:getComputedStyle(el.querySelector('h2')).fontSize,body:getComputedStyle(el.querySelector('h3')).fontSize,secondary:getComputedStyle(el.querySelector('article p')).fontSize,italic:getComputedStyle(el.querySelector('h2')).fontStyle,weight:getComputedStyle(el.querySelector('h3')).fontWeight}));
+ assert.deepEqual(sizes,{heading:'16px',body:'12px',secondary:'10px',italic:'italic',weight:'700'});
+});
+test('Built-in theme loading makes an editable library copy without changing the default catalogue',async t=>{
+ const a=await app(t),page=await browserPage(t,a),before=await a.json('/api/themes');const source=page.locator('#designThemeSource');assert.equal(await source.count(),1,'Built-in themes need a load selector');await page.waitForFunction(()=>document.querySelector('#designThemeSource').options.length===17);
+ await source.selectOption('metro');await page.locator('#designLoadTheme').click();assert.equal(await page.locator('#designName').inputValue(),'Metro · my design');await page.locator('#designLibrarySave').click();await page.waitForFunction(()=>document.querySelector('#designLibrary').textContent.includes('Metro · my design'));
+ assert.deepEqual(await a.json('/api/themes'),before);assert.equal((await a.json('/api/settings')).theme,'homeboard');assert.equal((await a.json('/api/family')).screens[0].design.colors.background,'#10151c');
+});
+test('Locked panels resist keyboard movement and a clean preview hides editing handles',async t=>{
+ const a=await app(t),page=await browserPage(t,a);await page.locator('[data-starter=family]').click();const panel=page.locator('#designCanvas [data-panel=calendar]');await panel.click({button:'right',position:{x:80,y:40}});
+ const lock=page.getByRole('menuitem',{name:'Lock position',exact:true});assert.equal(await lock.count(),1,'Panels need a position lock');await lock.click();await panel.focus();await page.keyboard.press('ArrowLeft');assert.equal(await page.locator('#designX').inputValue(),'5');
+ await panel.click({button:'right',position:{x:80,y:40}});assert.equal(await page.getByRole('menuitem',{name:'Copy panel style',exact:true}).isEnabled(),true,'Position locks permit copying appearance');await page.getByRole('menuitem',{name:'More layout actions…',exact:true}).click();assert.equal(await page.getByRole('menuitem',{name:'Bring to front',exact:true}).isDisabled(),true,'Position locks protect layer order');await page.keyboard.press('Escape');
+ await page.locator('#designPreviewToggle').click();assert.equal(await panel.isVisible(),false);assert.equal(await page.frameLocator('#designPreview').locator('.calendar').isVisible(),true);await page.locator('#designPreviewToggle').click();assert.equal(await panel.isVisible(),true);
+});
+
+test('Compact bin styling fits a short panel and copied typography can be pasted independently',async t=>{
+ const a=await app(t);await a.post('/api/family',{revision:0,collection:'bins',action:'save',item:{id:'demo-bin',title:'Demo recycling',date:'2026-10-10',every:14,color:'#557860',exceptions:[],reminderDays:1}});
+ const page=await browserPage(t,a);await page.locator('[data-starter=family]').click();const bin=page.locator('#designCanvas [data-panel=bins]');await bin.click({button:'right',position:{x:50,y:30}});await page.getByRole('menuitem',{name:'Make compact',exact:true}).click();
+ await bin.click({button:'right',position:{x:50,y:30}});await page.getByRole('menuitem',{name:'Copy panel style',exact:true}).click();await page.locator('#designCanvas [data-panel=chores]').click({button:'right',position:{x:50,y:30}});await page.getByRole('menuitem',{name:'Paste panel style',exact:true}).click();await save(page);
+ const d=(await a.json('/api/settings')).customDesign;assert.equal(d.panelStyles.bins.headingSize,16);assert.equal(d.panelStyles.bins.padding,8);assert.deepEqual(d.panelStyles.chores,d.panelStyles.bins);
+ await page.goto(a.base+'/');await page.locator('[data-design-panel=bins] article').waitFor();assert.equal(await page.locator('[data-design-panel=bins]').evaluate(el=>el.scrollHeight<=el.clientHeight),true,'Compact bin content should fit without internal scrolling');
 });

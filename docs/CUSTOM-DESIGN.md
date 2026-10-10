@@ -14,6 +14,24 @@ Select Landscape or Portrait to edit the independent layouts. Portrait tablets, 
 
 The preview uses your current calendar and household records. Empty selected family panels retain their headings and a setup hint. Weather/news require their own enabled source settings. Selecting a starter does not connect a source or add household records.
 
+## More creative control
+
+Right-click a panel and choose **Heading typography**, **Body typography** or **Secondary typography**. Each text group has its own font, size (including compact sizes below 12px), weight from light to black, italic toggle, underline/strikethrough, colour and alignment. **Panel appearance** exposes all text controls together.
+
+For family cards, the heading is the widget title; body text includes item names and content; secondary text includes dates, assignments and small metadata. In Bin collections, the collection date is secondary text, so its size can be adjusted independently of the bin name and widget heading.
+
+**Spacing & surface** controls padding, item gaps, corners, borders, shadow, surface opacity, a per-panel gradient, line height, letter spacing, vertical alignment and scrolling/clipping. Surface transparency leaves text opaque. **Make compact** applies small type, tight spacing and padding as a starting point for bins and other short panels. Choose whether to show a panel heading in its text options.
+
+**Copy panel style / Paste panel style** transfers presentation without moving the destination or changing household content. **Lock position** protects dragging, keyboard movement and placement controls while allowing appearance edits. **More layout actions** groups alignment, sizing presets and layer ordering. **Copy panel to other orientation** copies that panel's placement; check the other orientation for overlaps afterward. Undo/redo includes these operations.
+
+The **Preview** toolbar button hides selection overlays and lets you interact with the actual calendar in the iframe; **Edit panels** returns to design mode.
+
+## Copy a built-in theme
+
+Choose a theme in **Load a built-in theme as a copy**, then click **Load theme as new design**. All seventeen themes are available. The copy adopts its palette, font character, background type and a grid-based adaptation of its composition. Built-in theme layouts are responsive CSS, so this is an editable adaptation rather than a pixel-for-pixel conversion.
+
+The new draft is named “Theme name · my design”. Save it to your design library or save dashboard settings to apply it. The built-in theme catalogue and selected default theme remain unchanged. You can save multiple variations under new names.
+
 ## Make it yours
 
 Five coordinated palettes cover midnight blue, soft sage, warm terracotta, northern lights and lavender mist. Backgrounds support a solid colour, a gradient with two colours and a direction, or your existing slideshow with adjustable shading. A gradient is available while no photo is loaded. No separate image upload is required for backgrounds.
@@ -34,7 +52,11 @@ Export a design file to share its presentation choices. Imports preview as draft
 
 v0.3 adds design schema version 3 for validated gradient endpoints, direction and photo shading. Existing version 1/2 settings, saved screens and portable files remain supported; the editor upgrades them when edited. The portable file envelope remains `format: "homeboard-design"`, `version: 1` with a `design` object.
 
+The creative update uses schema version 4 for separate text roles, rich surfaces and position locks. Version 1/2/3 designs and reusable blocks are upgraded by the editor without mutating their source. Schema 4 files require a HomeBoard build containing this creative update.
+
 ## Implementation research
+
+Separate text styles and adjustable spacing follow the approach documented in [Figma's typography system guide](https://www.figma.com/best-practices/typography-systems-in-figma/) and [auto layout guide](https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties). Position locking and transferable styles help keep a composed screen stable while experimenting with typography and colour. Local font families and validated declarative properties keep designs portable without arbitrary CSS or remote font dependencies.
 
 The design uses native [W3C Pointer Events](https://www.w3.org/TR/pointerevents/latest/): pointer capture retains a drag when the cursor leaves its starting handle, mouse/touch use the same geometry, and cancellation restores the starting position. Grid snapping and bounded resize follow the interaction model documented by [interact.js](https://interactjs.io/docs/), while keeping HomeBoard's integer-grid implementation dependency-free.
 

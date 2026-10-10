@@ -1,5 +1,13 @@
 # Release notes
 
+## Unreleased · Creative designer · 10 October 2026
+
+- Added independent heading, body and secondary font families, sizes, weights, italic styles, decorations, colours and alignment in right-click menus.
+- Added panel-specific padding, item spacing, line/letter spacing, surface gradients/opacity, borders, corners, shadows, vertical alignment, heading visibility and overflow controls, plus a compact preset for small widgets.
+- Added editable copies of all seventeen built-in themes. Copies preserve their palettes and adapt their compositions to the editable grid; default themes are never overwritten.
+- Added copy/paste panel styles, position locks, copy-to-other-orientation and an interactive preview without editing handles. Layout commands live in a submenu to keep the main context menu manageable.
+- Introduced validated design schema 4 while retaining older designs, portable files and reusable blocks.
+
 ## v0.3 · 9 October 2026
 
 - Rebuilt Custom Design around a live dashboard canvas: left-button drag, eight resize handles, grid snapping, keyboard alternatives and one undo step per gesture.

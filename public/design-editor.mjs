@@ -1,10 +1,10 @@
-import {validateDesign,exportDesign,importDesign,fonts,panelNames,modernDesign,designStarter,designPalettes,transformPanel} from './design.mjs';
+import {validateDesign,exportDesign,importDesign,fonts,panelNames,designStarter,designPalettes,transformPanel,creativeDesign as editorDesign,creativePanelStyle,designFromTheme} from './design.mjs';
 import {api,esc} from './display.mjs';
 
 export function setupDesignEditor(initial,dirty,theme){
  const $=id=>document.getElementById(id);
- let design=modernDesign(initial?validateDesign(initial):{...designStarter('studio'),enabled:false}),selected='calendar',orientation='landscape';
- let history=[structuredClone(design)],historyIndex=0,gesture=null,previewFrame=0,menuAnchor=null;
+ let design=editorDesign(initial?validateDesign(initial):{...designStarter('studio'),enabled:false}),selected='calendar',orientation='landscape';
+ let history=[structuredClone(design)],historyIndex=0,gesture=null,previewFrame=0,menuAnchor=null,styleClipboard=null,themeSources=[];
  const names={calendar:'Calendar',clock:'Date & time',photo:'Photos',weather:'Weather',news:'News ticker',lists:'Shared lists',chores:'Chores',routines:'Routines',meals:'Meal plan',bins:'Bin collections',countdowns:'Countdowns',notices:'Noticeboard'};
  const canvas=$('designCanvas');
  const panels=()=>orientation==='portrait'?design.portraitPanels:design.panels;
@@ -29,11 +29,11 @@ export function setupDesignEditor(initial,dirty,theme){
   for(const b of canvas.querySelectorAll('[data-panel]')){const p=panels()[b.dataset.panel];
    Object.assign(b.style,{left:`calc(${p.x/12*100}% + ${p.x/12*design.gap}px)`,top:`calc(${p.y/12*100}% + ${p.y/12*design.gap}px)`,width:`calc(${p.w/12*100}% - ${(1-p.w/12)*design.gap}px)`,height:`calc(${p.h/12*100}% - ${(1-p.h/12)*design.gap}px)`,zIndex:p.layer+1});
    b.hidden=!p.visible;b.setAttribute('aria-pressed',String(b.dataset.panel===selected));b.setAttribute('aria-label',`${names[b.dataset.panel]}, column ${p.x+1}, row ${p.y+1}, width ${p.w}, height ${p.h}. Drag to move, edges to resize. Right-click for options.`);
-   b.querySelector('.designPanelBadge').textContent=names[b.dataset.panel]+' · '+p.w+' × '+p.h;
+   b.querySelector('.designPanelBadge').textContent=(design.panelStyles[b.dataset.panel].locked?'🔒 ':'')+names[b.dataset.panel]+' · '+p.w+' × '+p.h;
   }
   $('designPanel').value=selected;const p=panels()[selected],s=design.panelStyles[selected];
   for(const [id,key]of [['designX','x'],['designY','y'],['designW','w'],['designH','h'],['designLayer','layer']])$(id).value=p[key]+(['x','y'].includes(key)?1:0);
-  $('designVisible').checked=p.visible;$('panelStyleCustom').checked=s.custom;
+  for(const id of ['designX','designY','designW','designH','designLayer'])$(id).disabled=design.panelStyles[selected].locked;$('designVisible').checked=p.visible;$('panelStyleCustom').checked=s.custom;
   for(const key of ['font','fontSize','color','background','align'])$('panelStyle-'+key).value=s[key];
   $('designUndo').disabled=historyIndex===0;$('designRedo').disabled=historyIndex===history.length-1;
   const luminance=color=>{const c=color.slice(1).match(/../g).map(h=>{const v=parseInt(h,16)/255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;});return c[0]*.2126+c[1]*.7152+c[2]*.0722;};
@@ -52,23 +52,32 @@ export function setupDesignEditor(initial,dirty,theme){
   if(JSON.stringify(design)!==JSON.stringify(history[historyIndex])){history=history.slice(0,historyIndex+1);history.push(structuredClone(design));if(history.length>100)history.shift();historyIndex=history.length-1;}
   dirty();paint();$('designStatus').textContent='Draft updated · save changes to apply to your dashboard.';
  }
- function populate(value){design=modernDesign(value?validateDesign(value):{...designStarter('studio'),enabled:false});changed();sync();}
+ function populate(value){design=editorDesign(value?validateDesign(value):{...designStarter('studio'),enabled:false});changed();sync();}
  function select(name){selected=name;paint();}
  function closeMenu(restore=false){menu.hidden=true;if(restore)menuAnchor?.focus({preventScroll:true});}
  function propertyPanel(){closeMenu();$('designPanelDetails').open=true;$('designPanelDetails').scrollIntoView({block:'nearest',behavior:'smooth'});$('designPanel').focus();}
- function showMenu(x,y,addOnly=false,anchor=null){
+ function showMenu(x,y,addOnly=false,anchor=null,layoutOnly=false){
   closeMenu();menu.setAttribute('role','menu');menu.setAttribute('aria-label','Design options');menuAnchor=anchor||canvas.querySelector(`[data-panel="${selected}"]`);
   const heading=document.createElement('div');heading.className='designContextHeading';heading.setAttribute('role','presentation');heading.textContent=addOnly?'Add a panel':names[selected];menu.replaceChildren(heading);
-  function action(label,fn){const b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.textContent=label;b.onclick=()=>{closeMenu(true);fn();};menu.append(b);}
+  function action(label,fn){const b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.textContent=label;b.onclick=()=>{closeMenu(true);fn();};if(design.panelStyles[selected].locked&&/^(Position|Fit width|Size:|Align |Centre |Copy panel to|Bring to front|Send to back)/.test(label))b.disabled=true;menu.append(b);}
   if(addOnly){for(const name of panelNames)action((panels()[name].visible?'✓ ':'+ ')+names[name],()=>{selected=name;if(!panels()[name].visible){panels()[name].visible=true;panels()[name].layer=Math.min(10,Math.max(...Object.values(panels()).map(p=>p.layer))+1);changed();}else paint();canvas.querySelector(`[data-panel="${name}"]`).focus();});}
-  else{
-   action('Panel appearance…',()=>appearanceMenu(x,y,anchor));action('Position & size…',()=>placementMenu(x,y,anchor));
+  else if(layoutOnly){
    action('Fit width',()=>{const p=panels()[selected];p.x=0;p.w=12;changed();});
    action('Size: compact (3 × 3)',()=>size(3,3));action('Size: medium (4 × 4)',()=>size(4,4));action('Size: wide (8 × 4)',()=>size(8,4));
    action('Align left',()=>{panels()[selected].x=0;changed();});action('Align right',()=>{const p=panels()[selected];p.x=12-p.w;changed();});
    action('Centre horizontally',()=>{const p=panels()[selected];p.x=Math.floor((12-p.w)/2);changed();});
    action('Bring to front',()=>{const p=panels()[selected];for(const q of Object.values(panels()))if(q!==p)q.layer=Math.min(q.layer,9);p.layer=10;changed();});
    action('Send to back',()=>{for(const q of Object.values(panels()))if(q!==panels()[selected])q.layer=Math.min(10,q.layer+1);panels()[selected].layer=0;changed();});
+   action('‹ Back to panel options',()=>showMenu(x,y,false,anchor));
+  }
+  else{
+   action('Panel appearance…',()=>appearanceMenu(x,y,anchor));for(const group of ['Heading','Body','Secondary'])action(group+' typography…',()=>appearanceMenu(x,y,anchor,group));action('Spacing & surface…',()=>surfaceMenu(x,y,anchor));action('Position & size…',()=>placementMenu(x,y,anchor));
+   action('More layout actions…',()=>showMenu(x,y,false,anchor,true));
+   action(design.panelStyles[selected].locked?'Unlock position':'Lock position',()=>{design.panelStyles[selected].locked=!design.panelStyles[selected].locked;changed();});
+   action('Make compact',()=>{enablePanelStyle();Object.assign(design.panelStyles[selected],{headingSize:16,fontSize:12,secondarySize:11,padding:8,contentGap:4,lineHeight:1.2,radius:12});changed();});
+   action('Copy panel style',()=>{const source=design.panelStyles[selected];styleClipboard={...(source.custom?structuredClone(source):{...creativePanelStyle(design),fontSize:design.fontSize,color:design.colors.text,background:design.colors.surface}),custom:true,locked:false};$('designStatus').textContent='Panel style copied. Right-click another panel to paste it.';});
+   if(styleClipboard)action('Paste panel style',()=>{design.panelStyles[selected]={...structuredClone(styleClipboard),locked:design.panelStyles[selected].locked};changed();});
+   action('Copy panel to other orientation',()=>{const target=orientation==='landscape'?design.portraitPanels:design.panels;target[selected]=structuredClone(panels()[selected]);changed();});
    action('Hide panel',()=>{panels()[selected].visible=false;changed();});
    action('Add another panel…',()=>showMenu(x,y,true,anchor));action('Screen appearance…',()=>screenMenu(x,y,anchor));action('Advanced properties…',propertyPanel);
   }
@@ -83,19 +92,42 @@ export function setupDesignEditor(initial,dirty,theme){
   const done=document.createElement('button');done.type='button';done.textContent='Done';done.onclick=()=>closeMenu(true);menu.append(done);
   menu.hidden=false;menu.style.left='0px';menu.style.top='0px';const rect=menu.getBoundingClientRect();menu.style.left=Math.max(8,Math.min(x,innerWidth-rect.width-8))+'px';menu.style.top=Math.max(8,Math.min(y,innerHeight-rect.height-8))+'px';menu.scrollTop=0;menu.querySelector('select,input')?.focus({preventScroll:true});
  }
- function appearanceMenu(x,y,anchor){
-  const s=design.panelStyles[selected],edit=(key,value)=>{if(!s.custom){s.color=design.colors.text;s.background=design.colors.surface;s.fontSize=design.fontSize;}s.custom=true;s[key]=value;};
-  controlsMenu(names[selected]+' appearance',x,y,anchor,[
-   {label:'Panel font',value:s.font,options:[['inherit','Use screen font'],...Object.keys(fonts).map(f=>[f,f[0].toUpperCase()+f.slice(1)])],change:v=>edit('font',v)},
-   {label:'Panel text size',value:s.custom?s.fontSize:design.fontSize,options:Array.from({length:25},(_,i)=>i+12),change:v=>edit('fontSize',Number(v))},
-   {label:'Text alignment',value:s.align,options:[['left','Left'],['center','Centre'],['right','Right']],change:v=>edit('align',v)},
-   {label:'Text colour',value:s.custom?s.color:design.colors.text,color:true,change:v=>edit('color',v)},
-   {label:'Panel colour',value:s.custom?s.background:design.colors.surface,color:true,change:v=>edit('background',v)},
-   {label:'Style source',value:s.custom?'custom':'screen',options:[['screen','Use screen style'],['custom','Own panel style']],change:v=>s.custom=v==='custom'}
-  ]);
+ function enablePanelStyle(){const s=design.panelStyles[selected];if(!s.custom){const locked=s.locked;Object.assign(s,creativePanelStyle(design));s.locked=locked;s.color=design.colors.text;s.background=design.colors.surface;s.headingColor=design.colors.text;s.secondaryColor=design.colors.muted;s.fontSize=design.fontSize;}s.custom=true;return s;}
+ function appearanceMenu(x,y,anchor,group=null){
+  const stored=design.panelStyles[selected],s=stored.custom?stored:{...creativePanelStyle(design),color:design.colors.text,background:design.colors.surface,fontSize:design.fontSize};
+  const edit=(key,value)=>{enablePanelStyle()[key]=value;},fontOptions=[['inherit','Use screen font'],...Object.keys(fonts).map(f=>[f,f[0].toUpperCase()+f.slice(1)])];
+  const fields=[];
+  for(const [prefix,label,sizeKey,fontKey,weightKey,colorKey]of [['heading','Heading','headingSize','headingFont','headingWeight','headingColor'],['font','Body','fontSize','font','fontWeight','color'],['secondary','Secondary','secondarySize','secondaryFont','secondaryWeight','secondaryColor']]){
+   if(group&&label!==group)continue;fields.push({label:label==='Body'?'Panel font':label+' font',value:s[fontKey],options:fontOptions,change:v=>edit(fontKey,v)},
+    {label:label==='Body'?'Panel text size':label==='Secondary'?'Secondary text size':'Heading size',value:s[sizeKey],options:Array.from({length:(label==='Heading'?89:65)},(_,i)=>i+8),change:v=>edit(sizeKey,Number(v))},
+    {label:label+' weight',value:s[weightKey],options:[[300,'Light'],[400,'Normal'],[500,'Medium'],[600,'Semibold'],[700,'Bold'],[800,'Extra bold'],[900,'Black']],change:v=>edit(weightKey,Number(v))},
+    {label:label+' italic',value:String(s[prefix+'Italic']),options:[['false','Normal'],['true','Italic']],change:v=>edit(prefix+'Italic',v==='true')},
+    {label:label+' decoration',value:s[prefix+'Decoration'],options:[['none','None'],['underline','Underline'],['line-through','Strikethrough']],change:v=>edit(prefix+'Decoration',v)},
+    {label:label+' colour',value:s[colorKey],color:true,change:v=>edit(colorKey,v)},
+    {label:label+' alignment',value:s[label==='Body'?'align':prefix+'Align'],options:[['left','Left'],['center','Centre'],['right','Right']],change:v=>edit(label==='Body'?'align':prefix+'Align',v)});
+  }
+  fields.push({label:'Text alignment',value:s.align,options:[['left','Left'],['center','Centre'],['right','Right']],change:v=>edit('align',v)},
+   {label:'Show panel heading',value:String(s.showHeading),options:[['true','Show'],['false','Hide']],change:v=>edit('showHeading',v==='true')},
+   {label:'Style source',value:stored.custom?'custom':'screen',options:[['screen','Use screen style'],['custom','Own panel style']],change:v=>{if(v==='custom')enablePanelStyle();else stored.custom=false;}});
+  // Each text group is also available directly from the context menu.
+  controlsMenu(names[selected]+' · '+(group?group.toLowerCase()+' typography':'all typography'),x,y,anchor,fields);
+ }
+ function surfaceMenu(x,y,anchor){const old=design.panelStyles[selected],s=old.custom?old:{...creativePanelStyle(design),background:design.colors.surface};const edit=(key,v)=>enablePanelStyle()[key]=v;
+  controlsMenu(names[selected]+' spacing & surface',x,y,anchor,[
+   {label:'Panel colour',value:s.background,color:true,change:v=>edit('background',v)},
+   {label:'Surface',value:s.backgroundMode,options:[['solid','Solid'],['gradient','Gradient']],change:v=>edit('backgroundMode',v)},
+   {label:'Gradient end',value:s.gradientTo,color:true,change:v=>edit('gradientTo',v)},
+   {label:'Gradient angle',value:s.gradientAngle,options:[0,45,90,135,180,225,270,315],change:v=>edit('gradientAngle',Number(v))},
+   ...[['padding','Panel padding',48],['contentGap','Item spacing',40],['radius','Corners',48],['borderWidth','Border width',8],['opacity','Surface opacity',100]].map(([key,label,max])=>({label,value:s[key],options:Array.from({length:max+1},(_,i)=>i),change:v=>edit(key,Number(v))})),
+   {label:'Border colour',value:s.borderColor,color:true,change:v=>edit('borderColor',v)},
+   {label:'Shadow',value:s.shadow,options:['none','soft','deep'],change:v=>edit('shadow',v)},
+   {label:'Line height',value:s.lineHeight,options:[.8,1,1.1,1.2,1.3,1.4,1.5,1.6,1.8,2,2.5],change:v=>edit('lineHeight',Number(v))},
+   {label:'Letter spacing',value:s.letterSpacing,options:[-2,-1,0,.5,1,2,3,4,5,6,7,8],change:v=>edit('letterSpacing',Number(v))},
+   {label:'Vertical alignment',value:s.verticalAlign,options:[['top','Top'],['center','Centre'],['bottom','Bottom']],change:v=>edit('verticalAlign',v)},
+   {label:'Overflow',value:s.overflow,options:[['scroll','Scroll content'],['clip','Clip content']],change:v=>edit('overflow',v)}]);
  }
  function placementMenu(x,y,anchor){
-  const p=panels()[selected];controlsMenu(names[selected]+' position & size',x,y,anchor,[
+  if(design.panelStyles[selected].locked)return;const p=panels()[selected];controlsMenu(names[selected]+' position & size',x,y,anchor,[
    ...[['x','Column'],['y','Row'],['w','Panel width'],['h','Panel height'],['layer','Layer']].map(([key,label])=>({label,value:p[key]+(['x','y'].includes(key)?1:0),options:Array.from({length:key==='layer'?11:12},(_,i)=>i+(key==='layer'?0:1)),change:v=>{p[key]=Number(v)-(['x','y'].includes(key)?1:0);p.x=Math.min(p.x,12-p.w);p.y=Math.min(p.y,12-p.h);}})),
    {label:'Visibility',value:p.visible?'show':'hide',options:[['show','Show panel'],['hide','Hide panel']],change:v=>p.visible=v==='show'}
   ]);
@@ -116,16 +148,16 @@ export function setupDesignEditor(initial,dirty,theme){
 
  function size(w,h){const p=panels()[selected];p.w=w;p.h=h;p.x=Math.min(p.x,12-w);p.y=Math.min(p.y,12-h);changed();}
  menu.onkeydown=e=>{const items=[...menu.querySelectorAll('button,select,input')];const i=items.indexOf(document.activeElement);if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)&&document.activeElement.tagName==='BUTTON'&&menu.getAttribute('role')==='menu'){e.preventDefault();items[e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowDown'?1:items.length-1))%items.length].focus();}if(e.key==='Escape'){e.preventDefault();closeMenu(true);}if(e.key==='Tab'){if(menu.getAttribute('role')==='menu')closeMenu();else{e.preventDefault();items[(i+(e.shiftKey?items.length-1:1))%items.length].focus();}}};
- document.addEventListener('pointerdown',e=>{if(!menu.hidden&&!menu.contains(e.target))closeMenu();});window.addEventListener('resize',()=>closeMenu());window.addEventListener('scroll',e=>{if(e.target!==menu&&!menu.contains(e.target))closeMenu();},true);
+ document.addEventListener('pointerdown',e=>{if(!menu.hidden&&!menu.contains(e.target))closeMenu();});window.addEventListener('resize',()=>closeMenu());window.addEventListener('wheel',e=>{if(!menu.contains(e.target))closeMenu();},{passive:true});
  for(const name of panelNames){
   const b=document.createElement('button');b.type='button';b.dataset.panel=name;b.className='designPanelOverlay';b.innerHTML='<span class="designPanelBadge"></span>'+['n','ne','e','se','s','sw','w','nw'].map(edge=>`<span class="resizeHandle handle-${edge}" data-edge="${edge}" aria-hidden="true"></span>`).join('');
   b.onclick=()=>select(name);
   b.oncontextmenu=e=>{e.preventDefault();select(name);showMenu(e.clientX,e.clientY,false,b);};
   b.onkeydown=e=>{
    if(e.key==='ContextMenu'||e.key==='F10'&&e.shiftKey){e.preventDefault();select(name);const r=b.getBoundingClientRect();showMenu(r.left+12,r.top+24,false,b);return;}
-   if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();selected=name;const dx=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0,dy=e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:0;panels()[name]=transformPanel(panels()[name],e.shiftKey?'se':'move',dx,dy);changed();
+   if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();selected=name;if(design.panelStyles[selected].locked)return;const dx=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0,dy=e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:0;panels()[name]=transformPanel(panels()[name],e.shiftKey?'se':'move',dx,dy);changed();
   };
-  b.onpointerdown=e=>{if(e.button!==0||gesture)return;e.preventDefault();closeMenu();select(name);b.focus({preventScroll:true});gesture={name,initial:structuredClone(panels()[name]),clientX:e.clientX,clientY:e.clientY,mode:e.target.dataset.edge||'move',pointer:e.pointerId};b.setPointerCapture(e.pointerId);canvas.classList.add('dragging');};
+  b.onpointerdown=e=>{if(e.button!==0||gesture)return;e.preventDefault();closeMenu();select(name);if(design.panelStyles[name].locked)return;b.focus({preventScroll:true});gesture={name,initial:structuredClone(panels()[name]),clientX:e.clientX,clientY:e.clientY,mode:e.target.dataset.edge||'move',pointer:e.pointerId};b.setPointerCapture(e.pointerId);canvas.classList.add('dragging');};
   b.onpointermove=e=>{if(!gesture||gesture.name!==name||gesture.pointer!==e.pointerId)return;panels()[name]=transformPanel(gesture.initial,gesture.mode,(e.clientX-gesture.clientX)*12/(canvas.clientWidth+design.gap),(e.clientY-gesture.clientY)*12/(canvas.clientHeight+design.gap));paint();};
   b.onpointerup=e=>{if(!gesture||gesture.pointer!==e.pointerId)return;gesture=null;canvas.classList.remove('dragging');changed();};
   b.onpointercancel=()=>{if(gesture){panels()[gesture.name]=gesture.initial;gesture=null;canvas.classList.remove('dragging');paint();}};
@@ -138,11 +170,11 @@ export function setupDesignEditor(initial,dirty,theme){
  $('designProperties').onclick=()=>{const r=$('designProperties').getBoundingClientRect();showMenu(r.left,r.bottom+6,false,$('designProperties'));};
  $('designPanel').onchange=()=>select($('designPanel').value);$('designOrientation').onchange=()=>{orientation=$('designOrientation').value;paint();};
  $('designEnabled').onchange=()=>{design.enabled=$('designEnabled').checked;changed();};$('designName').onchange=()=>{const value=$('designName').value.trim();if(!value)return;design.name=value;changed();};
- for(const [id,key]of [['designX','x'],['designY','y'],['designW','w'],['designH','h'],['designLayer','layer']])$(id).onchange=()=>{const n=Number($(id).value)-(['x','y'].includes(key)?1:0);if(!Number.isInteger(n)||$(id).value===''){paint();return;}const p=panels()[selected];p[key]=Math.max(['w','h'].includes(key)?1:0,Math.min(key==='layer'?10:['x','y'].includes(key)?11:12,n));p.x=Math.min(p.x,12-p.w);p.y=Math.min(p.y,12-p.h);changed();};
+ for(const [id,key]of [['designX','x'],['designY','y'],['designW','w'],['designH','h'],['designLayer','layer']])$(id).onchange=()=>{if(design.panelStyles[selected].locked){paint();return;}const n=Number($(id).value)-(['x','y'].includes(key)?1:0);if(!Number.isInteger(n)||$(id).value===''){paint();return;}const p=panels()[selected];p[key]=Math.max(['w','h'].includes(key)?1:0,Math.min(key==='layer'?10:['x','y'].includes(key)?11:12,n));p.x=Math.min(p.x,12-p.w);p.y=Math.min(p.y,12-p.h);changed();};
  $('designVisible').onchange=()=>{panels()[selected].visible=$('designVisible').checked;changed();};
  $('panelStyleCustom').onchange=()=>{const s=design.panelStyles[selected];s.custom=$('panelStyleCustom').checked;if(s.custom){s.color=design.colors.text;s.background=design.colors.surface;}$('panelStyle-color').value=s.color;$('panelStyle-background').value=s.background;changed();};
- for(const key of ['font','fontSize','color','background','align'])$('panelStyle-'+key).oninput=()=>{const value=key==='fontSize'?Number($('panelStyle-'+key).value):$('panelStyle-'+key).value;if(key==='fontSize'&&(!Number.isInteger(value)||value<12||value>36))return;design.panelStyles[selected][key]=value;changed();};
- for(const [id,key,value]of [['designAlignLeft','x',0],['designAlignTop','y',0]])$(id).onclick=()=>{panels()[selected][key]=value;changed();};$('designCenter').onclick=()=>{const p=panels()[selected];p.x=Math.floor((12-p.w)/2);changed();};
+ for(const key of ['font','fontSize','color','background','align'])$('panelStyle-'+key).oninput=()=>{const value=key==='fontSize'?Number($('panelStyle-'+key).value):$('panelStyle-'+key).value;if(key==='fontSize'&&(!Number.isInteger(value)||value<8||value>72))return;design.panelStyles[selected][key]=value;changed();};
+ for(const [id,key,value]of [['designAlignLeft','x',0],['designAlignTop','y',0]])$(id).onclick=()=>{if(design.panelStyles[selected].locked)return;panels()[selected][key]=value;changed();};$('designCenter').onclick=()=>{if(design.panelStyles[selected].locked)return;const p=panels()[selected];p.x=Math.floor((12-p.w)/2);changed();};
  $('designUndo').onclick=()=>{if(historyIndex){design=structuredClone(history[--historyIndex]);sync();dirty();}};$('designRedo').onclick=()=>{if(historyIndex<history.length-1){design=structuredClone(history[++historyIndex]);sync();dirty();}};
  canvas.onkeydown=e=>{if(e.key==='Escape'&&gesture){panels()[gesture.name]=gesture.initial;gesture=null;canvas.classList.remove('dragging');paint();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();$(e.shiftKey?'designRedo':'designUndo').click();}};
  for(const [id,key]of [['designGradientFrom','from'],['designGradientTo','to'],['designGradientAngle','angle'],['designPhotoOverlay','overlay']])$(id).oninput=()=>{design.backdrop[key]=['angle','overlay'].includes(key)?Number($(id).value):$(id).value;changed();};
@@ -156,6 +188,9 @@ export function setupDesignEditor(initial,dirty,theme){
  $('designExport').onclick=()=>{try{const url=URL.createObjectURL(new Blob([JSON.stringify(exportDesign(value()),null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='homeboard-'+design.name.replace(/[^a-z\d-]/gi,'-').toLowerCase()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){$('designStatus').textContent=e.message;}};
  $('designImport').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>65536)throw Error('Design file exceeds 64 KB');populate(importDesign(JSON.parse(await file.text())));$('designStatus').textContent='Design imported as a draft · save changes to apply.';}catch(error){$('designStatus').textContent='Import failed: '+error.message;}e.target.value='';};
  function value(){design.name=$('designName').value.trim();return validateDesign(design);}
+ $('designPreviewToggle').onclick=()=>{const clean=canvas.classList.toggle('previewOnly');$('designPreviewToggle').textContent=clean?'Edit panels':'Preview';$('designPreviewToggle').setAttribute('aria-pressed',String(clean));};
+ api('/api/themes').then(values=>{themeSources=values;$('designThemeSource').replaceChildren(...values.map(t=>new Option(t.name,t.id)));}).catch(e=>$('designStatus').textContent=e.message);
+ $('designLoadTheme').onclick=()=>{try{const t=themeSources.find(t=>t.id===$('designThemeSource').value);populate(designFromTheme(t));$('designStatus').textContent='Built-in theme loaded as a new editable copy. Save to your library to keep it.';}catch(e){$('designStatus').textContent=e.message;}};
  $('designPreview').onload=sendPreview;sync();
- return {value,populate,selectedBlock:()=>({type:selected,panel:structuredClone(panels()[selected]),style:structuredClone(design.panelStyles[selected])}),applyBlock:block=>{panels()[selected]=structuredClone(block.panel);design.panelStyles[selected]=structuredClone(block.style);changed();}};
+ return {value,populate,selectedBlock:()=>({type:selected,panel:structuredClone(panels()[selected]),style:structuredClone(design.panelStyles[selected])}),applyBlock:block=>{const locked=design.panelStyles[selected].locked;if(!locked)panels()[selected]=structuredClone(block.panel);design.panelStyles[selected]=Object.hasOwn(block.style,'headingSize')?structuredClone(block.style):creativePanelStyle(design,block.style);design.panelStyles[selected].locked=locked;changed();}};
 }
