@@ -2,6 +2,12 @@
 
 ## Unreleased · Creative designer · 10 October 2026
 
+- Added direct layer controls with stable front/back and one-step forward/backward ordering, plus a toolbar panel selector for covered panels.
+- Added reversible panel cropping with draggable trim handles and direct Hide/Show heading actions.
+- Added durable pre-compact restoration that preserves later colour/font choices.
+- Added drag/resize and show/hide controls for time, analog clock, date, timezone/location and seconds inside the date/time panel; normal composition can be restored.
+- Added schema 5 persistence for crops, compact restoration and clock composition while retaining schema 1–4 support.
+
 - Added independent heading, body and secondary font families, sizes, weights, italic styles, decorations, colours and alignment in right-click menus.
 - Added panel-specific padding, item spacing, line/letter spacing, surface gradients/opacity, borders, corners, shadows, vertical alignment, heading visibility and overflow controls, plus a compact preset for small widgets.
 - Added editable copies of all seventeen built-in themes. Copies preserve their palettes and adapt their compositions to the editable grid; default themes are never overwritten.

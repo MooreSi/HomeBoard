@@ -20,11 +20,19 @@ Right-click a panel and choose **Heading typography**, **Body typography** or **
 
 For family cards, the heading is the widget title; body text includes item names and content; secondary text includes dates, assignments and small metadata. In Bin collections, the collection date is secondary text, so its size can be adjusted independently of the bin name and widget heading.
 
-**Spacing & surface** controls padding, item gaps, corners, borders, shadow, surface opacity, a per-panel gradient, line height, letter spacing, vertical alignment and scrolling/clipping. Surface transparency leaves text opaque. **Make compact** applies small type, tight spacing and padding as a starting point for bins and other short panels. Choose whether to show a panel heading in its text options.
+**Spacing & surface** controls padding, item gaps, corners, borders, shadow, surface opacity, a per-panel gradient, line height, letter spacing, vertical alignment and scrolling/clipping. Surface transparency leaves text opaque. **Make compact** applies small type, tight spacing and padding as a starting point for bins and other short panels. Choose whether to show a panel heading in its text options, or use the direct **Hide heading / Show heading** context action. **Restore pre-compact spacing & type** restores the sizes, spacing and corners from before Make compact. This restoration survives saving/reloading and keeps later colour/font choices. Reapplying Make compact retains the original restoration point; Undo/redo is also available.
 
-**Copy panel style / Paste panel style** transfers presentation without moving the destination or changing household content. **Lock position** protects dragging, keyboard movement and placement controls while allowing appearance edits. **More layout actions** groups alignment, sizing presets and layer ordering. **Copy panel to other orientation** copies that panel's placement; check the other orientation for overlaps afterward. Undo/redo includes these operations.
+**Copy panel style / Paste panel style** transfers presentation without moving the destination or changing household content. **Lock position** protects dragging, keyboard movement and placement controls while allowing appearance edits. **Layers** offers Bring to front, Go forward, Go backward and Send to back. Forward/backward move one position in a stable layer order, including when panels originally share a layer. **More layout actions** groups alignment and sizing presets. The selected-panel list in the toolbar lets you select a panel covered by another. **Copy panel to other orientation** copies that panel's placement; check the other orientation for overlaps afterward. Undo/redo includes these operations.
 
 The **Preview** toolbar button hides selection overlays and lets you interact with the actual calendar in the iframe; **Edit panels** returns to design mode.
+
+## Crop panels and compose date/time
+
+**Crop panel** trims the top, right, bottom and left edges by percentages. **Drag crop edges** switches the canvas to crop mode: drag its edge/corner handles, then click **Done editing**. Cropping retains the underlying content and grid position; the remaining area is at least 10% on each axis. **Reset crop** restores the whole panel. Crop mode supports arrows for the top/left edges and Shift + arrows for the bottom/right edges. Escape exits the tool or cancels an active drag. Cropping applies to both orientations.
+
+For Date & time, **Arrange date/time items** controls Time, Analog clock, Date, Location / timezone and Seconds. Select an item to show/hide it or set its position/size as a percentage of the panel. **Drag items on canvas** lets you move each visible item and resize with edge handles. Arrow keys move items; Shift + arrows resizes them. Removed items stay available in the dropdown. These settings survive reloads and clock updates. **Reset date/time arrangement** restores the normal automatic composition. The global Date & time settings still select digital/analog/both and date format. When using both clocks, position their independent slots to avoid overlap. Location displays the chosen timezone.
+
+Clock text inherits the panel’s heading/secondary typography; adjust that alongside the item rectangles to fit the available space. Date/time placement currently applies to both orientations. Use the independent panel positions/sizes to provide room in each orientation. Panel position locking protects the outer panel while internal clock composition remains editable. Unlock the position before dragging crop handles; crop percentage controls remain available while locked.
 
 ## Copy a built-in theme
 
@@ -52,7 +60,7 @@ Export a design file to share its presentation choices. Imports preview as draft
 
 v0.3 adds design schema version 3 for validated gradient endpoints, direction and photo shading. Existing version 1/2 settings, saved screens and portable files remain supported; the editor upgrades them when edited. The portable file envelope remains `format: "homeboard-design"`, `version: 1` with a `design` object.
 
-The creative update uses schema version 4 for separate text roles, rich surfaces and position locks. Version 1/2/3 designs and reusable blocks are upgraded by the editor without mutating their source. Schema 4 files require a HomeBoard build containing this creative update.
+The creative update uses schema version 4 for separate text roles, rich surfaces and position locks. Version 1/2/3 designs and reusable blocks are upgraded by the editor without mutating their source. Schema 4 files require a HomeBoard build containing this creative update. The panel-tools update upgrades editor drafts to schema 5, which adds validated crops, compact restoration and date/time composition; schemas 1–4 remain supported.
 
 ## Implementation research
 

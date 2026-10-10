@@ -1,48 +1,56 @@
 /* Explicit typography roles for schema 4 panels. */
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] {padding:var(--panel-padding)!important;border-radius:var(--panel-radius)!important;border-width:var(--panel-borderWidth)!important;border-color:var(--panel-borderColor)!important;background:var(--panel-surface)!important;box-shadow:var(--panel-shadow)!important;line-height:var(--panel-lineHeight)!important;letter-spacing:var(--panel-letterSpacing)!important;text-align:var(--panel-align)!important;font-weight:var(--panel-fontWeight)!important;font-style:var(--panel-fontItalic)!important;overflow:auto!important;}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] >header h2,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .widgetHeading h2,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .period h2,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .clock,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .agendaDay>h3,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .dayHead strong,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .weatherNow strong,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] #placeholder>span,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .monthDay>button{font-family:var(--panel-headingFont)!important;font-size:var(--panel-headingSize)!important;font-weight:var(--panel-headingWeight)!important;font-style:var(--panel-headingItalic)!important;text-decoration:var(--panel-headingDecoration)!important;color:var(--panel-headingColor)!important;line-height:var(--panel-lineHeight)!important;letter-spacing:var(--panel-letterSpacing)!important;text-align:var(--panel-headingAlign)!important;}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent h3,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent strong,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent p:not([data-text-role]),
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .agendaDetails strong,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .event span,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .agendaTime strong,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .forecastDay>strong,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .forecastDay>b,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .tickerTrack article,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] #placeholder p,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .agendaTime span{font-family:var(--panel-font)!important;font-size:var(--panel-size)!important;font-weight:var(--panel-fontWeight)!important;font-style:var(--panel-fontItalic)!important;text-decoration:var(--panel-fontDecoration)!important;color:var(--panel-color)!important;line-height:var(--panel-lineHeight)!important;letter-spacing:var(--panel-letterSpacing)!important;text-align:var(--panel-align)!important;}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] small,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] [data-text-role=secondary],
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .caption,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] #clockDate,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] #clockZone,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .eventSource,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] #status,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .attribution,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] #clockSeconds,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .calendarFilters label,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .calendarFilters select,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .calendar nav button,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .agendaDetails p{font-family:var(--panel-secondaryFont)!important;font-size:var(--panel-secondarySize)!important;font-weight:var(--panel-secondaryWeight)!important;font-style:var(--panel-secondaryItalic)!important;text-decoration:var(--panel-secondaryDecoration)!important;color:var(--panel-secondaryColor)!important;line-height:var(--panel-lineHeight)!important;letter-spacing:var(--panel-letterSpacing)!important;text-align:var(--panel-secondaryAlign)!important;}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] >header,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .widgetHeading{margin:0 0 var(--panel-contentGap)!important;}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent article{padding:var(--panel-contentGap) 0!important;}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent h3,
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent p{margin:0 0 calc(var(--panel-contentGap) / 2)!important;}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true][data-panel-heading=false]>header,body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true][data-panel-heading=false]>.widgetHeading{display:none!important}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true][data-panel-overflow=clip]{overflow:hidden!important}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true][data-panel-vertical=center]:is(.familyWidget,.clockCard){display:flex!important;flex-direction:column!important;justify-content:center!important;}
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true][data-panel-vertical=bottom]:is(.familyWidget,.clockCard){display:flex!important;flex-direction:column!important;justify-content:flex-end!important;}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] {padding:var(--panel-padding)!important;border-radius:var(--panel-radius)!important;border-width:var(--panel-borderWidth)!important;border-color:var(--panel-borderColor)!important;background:var(--panel-surface)!important;box-shadow:var(--panel-shadow)!important;line-height:var(--panel-lineHeight)!important;letter-spacing:var(--panel-letterSpacing)!important;text-align:var(--panel-align)!important;font-weight:var(--panel-fontWeight)!important;font-style:var(--panel-fontItalic)!important;overflow:auto!important;}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] >header h2,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .widgetHeading h2,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .period h2,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .clock,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .agendaDay>h3,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .dayHead strong,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .weatherNow strong,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] #placeholder>span,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .monthDay>button{font-family:var(--panel-headingFont)!important;font-size:var(--panel-headingSize)!important;font-weight:var(--panel-headingWeight)!important;font-style:var(--panel-headingItalic)!important;text-decoration:var(--panel-headingDecoration)!important;color:var(--panel-headingColor)!important;line-height:var(--panel-lineHeight)!important;letter-spacing:var(--panel-letterSpacing)!important;text-align:var(--panel-headingAlign)!important;}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent h3,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent strong,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent p:not([data-text-role]),
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .agendaDetails strong,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .event span,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .agendaTime strong,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .forecastDay>strong,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .forecastDay>b,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .tickerTrack article,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] #placeholder p,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .agendaTime span{font-family:var(--panel-font)!important;font-size:var(--panel-size)!important;font-weight:var(--panel-fontWeight)!important;font-style:var(--panel-fontItalic)!important;text-decoration:var(--panel-fontDecoration)!important;color:var(--panel-color)!important;line-height:var(--panel-lineHeight)!important;letter-spacing:var(--panel-letterSpacing)!important;text-align:var(--panel-align)!important;}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] small,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] [data-text-role=secondary],
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .caption,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] #clockDate,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] #clockZone,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .eventSource,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] #status,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .attribution,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] #clockSeconds,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .calendarFilters label,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .calendarFilters select,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .calendar nav button,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .agendaDetails p{font-family:var(--panel-secondaryFont)!important;font-size:var(--panel-secondarySize)!important;font-weight:var(--panel-secondaryWeight)!important;font-style:var(--panel-secondaryItalic)!important;text-decoration:var(--panel-secondaryDecoration)!important;color:var(--panel-secondaryColor)!important;line-height:var(--panel-lineHeight)!important;letter-spacing:var(--panel-letterSpacing)!important;text-align:var(--panel-secondaryAlign)!important;}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] >header,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .widgetHeading{margin:0 0 var(--panel-contentGap)!important;}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent article{padding:var(--panel-contentGap) 0!important;}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent h3,
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent p{margin:0 0 calc(var(--panel-contentGap) / 2)!important;}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true][data-panel-heading=false]>header,body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true][data-panel-heading=false]>.widgetHeading{display:none!important}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true][data-panel-overflow=clip]{overflow:hidden!important}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true][data-panel-vertical=center]:is(.familyWidget,.clockCard){display:flex!important;flex-direction:column!important;justify-content:center!important;}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true][data-panel-vertical=bottom]:is(.familyWidget,.clockCard){display:flex!important;flex-direction:column!important;justify-content:flex-end!important;}
 
-body[data-custom-design=true][data-design-version="4"] .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent{text-decoration:none!important}
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent{text-decoration:none!important}
+
+body[data-custom-design=true][data-clock-layout=custom] .clockCard{position:relative!important;display:block!important;container-type:size;}
+body[data-custom-design=true][data-clock-layout=custom] .clockCard>[data-clock-item]{position:absolute!important;left:var(--clock-x)!important;top:var(--clock-y)!important;width:var(--clock-w)!important;height:var(--clock-h)!important;margin:0!important;overflow:hidden!important;max-width:none!important;min-width:0!important;}
+body[data-custom-design=true][data-clock-layout=custom] .clockCard>[data-clock-item=time].clockFace{justify-content:flex-start!important;align-items:flex-start!important;}
+body[data-custom-design=true][data-clock-layout=custom] .clockCard>[data-clock-item=analog].analog{width:min(calc(var(--clock-w-number) * 1cqw),calc(var(--clock-h-number) * 1cqh))!important;height:min(calc(var(--clock-w-number) * 1cqw),calc(var(--clock-h-number) * 1cqh))!important;max-width:none!important;}
+body[data-custom-design=true][data-clock-layout=custom] [data-clock-visible=false]{display:none!important;}
+
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"]) .customDashboardGrid>[data-panel-styled=true][data-panel-heading=false] :is(.period>h2,.tickerLabel,#placeholder>span){display:none!important}
