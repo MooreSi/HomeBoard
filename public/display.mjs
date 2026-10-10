@@ -10,7 +10,7 @@ export function onDay(events,key,timezone){const start=zonedMidnight(key,timezon
 export function dateLabel(date,pref){const p=parts(date,pref.timezone);if(pref.dateFormat==='iso')return `${p.year}-${p.month}-${p.day}`;if(pref.dateFormat==='dmy')return `${p.day}/${p.month}/${p.year}`;if(pref.dateFormat==='mdy')return `${p.month}/${p.day}/${p.year}`;return date.toLocaleDateString('en-GB',{timeZone:pref.timezone,weekday:'long',day:'numeric',month:'long',year:'numeric'});}
 export async function api(url,options){const response=await fetch(url,options);const offline=document.getElementById('offlineStatus');if(offline&&response.headers.get('X-HomeBoard-Offline'))offline.hidden=false;const j=await response.json();if(!response.ok)throw Error(j.error||'Request failed');return j;}
 export const post=(url,value={})=>api(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value)});
-export function applyTheme(theme){document.body.dataset.theme=theme;}
+export function applyTheme(theme){if(document.body.classList.contains('settingsPage'))return;document.body.dataset.theme=theme;}
 export function weatherIcon(code){if(code<300)return '⛈';if(code<600)return '☂';if(code<700)return '❄';if(code<800)return '≋';if(code===800)return '☀';return '☁';}
 
 export function nextCalendarPage(cursor,view){if(view==='month'){const d=new Date(cursor+'T12:00:00Z');return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1)).toISOString().slice(0,10);}return addDays(cursor,view==='agenda'?14:view==='week'?7:view==='rolling'?21:1);}

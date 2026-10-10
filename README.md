@@ -4,6 +4,16 @@ A self-hosted family dashboard with a separate settings page, read-only Calendar
 Open `/` for the display and `/settings` to configure it. Settings are shared
 across displays and persist on the server. The dashboard has no upload controls.
 
+## v0.3 · A more visual, polished HomeBoard
+
+- Design directly on a live canvas: drag to move, pull edges/corners to resize, and right-click for size, placement, layers and appearance. The toolbar provides the same controls on phones and tablets.
+- Start with Studio, Family, Planner or Gallery; pick a coordinated palette, adjustable gradient or rotating photo background. Keep reusable designs in the visual library and share portable design files.
+- Dashboard themes affect the dashboard. Settings and the family organiser share an independent **Light / Dark / Auto** appearance.
+- Worldwide searchable timezone selection, twelve numbered settings sections, optional admin passwords and tidier dashboard cards.
+- Portrait layouts work on tablets and phones; custom calendar controls keep their own space.
+
+See the [custom designer guide](docs/CUSTOM-DESIGN.md) and [v0.3 validation](docs/testing/VALIDATION-v0.3-designer.md).
+
 ## v0.22 · Family organisation and dependable displays
 
 - Multiple private ICS Calendar Links with names, colours, family assignments and dashboard filters.
@@ -24,6 +34,10 @@ See the [family and reliability guide](docs/FAMILY-AND-RELIABILITY.md). Native f
 See [design format and guide](docs/CUSTOM-DESIGN.md) and [release notes](CHANGELOG.md).
 
 ## Screenshots
+
+![v0.3 custom dashboard with demo household records](docs/screenshots/custom-dashboard-v0.3.png)
+
+![v0.3 live designer with finished starters and resize handles](docs/screenshots/custom-designer-v0.3.png)
 
 ![Family organiser with demo profiles and shared lists](docs/screenshots/family-organiser.jpg)
 
@@ -342,7 +356,7 @@ release tags, and run only when you click the install button.
 
 ## Release and licence
 
-The public release is **[HomeBoard v0.2](https://github.com/MooreSi/HomeBoard/releases/tag/v0.2)**.
+This source version is **HomeBoard v0.3.0**. Published downloads are listed on the [GitHub releases page](https://github.com/MooreSi/HomeBoard/releases).
 Earlier validation files retain their development-build labels. HomeBoard is
 licensed under the [MIT licence](LICENSE), copyright © 2026 Simon Moore.
 Third-party npm dependencies retain their own licences in their installed

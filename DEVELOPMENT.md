@@ -44,3 +44,13 @@ Run `npm ci` after cloning. Runtime dependencies are the XML feed parser and
 Undici for DNS-validated outbound feed requests. No compilation step is needed.
 Docker produces the runnable build. `npm start` launches the managed update supervisor. `npm start` does not load `.env`; Docker Compose reads it. For direct Node
 execution set environment variables explicitly or use `node --env-file=.env scripts/runner.mjs`.
+
+## Visual designer browser regressions
+
+The optional browser suite is `tests/browser/release-03.mjs`. It uses the same
+isolated server fixture as the API suite and requires an external Playwright
+installation. Set `PLAYWRIGHT_MODULE` to that package's absolute path; use
+`BROWSER_ENGINE=webkit` for WebKit or `BROWSER_EXECUTABLE` for an installed Chrome.
+Run `node --test tests/browser/release-03.mjs` separately from full API suites to
+avoid competing fixture port probes. Missing browser dependencies fail the run.
+See [v0.3 validation](docs/testing/VALIDATION-v0.3-designer.md) for commands and coverage.

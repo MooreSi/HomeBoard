@@ -60,6 +60,7 @@ const server=http.createServer(async(req,res)=>{let unlock;try{
  if(['/api/auth/setup','/api/auth/login'].includes(u.pathname)&&req.method==='POST'){const {password}=await payload(req);res.setHeader('Set-Cookie',await (u.pathname.endsWith('setup')?auth.setup(req,password):auth.login(req,password)));return json(res,200,auth.status(req));}
  if(u.pathname==='/api/auth/logout'&&req.method==='POST'){res.setHeader('Set-Cookie',auth.logout(req));return json(res,200,{ok:true});}
  if(req.method==='POST')auth.require(req);
+ if(u.pathname==='/api/auth/disable'&&req.method==='POST'){res.setHeader('Set-Cookie',await auth.disable(req));return json(res,200,auth.status(req));}
  if(req.method==='GET'&&(u.pathname==='/api/settings'||/^\/api\/calendar\/(microsoft|google)\/list$/.test(u.pathname)||['/api/photos/uploads','/api/photos/folder'].includes(u.pathname)))auth.require(req);
  if(u.pathname==='/api/family'&&req.method==='GET')return json(res,200,family.value);
  if(u.pathname==='/api/family'&&req.method==='POST')return json(res,200,await family.mutate(await payload(req)));

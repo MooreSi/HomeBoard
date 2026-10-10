@@ -1,5 +1,5 @@
-const CACHE='homeboard-v022-1';
-const shell=['/','/family','/index.html','/family.html','/style.css','/app.js','/display.mjs','/agenda.mjs','/weather-icons.mjs','/slideshow.mjs','/design.mjs','/family.js','/auth-ui.mjs','/family-model.mjs','/family-widgets.mjs','/offline.mjs','/favicon.svg','/app-icon-192.png','/app-icon-512.png','/manifest.webmanifest','/fonts/Roboto.ttf'];
+const CACHE='homeboard-v03-1';
+const shell=['/','/family','/index.html','/family.html','/style.css','/app.js','/display.mjs','/agenda.mjs','/weather-icons.mjs','/slideshow.mjs','/design.mjs','/family.js','/auth-ui.mjs','/management.mjs','/family-model.mjs','/family-widgets.mjs','/offline.mjs','/favicon.svg','/app-icon-192.png','/app-icon-512.png','/manifest.webmanifest','/fonts/Roboto.ttf'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(c=>c.addAll(shell)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('homeboard-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 const displayAPI=new Set(['/api/display-settings','/api/family','/api/events','/api/weather','/api/news','/api/photos']);

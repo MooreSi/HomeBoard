@@ -1,5 +1,17 @@
 # Release notes
 
+## v0.3 · 9 October 2026
+
+- Rebuilt Custom Design around a live dashboard canvas: left-button drag, eight resize handles, grid snapping, keyboard alternatives and one undo step per gesture.
+- Added right-click menus for panel position, size, visibility, layers, font, colours and alignment, plus screen palettes, backgrounds, typography and spacing. Toolbar buttons expose the same controls on touch devices.
+- Added four finished compositions, five coordinated palettes, configurable gradients, slideshow backgrounds and a visual persistent design library with edit/update/delete. Library designs also support existing schedules, playlists and pinned links.
+- Isolated dashboard themes from management pages. Settings, login and the family organiser share Light, Dark or Auto appearance.
+- Renumbered all twelve settings sections, removed organiser navigation from dashboard widgets, and made admin protection explicitly optional, with removal available to unlocked browsers.
+- Replaced the timezone datalist with a searchable worldwide selector, including UTC, current selections, usual regions and the browser's supported IANA zones.
+- Fixed theme styling leaking into custom calendar controls, disappearing empty family panels, portrait tablets using landscape layouts, mobile landscape previews using portrait coordinates, and context menus closing when scrolled.
+- Preserved version 1/2 designs and portable imports. Version 3 stores validated gradient/background options. Refreshed the offline cache for the new assets.
+- Added API/geometry/persistence regressions and real-browser interaction/layout checks. See the release validation record for results and remaining live-device checks.
+
 ## v0.22 · 9 October 2026
 
 - Added multiple ICS feeds, family colours and calendar/person filters while retaining simple read-only calendar setup.

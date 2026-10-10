@@ -1,27 +1,41 @@
-# Custom Design
+# Custom designer
 
-Open Settings → Custom Design. Enable the custom design, give it a name and choose a starting layout. Your built-in theme stays selected so disabling Custom Design returns to it. Changes remain a draft until Save changes.
+Open Settings → Custom designer. Choose a finished starter (Studio, Family, Planner or Gallery), then enable your design. Changes are a draft until **Save changes**. Disabling the custom design returns to the selected dashboard theme.
 
-v0.22 upgrades saved designs to design schema version 2; version 1 imports remain supported. The theme-file envelope remains version 1.
+## Work on the live canvas
 
-The canvas has 12 columns and 12 rows. Drag a panel to move it; focus it and use arrow keys, or Shift + arrows to resize. Exact dimensions and layers appear below. Panels may overlap, with higher layers in front. Undo/redo keeps up to 100 draft steps. Calendar, clock, photos, weather, news, lists, chores, routines, meals, bins, countdowns and notices each have a visibility switch. Weather/news also require their own source settings to be enabled. The editor does not connect new sources.
+- Hold the left mouse button and drag a panel to move it. Drag any of its eight edge/corner handles to resize it. Placement snaps to a 12 × 12 grid and stays inside the canvas.
+- Right-click a panel for **Panel appearance**, **Position & size**, size presets, alignment, layer order or hiding. Appearance and placement open compact dropdown controls directly beside the canvas.
+- Right-click empty canvas space for **Screen appearance**: coordinated palettes, background type, gradient colours/direction, fonts, spacing, opacity and corners.
+- **Add panel**, **Panel options** and **Screen style** open the same controls without a right-click, including on touch devices. Hidden panels retain their content and placement.
+- Arrow keys move the focused panel; Shift + arrows resizes it. Shift + F10 opens its context menu. Escape closes menus and restores focus or cancels an active drag. Undo/redo stores up to 100 changes; a complete drag is one step.
 
-Eight locally available font families include bundled Roboto and system fonts. Choose different body and heading faces, sizes, weight, line height and spacing. Change six palette colours, panel gap/padding, corners, border, shadow and opacity. Backgrounds can be solid, a two-colour gradient or the existing rotating photo backdrop. Contrast is calculated for text against the opaque surface colour; transparency and photos can reduce actual contrast, so check the preview.
+Select Landscape or Portrait to edit the independent layouts. Portrait tablets, portrait wall displays and narrow phones use the portrait arrangement. The editor always previews the orientation you chose, regardless of the management device's width. Calendars and other overflowing panels scroll internally on the dashboard.
 
-Landscape screens use the landscape grid. For version 2 designs, screens below 700px use the independent portrait grid: choose Portrait in the editor to arrange it. Older version 1 designs retain their stacked layout. Calendar panels scroll internally. Hidden panels keep their canvas position for later use. Dimensions that cannot fit are clamped to the grid in the editor and rejected in imported files.
+The preview uses your current calendar and household records. Empty selected family panels retain their headings and a setup hint. Weather/news require their own enabled source settings. Selecting a starter does not connect a source or add household records.
 
-## Panel styles and reusable blocks
+## Make it yours
 
-Give the selected panel its own font, text size, foreground/background colours and alignment. Otherwise it inherits the overall design. Align left, align top and horizontal centring operate on the selected orientation. Placement always snaps to the grid.
+Five coordinated palettes cover midnight blue, soft sage, warm terracotta, northern lights and lavender mist. Backgrounds support a solid colour, a gradient with two colours and a direction, or your existing slideshow with adjustable shading. A gradient is available while no photo is loaded. No separate image upload is required for backgrounds.
 
-Save a named reusable panel layout/style in the block library, then apply it to another selected panel. This copies presentation and placement, without copying personal content. Blocks live in the family data store and are included in full backups. Exporting a theme includes its applied panel styles and both orientations, so they can be shared with other HomeBoard users.
+Choose bundled Roboto, system fonts and six other locally available families. Body/heading sizes, weights, line height, letter spacing, panel padding/gap, borders, rounded corners, shadows and opacity can be fine-tuned in the collapsed Screen appearance section. A panel can inherit the screen's style or have its own font, colour, size, surface and alignment. Advanced placement fields remain available as an alternative to dragging.
 
-## Sharing
+Contrast guidance compares text with the opaque surface colour. Transparency and photographs change actual contrast, so review the preview too.
 
-Export theme file downloads JSON with `format: "homeboard-design"`, `version: 1` and a `design` object. Import theme file accepts this format (maximum 64 KB) and previews it without changing the saved dashboard. Save changes applies it across your home displays. There is no remote theme marketplace; exchange files directly with other users.
+## Design library and scheduled screens
 
-Design files contain presentation settings only. Arbitrary CSS/scripts, remote font URLs, unexpected fields and invalid dimensions/colours are rejected. Calendar subscription links, weather keys, tokens, source paths, photos and display preferences are excluded. Themes from other software need to be recreated with these controls; they are not directly compatible.
+**Save to library** stores the current whole design with its name and both orientations. Library cards let you **Edit** a saved copy as a draft, **Update** it from the current draft, or **Delete** it. Saving a library copy does not replace the dashboard until you save the dashboard settings.
 
-## Design research
+The library uses the durable named-screen store. Existing saved screens appear in it. New copies start with scheduling disabled; use Settings → Family & screens to set weekdays/times, enable schedules, arrange playlists or open pinned screen URLs. Designs and reusable panel blocks are included in household backups. Reusable block controls live under Advanced panel properties.
 
-The controls were informed by common wall-display editor conventions: precise block placement, snapping, layers, keyboard movement, undo/redo and font selection; and [Home Assistant's Sections](https://www.home-assistant.io/dashboards/sections/) for responsive grid placement. HomeBoard implements these concepts with its own HTML/CSS modules and a portable declarative theme format. It uses existing content panels rather than copying third-party code or exposing arbitrary imported CSS.
+## Sharing and compatibility
+
+Export a design file to share its presentation choices. Imports preview as drafts; Save changes applies them. Files contain no calendar links, credentials, photos or household content. Unexpected fields, executable CSS/scripts, remote font URLs, invalid colours/geometry and files over 64 KB are rejected.
+
+v0.3 adds design schema version 3 for validated gradient endpoints, direction and photo shading. Existing version 1/2 settings, saved screens and portable files remain supported; the editor upgrades them when edited. The portable file envelope remains `format: "homeboard-design"`, `version: 1` with a `design` object.
+
+## Implementation research
+
+The design uses native [W3C Pointer Events](https://www.w3.org/TR/pointerevents/latest/): pointer capture retains a drag when the cursor leaves its starting handle, mouse/touch use the same geometry, and cancellation restores the starting position. Grid snapping and bounded resize follow the interaction model documented by [interact.js](https://interactjs.io/docs/), while keeping HomeBoard's integer-grid implementation dependency-free.
+
+The click/dropdown and keyboard alternatives follow [W3C dragging guidance](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements). Context actions use [WAI menu keyboard conventions](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/); property popovers use ordinary labelled inputs, dropdowns and Escape/focus restoration. Right-click is an accelerator; the toolbar exposes equivalent operations.

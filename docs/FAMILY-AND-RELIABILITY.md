@@ -1,6 +1,6 @@
 # Family organiser, screens and reliability
 
-Open `/family` on the display or a phone on your home network. Use Settings → Family & screens for saved screen schedules, playlists and pinned links. Existing connections, uploaded photos and v0.21 themes remain supported.
+Open `/family` on the display or a phone on your home network. Settings, login and the organiser share the Light/Dark/Auto appearance set under Display & appearance; dashboard themes apply only to the display. Use Settings → Family & screens for saved screen schedules, playlists and pinned links. Existing connections, uploaded photos and v0.21 themes remain supported.
 
 ## Calendars and people
 
@@ -17,19 +17,21 @@ The original Calendar Link remains separate for compatibility. To move it to a n
 - Bin schedules use a first date and repeat interval in days. Holiday exceptions replace an occurrence or skip it. Reminders appear from the chosen number of days beforehand. Automatic council-specific scraping is not included.
 - Countdown cards show whole calendar days; annual birthdays/anniversaries advance to their next occurrence. February 29 anniversaries use March 1 in non-leap years.
 
-Built-in dashboards show populated family widgets below the main display. Custom Design lets you place them on the screen or hide them. Dashboard cards link to the organiser for editing. All family writes are validated and use a revision check to prevent one phone overwriting another's changes. A conflict asks you to reload/retry. Screens poll for changes every 10 seconds; the organiser refreshes every 15 seconds while you are not editing.
+Built-in dashboards show populated family widgets below the main display. Custom Design lets you place them on the screen or hide them. Dashboard cards keep you on the display. Open the organiser explicitly from the main toolbar or settings to edit household records. All family writes are validated and use a revision check to prevent one phone overwriting another's changes. A conflict asks you to reload/retry. Screens poll for changes every 10 seconds; the organiser refreshes every 15 seconds while you are not editing.
 
 ## Protected editing and phones
 
-Visit `/login` and choose an admin password of at least ten characters. There is no default password. Before setup, editing remains open for compatibility; the organiser shows a setup prompt. After setup, all write APIs and private management reads require a signed-in browser. Viewing the display and household content remains available on the LAN.
+Visit `/login` and choose an admin password of at least ten characters. There is no default password. Password protection is optional. Editing is open until you choose a password; the login page offers Continue without a password. An unlocked browser can remove protection in Settings. After setup, all write APIs and private management reads require a signed-in browser. Viewing the display and household content remains available on the LAN.
 
 Passwords are salted and hashed with scrypt. Sessions use random HttpOnly SameSite=Strict cookies, expire after eight hours and end at server restart. Five failed login attempts block that client address for 15 minutes. Lock ends the browser session. An HTTPS reverse proxy should replace the X-Forwarded-Proto header appropriately. For away-from-home use, access through a VPN or an authenticated HTTPS deployment; do not expose the unprotected display directly to the internet.
 
 If the password is lost, stop HomeBoard, privately preserve `data/admin.json`, remove that file on the host and restart to set a new password. Store that preserved file securely. Restoring a household backup deliberately retains the current admin password.
 
-On supporting browsers, add HomeBoard to the home screen through the browser's install/share menu. The manifest opens the phone-friendly organiser. HTTPS or localhost is required for service workers/offline installation; plain HTTP LAN addresses still work online. Physical iOS/Android installation support should be checked on the target device.
+On supporting browsers, add HomeBoard to the home screen through the browser's install/share menu. The manifest opens the shared dashboard; the organiser remains available from its toolbar. HTTPS or localhost is required for service workers/offline installation; plain HTTP LAN addresses still work online. Physical iOS/Android installation support should be checked on the target device.
 
 ## Saved screens
+
+The Custom designer includes a visual design library. Saved designs and scheduled screens use the same durable store. New library copies start with scheduling disabled.
 
 Save the current draft design as a named screen. New schedules start disabled. Choose active weekdays and start/end times; equal times mean all day, and an overnight schedule belongs to its starting weekday. Schedules use the configured timezone. Enable screens and select them in a playlist; up/down arrows control rotation order. The interval is 15–3600 seconds. When no schedule matches, the normal selected design/theme returns.
 

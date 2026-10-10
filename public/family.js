@@ -1,3 +1,4 @@
+import {applyManagementAppearance} from './management.mjs';
 import {api,post,esc,zonedDate,addDays,weekday} from './display.mjs';
 import {authBanner} from './auth-ui.mjs';
 import {taskOccurs,completed,nextBin,countdownDate,daysBetween,newId} from './family-model.mjs';
@@ -27,7 +28,7 @@ function render(){const f=family,person=id=>f.people.find(p=>p.id===id)?.name||'
  for(const el of document.querySelectorAll('[data-ingredients]'))el.onclick=()=>mutate({collection:'meals',action:'ingredients',id:el.dataset.ingredients,listId:f.lists.find(x=>x.title.toLowerCase()==='shopping')?.id});
  if(!auth.editable)for(const el of document.querySelectorAll('#familyEditor input,#familyEditor button,#familyEditor textarea,#familyEditor select'))el.disabled=true;
 }
-async function init(){[family,pref,auth]=await Promise.all([api('/api/family'),api('/api/display-settings'),authBanner('#familyAuth')]);today=zonedDate(new Date(),pref.timezone);mealWeek=addDays(today,-((weekday(today)+6)%7));render();registerOffline();}
+async function init(){[family,pref,auth]=await Promise.all([api('/api/family'),api('/api/display-settings'),authBanner('#familyAuth')]);applyManagementAppearance(pref.managementAppearance);today=zonedDate(new Date(),pref.timezone);mealWeek=addDays(today,-((weekday(today)+6)%7));render();registerOffline();}
 init().catch(e=>status(e.message));
 setInterval(async()=>{if(document.querySelector('#familyEditor :focus'))return;try{const value=await api('/api/family');if(value.revision!==family.revision){family=value;render();}const next=zonedDate(new Date(),pref.timezone);if(next!==today){today=next;render();}}catch{status('Offline · showing the last loaded family data. Editing needs a connection.');auth.editable=false;render();}},15000);
 
