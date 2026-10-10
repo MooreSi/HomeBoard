@@ -1,5 +1,6 @@
 /* Dashboard-only rules: management pages keep their independent layout. */
 .dashboard>header{display:none!important}
+.dashboard>.familyWidgets:not(:has(.familyWidget:not([hidden]))){display:none!important}
 .dashboard{padding:12px;max-width:none}
 .calendar{position:relative;min-width:0}
 .calendarTools{display:flex;justify-content:flex-end;gap:6px;flex-shrink:0;margin-bottom:6px}

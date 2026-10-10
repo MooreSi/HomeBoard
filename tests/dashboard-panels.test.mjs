@@ -15,3 +15,7 @@ test('Smart charging presents schedules without a countdown banner',()=>{
  const html=chargingHTML({status:'scheduled',slots:[{start:'2026-10-10T22:00:00Z',end:'2026-10-10T23:00:00Z',source:'SMART',energyKwh:12}]},{timezone:'UTC',hour12:false},new Date('2026-10-10T12:00:00Z'));
  assert.match(html,/22:00 – 23:00/);assert.doesNotMatch(html,/Next charge in/);
 });
+test('A stale charging schedule does not highlight a slot as currently active',()=>{
+ const html=chargingHTML({status:'scheduled',stale:true,slots:[{start:'2026-10-10T11:00:00Z',end:'2026-10-10T13:00:00Z',source:'SMART',energyKwh:12}]},{timezone:'UTC',hour12:false},new Date('2026-10-10T12:00:00Z'));
+ assert.match(html,/Last known schedule/);assert.doesNotMatch(html,/chargingCurrent/);
+});

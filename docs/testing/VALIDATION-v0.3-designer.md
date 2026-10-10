@@ -1,5 +1,17 @@
 # HomeBoard v0.3 validation · 9 October 2026
 
+## Weather rail and populated dashboard refinement · 10 October 2026
+
+- Final verification: 77 JavaScript files checked; 137/137 API/unit tests passed locally and in the production image. Chrome and WebKit each passed all 39 browser scenarios, with zero failures or skips. Shell syntax, Docker build and disposable-container boot/static-asset/persistence/admin checks passed across two restarts.
+
+- Weather is a permanent child of the built-in right-hand rail, immediately after smart charging. Custom designs retain their independent panel placement and restore the rail on return to a built-in layout.
+- The new populated-dashboard scenario exercises all 17 themes at 1920×1080, 1024×768, 768×1024 and 600×960 with seven forecast days, an uploaded synthetic JPEG, three bin collections, charging and news fixtures. It checks forecast labels/card bounds against both the panel and its rail, a visible first charging slot, at least 80 pixels of photo space, readable time/date fonts and every bin row fitting its card.
+- Empty family strips collapse when weather is disabled and return when a collection is populated; this previously reserved unused tablet space.
+- Analog and combined clock modes are checked with the populated tablet layout. Five-day weather, disabled charging, custom/default restoration and forecast chart accessibility labels are also covered. Deliberately displaced forecast and bin rows prove the clipping detectors reject overflow.
+- Regressions were observed failing before fixes: weather outside the right rail, stale charging retaining its active highlight, analog preferences hiding explicitly composed digital time, photos collapsing, clipped charging content and unreadable clock text. Three-row bin checks also exposed the Metro strip's extra padding at desktop sizes.
+- Screenshots use demo fixtures across HomeBoard, Metro and Observatory at iPad portrait/landscape, Android landscape and desktop sizes. No personal photos, weather credentials or energy account data are used. Physical tablets and new live provider checks remain unverified.
+
+
 ## Device preview and tablet density refinement · 10 October 2026
 
 - 77 JavaScript files checked; 136/136 tests passed locally and in the image.

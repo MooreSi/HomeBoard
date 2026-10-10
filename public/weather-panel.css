@@ -1,0 +1,60 @@
+/* A compact forecast in the built-in dashboard's right-hand rail. */
+body:not([data-custom-design=true]) .dashboard #weatherWidget{position:relative!important;inset:auto!important;width:auto!important;height:auto!important;min-height:0;max-height:none;margin:0!important;padding:10px!important;flex:0 0 auto;border-radius:16px;background:var(--card);text-shadow:none}
+body:not([data-custom-design=true]) #weatherWidget .widgetHeading{display:flex;flex-direction:column;align-items:stretch;gap:3px;margin:0 0 6px}
+body:not([data-custom-design=true]) #weatherWidget .widgetHeading h2{font-size:16px;line-height:1.2;margin:0;overflow-wrap:anywhere}
+body:not([data-custom-design=true]) #weatherStatus{font-size:10px;line-height:1.2;text-align:left;max-width:none}
+body:not([data-custom-design=true]) #weatherWidget :is(.forecastChart,.weatherNow){display:none}
+body:not([data-custom-design=true]) .dashboard aside #weatherWidget .forecastDays{display:grid;grid-template-columns:repeat(auto-fit,minmax(44px,1fr));gap:4px}
+body:not([data-custom-design=true]) #weatherWidget .forecastDay{min-width:0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:2px 0;border:0;border-radius:8px;background:color-mix(in srgb,var(--muted) 8%,transparent);line-height:1.1}
+body:not([data-custom-design=true]) #weatherWidget .forecastDay>strong{font-size:11px;margin:0;padding:0;line-height:1.1}
+body:not([data-custom-design=true]) #weatherWidget .forecastDay .weatherIcon{font-size:20px;line-height:1}
+body:not([data-custom-design=true]) #weatherWidget .forecastDay>b{font-size:13px;white-space:normal;display:flex;flex-wrap:wrap;justify-content:center;gap:3px}
+body:not([data-custom-design=true]) #weatherWidget .forecastDay>b small{font-size:11px}
+body:not([data-custom-design=true]) #weatherWidget .forecastDay>span:not(.weatherIcon){font-size:10px}
+body:not([data-custom-design=true]) #weatherWidget .forecastDay>small{display:block;font-size:9px}
+body:not([data-custom-design=true]) #weatherWidget .attribution{font-size:9px;line-height:1.2;margin:6px 0 0;text-align:left}
+@media(min-width:600px){
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])){display:flex!important;flex-direction:column!important;height:100dvh!important;min-height:0!important;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important;gap:8px;overflow:hidden}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden]))>.layout{display:grid!important;grid-template-columns:minmax(0,1fr) clamp(240px,36%,420px)!important;grid-template-rows:minmax(0,1fr)!important;align-items:stretch!important;flex:1;min-height:0;height:auto!important;gap:8px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .calendar{grid-column:1!important;grid-row:1!important;display:flex!important;flex-direction:column;position:relative!important;inset:auto!important;min-height:0!important;height:auto!important;padding:12px!important;overflow:hidden}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .calendar nav{max-width:none}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #calendar{position:relative!important;inset:auto!important;flex:1;min-height:0;height:auto!important;max-height:none;overflow:auto!important}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) aside{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;position:relative!important;inset:auto!important;width:auto!important;height:auto!important;min-height:0;align-items:stretch!important;gap:8px;overflow:hidden;background:none}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .clockCard{position:relative!important;inset:auto!important;flex:0 0 80px;display:flex;flex-direction:column;justify-content:center;gap:2px;margin:0!important;padding:8px!important;overflow:hidden}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .clockCard:has(#analog:not([hidden])){flex-basis:90px;display:grid;grid-template-columns:70px minmax(0,1fr);grid-template-rows:repeat(3,minmax(0,1fr));column-gap:8px;align-items:center}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .clockCard:has(#analog:not([hidden])) #analog{grid-column:1;grid-row:1 / -1;margin:0}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .clockCard:has(#analog:not([hidden])) :is(.clockFace,#clockDate,#clockZone){grid-column:2;margin:0}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .analog{width:70px;height:70px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .analog #hourHand{height:25%;width:2px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .analog #minuteHand{height:35%;width:2px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .analog #secondHand{height:38%;width:1px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .analog span{font-size:8px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .analog .clock12{top:3px;left:calc(50% - 5px)}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .analog .clock3{right:3px;top:calc(50% - 6px)}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .analog .clock6{bottom:3px;left:calc(50% - 3px)}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .analog .clock9{left:3px;top:calc(50% - 6px)}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #clock{font-size:28px;letter-spacing:normal}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #clockDate{font-size:14px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #clockZone{display:block;font-size:10px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #clockSeconds{font-size:12px;padding:0;letter-spacing:normal}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .photo{position:relative!important;inset:auto!important;flex:1 0 80px;min-height:80px;height:auto!important;width:auto!important;margin:0!important}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) .photo:has(#placeholder:not([hidden])){display:none}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) :is(.photoFooter,.local){display:none}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget{position:relative;inset:auto;flex:0 1 160px;min-height:120px;margin:0;padding:12px;overflow:auto}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget>header{margin:0 0 6px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget>header h2{font-size:18px;line-height:1.2;margin:0}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget .chargingSummary :is(h3,p){font-size:11px;margin:0 0 4px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget .chargingSlot{padding-block:6px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget .chargingSlot h3{font-size:14px;line-height:1.2}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget .chargingSlot p{font-size:11px;line-height:1.2;margin:3px 0}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget small{line-height:1.2}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) #clockDate{margin:0}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden]))>.familyWidgets{display:flex;flex:0 0 160px;gap:8px;min-height:0;margin:0;padding:0;overflow:auto}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden]))>.familyWidgets .familyWidget{padding:12px;overflow:auto}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden]))>.familyWidgets .familyWidget>header{margin:0 0 6px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden]))>.familyWidgets .familyWidget>header h2{font-size:16px;line-height:1.2;margin:0}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) [data-family-panel=bins] .binCollection{padding-block:3px}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) [data-family-panel=bins] .familyWidgetContent :is(h3,p,strong){font-size:var(--bin-font,10px);line-height:1.2;margin:0}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) [data-family-panel=bins] .wheelieBin{width:var(--bin-icon,17px);height:var(--bin-icon,17px);flex-basis:var(--bin-icon,17px)}
+ body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden]))>.newsWidget{position:relative!important;inset:auto!important;flex:0 0 auto;min-height:0;max-height:80px;width:auto!important;margin:0!important;padding:10px!important;display:flex;align-items:center;gap:10px;overflow:hidden}
+}

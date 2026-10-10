@@ -2,6 +2,9 @@
 
 ## Unreleased · Creative designer · 10 October 2026
 
+- Weather now sits to the right of the calendar below smart charging in every built-in theme. Compact forecast cards wrap within the rail, keep all forecast days visible and preserve space for loaded photos. Empty family strips collapse so the calendar can use the space.
+- Fixed stale charging slots retaining an active highlight and custom date/time compositions hiding digital time when the global preference was analog. Forecast chart accessibility labels now reflect five-day or seven-day data.
+
 - Removed the redundant weather eyebrow and 3-week calendar choice. Old stored rolling preferences fall back to Week in the display and settings.
 - Designer previews now render at selectable native device resolutions and scale the complete screen, with matching placement/crop/resize overlays.
 - Added compact tablet Upcoming rows, a complete six-row Month grid, adaptive bin typography and ticker icons sized to their panel.
