@@ -24,8 +24,10 @@ Octopus may change or remove planned slots. An empty result means **Awaiting a c
 
 ## API references
 
+Authentication sends the case-sensitive `APIKey` input. Octopus can return signed planned-energy values; the panel displays their magnitude while preserving the schedule times.
+
 The implementation uses Octopus’s documented [authentication mutation](https://docs.octopus.energy/graphql/reference/mutations/#obtainkrakentoken), [account device query](https://docs.octopus.energy/graphql/reference/queries/#devices) and [planned dispatch query](https://docs.octopus.energy/graphql/reference/queries/#flexplanneddispatches). Requests use the fixed HTTPS GraphQL endpoint and variables. Responses/errors are validated and raw upstream error text is excluded from display responses. Tokens, account ID and key stay server-side.
 
 The designer adds schema 6 with an optional charging panel. Existing schema 1–5 files remain valid and are upgraded by the editor without mutating their source or rearranging their panels. Adding a thirteenth panel expands the stable front/back rank to 0–12 when all panel ranks are normalised.
 
-The live account still requires verification using the connection test in Settings. Automated testing uses labelled demo accounts/devices and external HTTP fixtures; no personal Octopus credentials are included in source or test data.
+Use the connection test in Settings to verify each account and charger. Automated testing uses labelled demo accounts/devices and external HTTP fixtures; no personal Octopus credentials are included in source or test data.

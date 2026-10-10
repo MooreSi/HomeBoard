@@ -2,6 +2,8 @@
 
 ## Unreleased · Creative designer · 10 October 2026
 
+- Fixed Octopus authentication to use the required case-sensitive `APIKey` GraphQL input and accept signed planned-energy values as display magnitudes. Verified live authentication, device discovery and schedules without logging credentials.
+
 - Added direct Octopus Energy smart charging with private account-ID/API-key settings, save/test, discovered vehicle/charger selection and connection removal.
 - Added a Smart charging panel showing planned windows, countdown, planned energy, source labels and freshness, integrated with designer controls and saved libraries.
 - Added shared caching, concurrent-request coalescing, retry backoff, token renewal and explicit stale/unsupported/unavailable states. Charging schedules are excluded from browser offline caching.
