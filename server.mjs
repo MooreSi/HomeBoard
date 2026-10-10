@@ -1,3 +1,4 @@
+import {Octopus} from './lib/octopus.mjs';
 import {newsFeeds} from './lib/news-feeds.mjs';
 import http from 'node:http';
 import fs from 'node:fs/promises';
@@ -33,17 +34,20 @@ secrets.weatherApiKey=process.env.OPENWEATHER_API_KEY||secrets.weatherApiKey||''
 }
 applyEnvironment();
 const calendars=new Calendars(data,()=>settings,()=>secrets),album=new ICloudAlbum(()=>secrets),photos=new Photos(data,()=>settings,album),weather=new Weather(data,()=>settings,()=>secrets),news=new News(data,()=>settings);
+const octopus=new Octopus(()=>settings,()=>secrets);
 const family=new Family(data),auth=new Auth(data),backup=new Backup(data,()=>({settings,secrets}));
 await Promise.all([calendars.init(),weather.init(),news.init(),family.init(),auth.init()]);
-function publicSettings(){return {...settings,calendarFeedConfigured:!!secrets.calendarFeedUrl,icloudAlbumConfigured:!!secrets.icloudAlbumUrl,googleSecretConfigured:!!secrets.googleClientSecret,weatherKeyConfigured:!!secrets.weatherApiKey};}
+function publicSettings(){return {...settings,calendarFeedConfigured:!!secrets.calendarFeedUrl,icloudAlbumConfigured:!!secrets.icloudAlbumUrl,googleSecretConfigured:!!secrets.googleClientSecret,octopusKeyConfigured:!!secrets.octopusApiKey,octopusAccountConfigured:!!secrets.octopusAccountId,weatherKeyConfigured:!!secrets.weatherApiKey};}
 async function body(req,limit=12*1024*1024){let size=0,chunks=[];for await(const c of req){size+=c.length;if(size>limit)throw Error('Maximum upload size is 12 MB');chunks.push(c);}return Buffer.concat(chunks);}
 async function payload(req){return JSON.parse((await body(req,65536)).toString());}
 function json(res,status,value){res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(value));}
-async function update(patch){const nextSecrets={...secrets},clean={...patch};for(const k of ['googleClientSecret','weatherApiKey','calendarFeedUrl','icloudAlbumUrl'])if(Object.hasOwn(clean,k)){if(typeof clean[k]!=='string'||clean[k].length>2048)throw Error('Invalid credential');nextSecrets[k]=clean[k];delete clean[k];}
+async function update(patch){const nextSecrets={...secrets},clean={...patch};for(const k of ['googleClientSecret','weatherApiKey','calendarFeedUrl','icloudAlbumUrl','octopusApiKey','octopusAccountId'])if(Object.hasOwn(clean,k)){if(typeof clean[k]!=='string'||clean[k].length>2048)throw Error('Invalid credential');nextSecrets[k]=clean[k];delete clean[k];}
  if(Object.hasOwn(patch,'calendarFeedUrl'))nextSecrets.calendarFeedUrl=nextSecrets.calendarFeedUrl.trim().replace(/^webcal:\/\//i,'https://');
  if(nextSecrets.icloudAlbumUrl)albumToken(nextSecrets.icloudAlbumUrl);
  if(Object.hasOwn(patch,'calendarFeedUrl')&&nextSecrets.calendarFeedUrl){const u=await publicURL(nextSecrets.calendarFeedUrl);if(u.protocol!=='https:')throw Error('Use an HTTPS ICS calendar link');}
  if(Object.hasOwn(clean,'feedConnections')){const items=clean.feedConnections;if(!Array.isArray(items)||items.length>20)throw Error('Invalid calendar connections');nextSecrets.calendarFeeds={};clean.calendarFeeds=[];for(const item of items){const id=item.id||crypto.randomUUID(),old=secrets.calendarFeeds?.[id],url=(item.url||old||'').trim().replace(/^webcal:\/\//i,'https://');if(url){const u=await publicURL(url);if(u.protocol!=='https:')throw Error('Use an HTTPS ICS calendar link');nextSecrets.calendarFeeds[id]=url;}else throw Error('A new calendar needs an ICS link');clean.calendarFeeds.push({id,name:item.name,color:item.color,person:item.person||'',enabled:item.enabled});}delete clean.feedConnections;}
+ if(Object.hasOwn(patch,'octopusAccountId')){nextSecrets.octopusAccountId=nextSecrets.octopusAccountId.trim().toUpperCase();if(nextSecrets.octopusAccountId&&!/^A-[A-Z0-9]{6,16}$/.test(nextSecrets.octopusAccountId))throw Error('Octopus account ID should look like A-12345678');if(nextSecrets.octopusAccountId!==secrets.octopusAccountId)clean.octopusDeviceId='';}
+ if(Object.hasOwn(patch,'octopusApiKey')){nextSecrets.octopusApiKey=nextSecrets.octopusApiKey.trim();if(/[\r\n]/.test(nextSecrets.octopusApiKey))throw Error('Invalid Octopus API key');}
  const next=validateSettings(clean,settings);
  if(next.microsoftClientId!==settings.microsoftClientId||next.microsoftTenant!==settings.microsoftTenant)await calendars.disconnect('microsoft');
  if(next.googleClientId!==settings.googleClientId||next.googleRedirectUri!==settings.googleRedirectUri||nextSecrets.googleClientSecret!==secrets.googleClientSecret)await calendars.disconnect('google');
@@ -83,6 +87,8 @@ const server=http.createServer(async(req,res)=>{let unlock;try{
  if(u.pathname==='/api/calendar/google/callback'&&req.method==='GET'){res.setHeader('Referrer-Policy','no-referrer');await calendars.callbackGoogle(u,req.headers.cookie);res.writeHead(303,{Location:'/settings?connected=google','Set-Cookie':'homeboard_oauth=; HttpOnly; SameSite=Lax; Path=/api/calendar/google/callback; Max-Age=0'});return res.end();}
  if(u.pathname==='/api/calendar/google/disconnect'&&req.method==='POST'){await calendars.disconnect('google');return json(res,200,{ok:true});}
  const calendarList=u.pathname.match(/^\/api\/calendar\/(microsoft|google)\/list$/);if(calendarList&&req.method==='GET')return json(res,200,await calendars.calendars(calendarList[1]));
+ if(u.pathname==='/api/octopus'&&req.method==='GET')return json(res,200,await octopus.schedule());
+ if(u.pathname==='/api/octopus/test'&&req.method==='POST')return json(res,200,await octopus.schedule({refresh:true}));
  if(u.pathname==='/api/weather/locations'&&req.method==='GET')return json(res,200,await weather.locations(u.searchParams.get('q')));
  if(u.pathname==='/api/weather'&&req.method==='GET')return json(res,200,await weather.forecast());
  if(u.pathname==='/api/news/feeds'&&req.method==='GET')return json(res,200,newsFeeds);

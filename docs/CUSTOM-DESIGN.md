@@ -26,6 +26,10 @@ For family cards, the heading is the widget title; body text includes item names
 
 The **Preview** toolbar button hides selection overlays and lets you interact with the actual calendar in the iframe; **Edit panels** returns to design mode.
 
+## Smart charging panel
+
+Connect Octopus in Settings → Smart charging using your account ID/API key, then choose **Add panel → Smart charging**. The panel uses the same typography, crop, layers and library controls as other widgets. See the [Octopus setup guide](OCTOPUS.md). Credentials are server-side and are excluded from portable designs. The editor now uses schema 6 to add this optional panel while retaining earlier schema support.
+
 ## Crop panels and compose date/time
 
 **Crop panel** trims the top, right, bottom and left edges by percentages. **Drag crop edges** switches the canvas to crop mode: drag its edge/corner handles, then click **Done editing**. Cropping retains the underlying content and grid position; the remaining area is at least 10% on each axis. **Reset crop** restores the whole panel. Crop mode supports arrows for the top/left edges and Shift + arrows for the bottom/right edges. Escape exits the tool or cancels an active drag. Cropping applies to both orientations.

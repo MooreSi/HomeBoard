@@ -1,11 +1,11 @@
-import {validateDesign,exportDesign,importDesign,fonts,panelNames,designStarter,designPalettes,transformPanel,panelToolsDesign as editorDesign,creativePanelStyle,designFromTheme,reorderPanel,transformCrop,compactFields,clockItemNames,defaultClockLayout} from './design.mjs';
+import {validateDesign,exportDesign,importDesign,fonts,designerPanelNames as panelNames,designStarter,designPalettes,transformPanel,chargingDesign as editorDesign,creativePanelStyle,designFromTheme,reorderPanel,transformCrop,compactFields,clockItemNames,defaultClockLayout} from './design.mjs';
 import {api,esc} from './display.mjs';
 
 export function setupDesignEditor(initial,dirty,theme){
  const $=id=>document.getElementById(id);
  let design=editorDesign(initial?validateDesign(initial):{...designStarter('studio'),enabled:false}),selected='calendar',orientation='landscape';
  let history=[structuredClone(design)],historyIndex=0,gesture=null,previewFrame=0,menuAnchor=null,styleClipboard=null,themeSources=[],tool=null,clockSelected='time';
- const names={calendar:'Calendar',clock:'Date & time',photo:'Photos',weather:'Weather',news:'News ticker',lists:'Shared lists',chores:'Chores',routines:'Routines',meals:'Meal plan',bins:'Bin collections',countdowns:'Countdowns',notices:'Noticeboard'};
+ const names={calendar:'Calendar',clock:'Date & time',photo:'Photos',weather:'Weather',news:'News ticker',lists:'Shared lists',chores:'Chores',routines:'Routines',meals:'Meal plan',bins:'Bin collections',countdowns:'Countdowns',notices:'Noticeboard',charging:'Smart charging'};
  const canvas=$('designCanvas');
  const toolHint=document.createElement('div');toolHint.className='designToolHint';toolHint.hidden=true;canvas.before(toolHint);
  function finishTool(){tool=null;paint();}
@@ -66,7 +66,7 @@ export function setupDesignEditor(initial,dirty,theme){
   closeMenu();menu.setAttribute('role','menu');menu.setAttribute('aria-label','Design options');menuAnchor=anchor||canvas.querySelector(`[data-panel="${selected}"]`);
   const heading=document.createElement('div');heading.className='designContextHeading';heading.setAttribute('role','presentation');heading.textContent=addOnly?'Add a panel':names[selected];menu.replaceChildren(heading);
   function action(label,fn){const b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.textContent=label;b.onclick=()=>{closeMenu(true);fn();};if(design.panelStyles[selected].locked&&/^(Position|Fit width|Size:|Align |Centre |Copy panel to|Layers|Bring to front|Send to back|Go forward|Go backward)/.test(label))b.disabled=true;menu.append(b);}
-  if(addOnly){for(const name of panelNames)action((panels()[name].visible?'✓ ':'+ ')+names[name],()=>{selected=name;if(!panels()[name].visible){panels()[name].visible=true;panels()[name].layer=Math.min(10,Math.max(...Object.values(panels()).map(p=>p.layer))+1);changed();}else paint();canvas.querySelector(`[data-panel="${name}"]`).focus();});}
+  if(addOnly){for(const name of panelNames)action((panels()[name].visible?'✓ ':'+ ')+names[name],()=>{selected=name;if(!panels()[name].visible){panels()[name].visible=true;panels()[name].layer=Math.min(31,Math.max(...Object.values(panels()).map(p=>p.layer))+1);changed();}else paint();canvas.querySelector(`[data-panel="${name}"]`).focus();});}
   else if(layersOnly){for(const [label,direction]of [['Bring to front','front'],['Go forward','forward'],['Go backward','backward'],['Send to back','back']])action(label,()=>{const value=reorderPanel(panels(),selected,direction);if(orientation==='portrait')design.portraitPanels=value;else design.panels=value;changed();});action('‹ Back to panel options',()=>showMenu(x,y,false,anchor));}
   else if(layoutOnly){
    action('Fit width',()=>{const p=panels()[selected];p.x=0;p.w=12;changed();});

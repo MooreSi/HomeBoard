@@ -2,6 +2,11 @@
 
 ## Unreleased · Creative designer · 10 October 2026
 
+- Added direct Octopus Energy smart charging with private account-ID/API-key settings, save/test, discovered vehicle/charger selection and connection removal.
+- Added a Smart charging panel showing planned windows, countdown, planned energy, source labels and freshness, integrated with designer controls and saved libraries.
+- Added shared caching, concurrent-request coalescing, retry backoff, token renewal and explicit stale/unsupported/unavailable states. Charging schedules are excluded from browser offline caching.
+- Added schema 6 with migration of existing designs to include an optional thirteenth panel.
+
 - Added direct layer controls with stable front/back and one-step forward/backward ordering, plus a toolbar panel selector for covered panels.
 - Added reversible panel cropping with draggable trim handles and direct Hide/Show heading actions.
 - Added durable pre-compact restoration that preserves later colour/font choices.

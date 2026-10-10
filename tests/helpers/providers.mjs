@@ -17,6 +17,13 @@ globalThis.fetch=async(input,options={})=>{
  if(control.wrongAudience&&u.pathname.endsWith('/token'))return new Response(JSON.stringify({error:'unauthorized_client',error_description:'AADSTS50020: User account does not exist in tenant'}),{status:400});
  if(control.denyMicrosoft&&u.pathname.endsWith('/token'))return new Response(JSON.stringify({error:'authorization_declined'}),{status:400});
  const ok=value=>new Response(JSON.stringify(value),{status:200,headers:{'Content-Type':'application/json'}});
+ if(u.hostname==='api.octopus.energy'){
+  if(u.pathname!=='/v1/graphql/'||options.method!=='POST')throw Error('Unexpected Octopus request');const b=JSON.parse(options.body);
+  if(b.query.includes('obtainKrakenToken')){if(b.variables.input.apiKey!=='demo-octopus-key')return ok({errors:[{extensions:{errorCode:'KT-CT-1134'}}]});return ok({data:{obtainKrakenToken:{token:'demo-octopus-token',payload:{exp:4102444800}}}});}
+  if(options.headers.Authorization!=='demo-octopus-token')throw Error('Missing Octopus auth');
+  if(b.query.includes('devices(')){if(b.variables.accountNumber!=='A-12345678')throw Error('Wrong Octopus account');return ok({data:{devices:[{id:'demo-car',name:'Demo family EV',deviceType:'ELECTRIC_VEHICLES',provider:'DEMO'}]}});}
+  if(!b.query.includes('flexPlannedDispatches(')||b.variables.deviceId!=='demo-car')throw Error('Unexpected Octopus query');return ok({data:{flexPlannedDispatches:[{start:'2099-12-10T23:00:00Z',end:'2099-12-11T01:00:00Z',type:'SMART',energyAddedKwh:'12'}]}});
+ }
  if(u.hostname==='login.microsoftonline.com'){
   if(!u.pathname.startsWith('/common/'))throw Error('Microsoft must support work/school and personal accounts');
   if(u.pathname.endsWith('/devicecode')){const p=new URLSearchParams(options.body);if(!p.get('scope').includes('Calendars.ReadBasic'))throw Error('Missing read-only scope');return ok({device_code:'fake-device',user_code:'TEST-CODE',verification_uri:'https://microsoft.com/devicelogin',expires_in:600,interval:1});}
