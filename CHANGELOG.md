@@ -2,6 +2,11 @@
 
 ## Unreleased · Creative designer · 10 October 2026
 
+- Added responsive tablet dashboards, full-height custom canvases and calendar-toolbar settings/fullscreen controls. The dashboard family shortcut has been removed; use Settings.
+- Date/time text fits resized panels and individual slots; a right-click preset places date and time on one line without changing the portable design schema.
+- Bin collections now have stripe padding, matching wheelie-bin icons and ordinal month dates. News tickers identify the selected publisher with locally bundled icons.
+- Week/month grids fit all seven columns within tablet calendars; long card contents retain internal scrolling.
+
 - Fixed Octopus authentication to use the required case-sensitive `APIKey` GraphQL input and accept signed planned-energy values as display magnitudes. Verified live authentication, device discovery and schedules without logging credentials.
 
 - Added direct Octopus Energy smart charging with private account-ID/API-key settings, save/test, discovered vehicle/charger selection and connection removal.

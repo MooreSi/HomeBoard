@@ -1,10 +1,40 @@
 # HomeBoard v0.3 validation · 9 October 2026
 
-## Automated verification
+## Tablet and panel refinement · 10 October 2026
 
-Final results: **116/116** API/unit tests locally and in the production image; **12/12** Chrome and **12/12** WebKit browser scenarios; zero failures or skips. Docker build, restart/persistence smoke checks, installer syntax and Git whitespace checks passed.
+- Local verification: 76 JavaScript files checked; 135/135 API/unit tests passed.
+- Chrome and WebKit: 29/29 full browser scenarios plus the new touch-target
+  scenario passed in each engine (30 distinct scenarios per engine).
+- Nine custom-dashboard viewports: 768×1024, 1024×768, 820×1180, 1180×820,
+  800×1280, 1280×800, 1366×1024, 1024×1366 and 600×960. All 17 built-in themes
+  were checked at four tablet sizes, with a configured news feed.
+- Regression checks cover bin stripe padding despite compact styling, ordinal
+  dates and matching wheelie-bin colours, publisher icons in both preview and
+  display, same-line date/time placement, oversized dates in short slots,
+  seven calendar columns without horizontal scrolling, and 44px touch targets.
+- The bounds detector was verified with a deliberately displaced calendar.
+  Date clipping was observed again with the fitting observer disconnected,
+  then passed when restored. Original bin/date, missing layout action, preview
+  branding, week-width and touch-target regressions were observed red.
+- Production image: 135/135 tests passed. Docker build, disposable-container
+  boot/static-assets/API checks, two restarts and settings/library/private-key
+  persistence checks passed. Installer syntax and Git whitespace checks passed.
+- Visual review used synthetic household data at iPad portrait/landscape,
+  Android portrait and desktop sizes. Physical iPad/Android hardware remains
+  unverified; browser emulation does not establish device-specific behaviour.
 
-The release uses Node 24.19.0 for local verification; the package requires Node 22.19.0 or later. `npm run verify` checks 68 JavaScript files and runs 116 API/unit regressions. Existing assertions remain intact. Installer shell syntax and Git whitespace checks are included in the release checks.
+Text fitting responds to rendered panel changes through
+[ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
+The dashboard uses the available dynamic viewport height and safe-area padding;
+see [MDN viewport lengths](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/length).
+Custom designs retain separate saved portrait and landscape compositions and
+remain schema 6 compatible. Long contents scroll within their cards.
+
+## Original automated verification
+
+Original v0.3 release results: **116/116** API/unit tests locally and in the production image; **12/12** Chrome and **12/12** WebKit browser scenarios; zero failures or skips. Docker build, restart/persistence smoke checks, installer syntax and Git whitespace checks passed.
+
+The release uses Node 24.19.0 for local verification; the package requires Node 22.19.0 or later. At the original release, `npm run verify` checked 68 JavaScript files and ran 116 API/unit regressions. Existing assertions remain intact. Installer shell syntax and Git whitespace checks are included in the release checks.
 
 New regressions cover independent management appearance and rejection of invalid choices, optional password removal and unauthorized rejection, durable settings/admin state across restart, eight-edge integer resize geometry and bounds, valid starter layouts without overlapping visible panels, version 3 gradient persistence/import validation, preserved legacy gradient endpoints, and worldwide timezone fallback/current aliases.
 

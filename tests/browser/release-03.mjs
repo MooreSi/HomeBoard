@@ -4,10 +4,10 @@ import {createRequire} from 'node:module';
 import {app} from '../helpers/app.mjs';
 const require=createRequire(import.meta.url);
 const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-async function browserPage(t,a,viewport={width:1500,height:1100}){
+async function browserPage(t,a,viewport={width:1500,height:1100},options={}){
  const engine=process.env.BROWSER_ENGINE==='webkit'?webkit:chromium;
  const browser=await engine.launch({headless:true,...(process.env.BROWSER_EXECUTABLE?{executablePath:process.env.BROWSER_EXECUTABLE}:{})});t.after(()=>browser.close());
- const page=await browser.newPage({viewport}),errors=[];page.on('pageerror',e=>errors.push(e.message));t.after(()=>assert.deepEqual(errors,[],'No browser script errors'));
+ const page=await browser.newPage({viewport,...options}),errors=[];page.on('pageerror',e=>errors.push(e.message));t.after(()=>assert.deepEqual(errors,[],'No browser script errors'));
  await page.goto(a.base+'/settings');await page.waitForFunction(()=>document.querySelector('#saveStatus').textContent==='All changes saved'&&document.querySelector('#designLibrary').children.length);
  return page;
 }
@@ -187,4 +187,53 @@ test('Clock items resize with keyboard and analog remains round in its independe
 test('Octopus settings accept private credentials and display discovered charging slots in a new panel',async t=>{
  const a=await app(t,{fake:true}),page=await browserPage(t,a);assert.equal(await page.locator('#octopusAccountId').count(),1,'Account ID setup field required');await page.locator('#octopusEnabled').check();await page.locator('#octopusAccountId').fill('A-12345678');await page.locator('#octopusApiKey').fill('demo-octopus-key');await page.locator('#octopusTest').click();await page.waitForFunction(()=>document.querySelector('#octopusStatus').textContent.includes('1 charging slot'));assert.equal(await page.locator('#octopusApiKey').inputValue(),'');assert.equal(await page.locator('#octopusAccountId').inputValue(),'');assert.equal(await page.locator('#octopusDeviceId option[value="demo-car"]').textContent(),'Demo family EV');
  await page.locator('[data-starter=family]').click();await panelMenu(page,'bins');await page.getByRole('menuitem',{name:'Layers…',exact:true}).click();await page.getByRole('menuitem',{name:'Bring to front',exact:true}).click();await page.locator('#designAdd').click();await page.getByRole('menuitem',{name:'+ Smart charging',exact:true}).click();const frame=page.frameLocator('#designPreview');await frame.locator('#chargingWidget .chargingSlot h3').waitFor({state:'visible'});assert.equal(await frame.locator('#chargingWidget').textContent().then(x=>x.includes('23:00')),true);assert.equal(await frame.locator('#chargingWidget').textContent().then(x=>x.includes('12 kWh planned')),true);await save(page);const design=(await a.json('/api/settings')).customDesign;assert.ok(design.panels.charging.layer>design.panels.bins.layer,'Added charging panel is above existing panels');assert.equal((await a.json('/api/settings')).octopusKeyConfigured,true);assert.equal((await a.json('/api/settings')).octopusApiKey,undefined);await page.goto(a.base+'/');await page.locator('#chargingWidget .chargingSlot h3').waitFor({state:'visible'});assert.equal(await page.locator('#chargingWidget').textContent().then(x=>x.includes('Scheduled')),true);
+});
+
+test('Tablet dashboard uses its full canvas with calendar controls and fitted date items',async t=>{
+ const a=await app(t),page=await browserPage(t,a);await page.locator('[data-starter=family]').click();await panelMenu(page,'clock');await page.getByRole('menuitem',{name:'Arrange date/time items…',exact:true}).click();await page.getByRole('button',{name:'Date and time on one line',exact:true}).click();await save(page);
+ await page.goto(a.base+'/');await page.waitForLoadState('networkidle');assert.equal(await page.locator('.calendar #fullscreen').count(),1);assert.equal(await page.locator('.dashboard a[href="/family"]').count(),0);
+ for(const viewport of [{width:768,height:1024},{width:1024,height:768},{width:820,height:1180},{width:1180,height:820},{width:800,height:1280},{width:1280,height:800},{width:1366,height:1024},{width:1024,height:1366},{width:600,height:960}]){
+  await page.setViewportSize(viewport);
+  await page.waitForFunction(()=>{const d=document.querySelector('#clockDate');return d.scrollWidth<=d.clientWidth+1&&d.scrollHeight<=d.clientHeight+1;});
+  const box=await page.locator('.customDashboardGrid').boundingBox();assert.ok(box.y<=12,'No reserved top toolbar');assert.ok(box.y+box.height<=viewport.height);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  assert.equal(await page.locator('#fullscreen').evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('#fullscreen')===el;}),true,'Fullscreen control is reachable');
+  const date=await page.locator('#clockDate').boundingBox(),time=await page.locator('.clockFace').boundingBox();assert.ok(Math.abs(date.y-time.y)<1,'Date and time share a row');assert.ok(date.x+date.width<=time.x+1);
+ }
+});
+test('News ticker identifies the configured publisher at its left edge',async t=>{
+ const a=await app(t,{fake:true});await a.post('/api/settings',{newsEnabled:true,newsUrl:'https://feeds.bbci.co.uk/news/rss.xml'});const page=await browserPage(t,a);await page.locator('[data-starter=studio]').click();const preview=page.frameLocator('#designPreview');await preview.locator('#newsSource img').waitFor({state:'visible'});assert.ok((await preview.locator('#newsSource').boundingBox()).x<(await preview.locator('#headlines').boundingBox()).x,'Source sits left of headlines in the designer too');await save(page);await page.goto(a.base+'/');await page.locator('#newsSource img').waitFor({state:'visible'});assert.equal(await page.locator('#newsSource img').getAttribute('alt'),'BBC News');assert.ok((await page.locator('#newsSource').boundingBox()).x<(await page.locator('#headlines').boundingBox()).x);
+});
+
+test('Coloured bin stripes retain padding in styled compact panels',async t=>{
+ const a=await app(t),d=await import('../../public/design.mjs'),design=d.chargingDesign(d.designStarter('family'));design.panelStyles.bins.custom=true;design.panelStyles.bins.padding=4;design.panelStyles.bins.contentGap=0;
+ await a.post('/api/settings',{customDesign:design});await a.post('/api/family',{revision:0,collection:'bins',action:'save',item:{id:'demo-bin',title:'Demo brown bin',color:'#a07842',date:'2026-10-23',every:14,reminderDays:1,exceptions:[]}});
+ const page=await browserPage(t,a);await page.goto(a.base+'/');await page.locator('.binCollection h3').waitFor();
+ const gap=await page.locator('.binCollection').evaluate(el=>el.querySelector('h3').getBoundingClientRect().left-el.getBoundingClientRect().left);assert.ok(gap>=16,'Text clears the 4px stripe by at least 12px');assert.equal(await page.locator('.wheelieBin').count(),1);
+});
+test('Built-in tablet themes keep visible cards on screen in both orientations',async t=>{
+ const a=await app(t,{fake:true}),page=await browserPage(t,a);await a.post('/api/settings',{newsEnabled:true,newsUrl:'https://feeds.bbci.co.uk/news/rss.xml'});
+ const {themes}=await import('../../lib/settings.mjs');
+ const offender=()=>page.evaluate(()=>[...document.querySelectorAll('.dashboard .calendar,.dashboard aside,.dashboard>.widget')].filter(el=>el.getClientRects().length).filter(el=>{const r=el.getBoundingClientRect();return r.left<0||r.top<0||r.right>innerWidth+1||r.bottom>innerHeight+1;}).map(el=>el.className));
+ for(const {id:theme} of themes){
+  assert.equal((await a.post('/api/settings',{theme})).status,200);await page.goto(a.base+'/');await page.waitForLoadState('networkidle');
+  for(const viewport of [{width:768,height:1024},{width:1024,height:768},{width:1366,height:1024},{width:600,height:960}]){await page.setViewportSize(viewport);assert.deepEqual(await offender(),[],theme+' '+viewport.width);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
+ }
+ await page.locator('.calendar').evaluate(el=>el.style.setProperty('transform','translateX(200vw)','important'));assert.deepEqual(await offender(),['calendar'],'Bounds detector catches a displaced panel');
+});
+test('A large date shrinks to its short designer slot instead of clipping vertically',async t=>{
+ const a=await app(t),d=await import('../../public/design.mjs'),design=d.chargingDesign(d.designStarter('family'));design.clockLayout.custom=true;design.panelStyles.clock.custom=true;design.panelStyles.clock.secondarySize=72;design.panels.clock.h=1;design.portraitPanels.clock.h=1;
+ await a.post('/api/settings',{customDesign:design});const page=await browserPage(t,a);await page.goto(a.base+'/');await page.waitForLoadState('networkidle');
+ await page.waitForFunction(()=>{const el=document.querySelector('#clockDate'),r=document.createRange();r.selectNodeContents(el);return r.getBoundingClientRect().height<=el.clientHeight&&r.getBoundingClientRect().width<=el.clientWidth;});
+ assert.ok(await page.locator('#clockDate').evaluate(el=>parseFloat(getComputedStyle(el).fontSize))<72);
+ await page.setViewportSize({width:820,height:1180});await page.screenshot({path:'artifacts/tablet-date-portrait.png'});
+});
+test('All seven week columns fit inside a tablet calendar without horizontal scrolling',async t=>{
+ const a=await app(t),d=await import('../../public/design.mjs');await a.post('/api/settings',{customDesign:d.chargingDesign(d.designStarter('family')),defaultView:'week'});const page=await browserPage(t,a,{width:1024,height:768});await page.goto(a.base+'/');await page.locator('.week').waitFor();
+ const calendar=await page.locator('#calendar').boundingBox(),last=await page.locator('.week .dayColumn').last().boundingBox();assert.ok(last.x+last.width<=calendar.x+calendar.width+1,'Sunday remains inside the calendar');assert.equal(await page.locator('#calendar').evaluate(el=>el.scrollWidth<=el.clientWidth),true);
+});
+
+test('Touch tablet calendar controls retain finger-sized targets',async t=>{
+ const a=await app(t),d=await import('../../public/design.mjs');await a.post('/api/settings',{customDesign:d.chargingDesign(d.designStarter('family'))});const page=await browserPage(t,a,{width:1024,height:768},{hasTouch:true,isMobile:true});await page.goto(a.base+'/');await page.waitForLoadState('networkidle');assert.equal(await page.evaluate(()=>matchMedia('(pointer:coarse)').matches),true);
+ for(const selector of ['#fullscreen','[aria-label="Open settings"]','.calendar button[data-view=week]']){const box=await page.locator(selector).boundingBox();assert.ok(box.width>=44&&box.height>=44,'At least 44px touch target: '+selector);}
 });

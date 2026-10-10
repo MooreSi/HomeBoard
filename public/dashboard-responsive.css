@@ -1,0 +1,81 @@
+/* Dashboard-only rules: management pages keep their independent layout. */
+.dashboard>header{display:none!important}
+.dashboard{padding:12px;max-width:none}
+.calendar{position:relative;min-width:0}
+.calendarTools{display:flex;justify-content:flex-end;gap:6px;flex-shrink:0;margin-bottom:6px}
+.calendarTools .iconButton{position:static!important;display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;margin:0;padding:5px;font-size:20px;text-decoration:none}
+.calendar nav,.calendar .period,.calendarFilters{position:relative!important;inset:auto!important;opacity:1!important;flex-shrink:0}
+.calendar nav{flex-wrap:wrap;gap:6px}
+.calendar .tabs{flex-wrap:wrap}
+.calendarFilters{flex-wrap:wrap}
+.calendarFilters select{max-width:100%}
+.calendar .period h2{margin:0}
+body[data-custom-design=true] .dashboard .customDashboardGrid{height:100%!important}
+body[data-custom-design=true] .dashboard{height:100dvh!important;min-height:0!important;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important}
+body[data-custom-design=true] .customDashboardGrid>.calendar{overflow:hidden!important}
+body[data-custom-design=true] .customDashboardGrid>.calendar #calendar{overflow:auto!important;overscroll-behavior:contain}
+.clockCard{min-width:0;min-height:0}
+.clockFace{min-width:0;max-width:100%}
+.clockCard :is(#clock,#clockDate,#clockZone,#clockSeconds){white-space:nowrap;max-width:100%;min-width:0;line-height:1.2!important}
+body[data-custom-design=true][data-clock-layout=custom] .clockCard>.clockFace{align-items:center!important;justify-content:var(--panel-headingAlign,start)!important}
+body[data-custom-design=true][data-clock-layout=custom] .clockCard>:is(#clockDate,#clockZone,#clockSeconds){align-content:center}
+.dashboard .familyWidgetContent article.binCollection{padding-inline-start:max(12px,var(--panel-contentGap,12px))!important}
+.binDate{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.binDate>span{min-width:0;overflow-wrap:anywhere}
+.wheelieBin{width:32px;height:40px;flex:0 0 32px;align-self:center}
+.newsSource{display:flex;flex:0 0 auto;align-items:center;justify-content:center;gap:8px;max-width:140px;min-width:40px;padding-right:12px;border-right:1px solid var(--line,#ffffff25);font-size:13px;font-weight:700}
+.newsSource img{width:36px;height:36px;object-fit:contain;flex-shrink:0}
+.newsSource span{overflow-wrap:anywhere}
+.newsWidget .tickerViewport{min-width:0;flex:1}
+@media(max-width:1440px){
+ body:not(.designPreviewMode)[data-custom-design=true] .customDashboardGrid{gap:min(var(--design-gap),10px)!important}
+ body:not(.designPreviewMode)[data-custom-design=true] .customDashboardGrid>[data-design-panel]{padding:min(var(--design-padding),12px)!important}
+ body:not(.designPreviewMode)[data-custom-design=true] .dashboard .customDashboardGrid>[data-panel-styled=true]{padding:min(var(--panel-padding),12px)!important}
+ .calendar nav{margin-bottom:6px!important}.calendarFilters{gap:6px;margin-bottom:6px}
+ .calendar nav button{min-height:32px;padding:5px 8px}
+ .newsSource{max-width:90px;padding-right:8px}.newsSource span{display:none}
+}
+/* Built-in themes reflow into a bounded dashboard on tablets. Contents scroll inside cards. */
+@media(max-width:1440px){
+ body:not([data-custom-design=true]) .dashboard{display:flex!important;flex-direction:column!important;height:100dvh!important;min-height:0!important;padding:8px!important;overflow:hidden!important;gap:8px}
+ body:not([data-custom-design=true]) .dashboard>.layout{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(0,1fr)!important;flex:1;min-height:0;height:auto!important;gap:8px}
+ body:not([data-custom-design=true]) .dashboard .calendar{display:flex!important;flex-direction:column;position:relative!important;inset:auto!important;height:auto!important;min-height:0!important;padding:12px!important;overflow:hidden!important}
+ body:not([data-custom-design=true]) .dashboard #calendar{position:relative!important;inset:auto!important;flex:1;min-height:0;height:auto!important;overflow:auto!important;padding:0!important}
+ body:not([data-custom-design=true]) .dashboard aside{display:flex!important;position:relative!important;inset:auto!important;min-height:0;flex-direction:column;gap:8px;width:auto!important}
+ body:not([data-custom-design=true]) .dashboard .clockCard{flex:0 0 28%;padding:12px!important;overflow:hidden}
+ body:not([data-custom-design=true]) .dashboard .photo{flex:1;min-height:0;height:auto!important;margin:0!important;position:relative!important;inset:auto!important}
+ body:not([data-custom-design=true]) .dashboard :is(.local,.photoFooter){display:none}
+ body:not([data-custom-design=true]) .dashboard>.familyWidgets{display:flex;gap:8px;overflow:auto;flex:0 1 24%;min-height:0;margin:0;padding:0}
+ body:not([data-custom-design=true]) .dashboard .familyWidget{flex:1 0 220px;overflow:auto;margin:0;padding:12px}
+ body:not([data-custom-design=true]) .dashboard>.widget{position:relative!important;inset:auto!important;flex:0 1 auto;min-height:0;max-height:18vh;margin:0!important;padding:10px!important;width:auto!important;overflow:auto}
+ body:not([data-custom-design=true]) .dashboard .newsWidget{display:flex;align-items:center;gap:10px}
+ body:not([data-custom-design=true]) .dashboard .newsWidget[hidden],body:not([data-custom-design=true]) .dashboard .weatherWidget[hidden]{display:none!important}
+}
+@media(max-width:1440px) and (orientation:portrait){
+ body:not([data-custom-design=true]) .dashboard>.layout{grid-template-columns:1fr!important;grid-template-rows:minmax(0,3fr) minmax(0,1fr)}
+ body:not([data-custom-design=true]) .dashboard aside{flex-direction:row!important}
+ body:not([data-custom-design=true]) .dashboard .clockCard{flex:1;justify-content:center}
+ body:not([data-custom-design=true]) .dashboard .photo{flex:1}
+}
+body[data-custom-design=true] .dashboard>header{display:none!important}
+body[data-custom-design=true][data-design-version] .dashboard .customDashboardGrid{height:100%!important}
+body.designPreviewMode[data-custom-design=true] .dashboard{padding:0!important}
+body.designPreviewMode .calendarTools{visibility:hidden}
+@media(max-width:1440px){body:not([data-custom-design=true]) .dashboard .calendar{grid-column:1!important;grid-row:1!important}body:not([data-custom-design=true]) .dashboard aside{grid-column:2!important;grid-row:1!important}}
+@media(max-width:1440px) and (orientation:portrait){body:not([data-custom-design=true]) .dashboard aside{grid-column:1!important;grid-row:2!important}}
+
+body[data-custom-design=true][data-design-version] .dashboard .customDashboardGrid>[data-panel-styled=true] .familyWidgetContent article.binCollection{padding-inline-start:max(12px,var(--panel-contentGap,12px))!important}
+
+.dashboard .calendar nav .calendarTools{margin:0 0 0 auto}
+body .dashboard .calendar nav .calendarTools .iconButton{min-height:36px!important;min-width:36px!important;font-size:20px!important}
+@media(max-width:1440px){
+ body .dashboard #calendar :is(.week,.month){width:100%!important;min-width:0!important;grid-template-columns:repeat(7,minmax(0,1fr))!important}
+ .dashboard .dayBody{padding:4px}
+ .dashboard .week .event{padding:7px 4px;overflow-wrap:anywhere}
+ .dashboard :is(.monthHead,.monthDay){min-width:0;padding:4px}
+ .dashboard .monthDay button{max-width:100%;min-width:0}
+ .dashboard .dayHead{padding:8px 3px}
+}
+body.designPreviewMode[data-preview-orientation=landscape] .customDashboardGrid>.newsWidget[data-design-visible=true]:not([hidden]),body.designPreviewMode[data-preview-orientation=portrait] .customDashboardGrid>.newsWidget[data-portrait-visible=true]:not([hidden]){display:flex!important}
+@media(pointer:coarse){body .dashboard .calendar nav :is(button,.iconButton),body .dashboard .calendarFilters select{min-height:44px!important;min-width:44px!important}}
+@media(pointer:coarse){body .dashboard .calendar nav .calendarTools .iconButton{min-height:44px!important;min-width:44px!important}}

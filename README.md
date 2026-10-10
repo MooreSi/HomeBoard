@@ -246,13 +246,25 @@ Select an IANA timezone, long/DMY/MDY/ISO date, digital/analog/both clock and 12
 hour time. Calendar day boundaries use that timezone, including DST; all-day
 appointments retain their calendar dates.
 
+In the custom designer, right-click Date and time → Arrange date/time items →
+Date and time on one line to place them side by side. Text automatically shrinks
+to fit its panel or individual item slots when resized, including after rotating
+a tablet. Reset date/time arrangement restores the normal composition.
+
+Dashboard settings and fullscreen controls sit in the calendar toolbar. The family
+organiser opens through Settings. Custom designs use their saved portrait and
+landscape layouts; tablet themes reflow into the available browser height, with
+long panel contents scrolling within cards. All seven week/month columns fit
+the calendar width. Bin cards show matching wheelie bins and ordinal month dates.
+
 Toggle RSS/Atom headlines, choose a news source or Custom RSS / Atom, and set a
 headline count. Presets include BBC, CNBC, CNN via Google News, Fox News, Sky News,
 GB News, The Guardian, NPR and Al Jazeera. CNN’s legacy RSS feed was stale, so its
 preset clearly identifies the Google News aggregator. See the
 [checked news sources](docs/NEWS-SOURCES.md).
 Feeds are fetched on the server, cached, and rendered as safe text with HTTP(S)
-links in a scrolling bottom ticker. Pause it with its button; keyboard focus and
+links in a scrolling bottom ticker. Bundled publisher icons identify preset sources
+at the left; custom feeds show an RSS icon and their feed title. Pause it with its button; keyboard focus and
 hover also pause movement. Reduced-motion preferences switch to static scrolling. Local/private-network destinations, unsafe redirects, XML entity/DOCTYPE
 payloads and oversized feeds are rejected.
 
