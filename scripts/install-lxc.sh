@@ -55,6 +55,6 @@ pct exec "$ctid" -- bash -c 'apt-get update && apt-get install -y ca-certificate
 pct exec "$ctid" -- mkdir -p /opt/homeboard
 pct push "$ctid" "$work/homeboard.tar.gz" /tmp/homeboard.tar.gz
 pct exec "$ctid" -- bash -c 'tar -xzf /tmp/homeboard.tar.gz -C /opt/homeboard && rm /tmp/homeboard.tar.gz && bash /opt/homeboard/scripts/install-node.sh'
-pct exec "$ctid" -- node /opt/homeboard/scripts/setup.mjs local --service --port "$port"
+pct exec "$ctid" -- env PATH=/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin /usr/local/bin/node /opt/homeboard/scripts/setup.mjs local --service --port "$port"
 echo "Container $ctid installed. Logs: pct exec $ctid -- journalctl -u homeboard-dashboard"
 echo 'Reserve its DHCP address on your router so tablets keep the same URL.'

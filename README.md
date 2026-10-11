@@ -146,6 +146,16 @@ After downloading, inspect selections without installing anything:
 bash /root/homeboard-proxmox.sh --dry-run
 ```
 
+If an older installer stopped with `node: command not found` immediately after a
+successful Node archive checksum, finish setup in the existing guest using the
+command below. Replace `100` with the LXC number printed by the installer (and
+`8080` if you chose a different port). This sets the search path for both Node and
+npm. Rerunning the bootstrap would create another guest.
+
+```bash
+pct exec 100 -- env PATH=/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin /usr/local/bin/node /opt/homeboard/scripts/setup.mjs local --service --port 8080
+```
+
 For manual options, run the installer **on the Proxmox host**, from a checkout of this repository.
 Download a Debian or Ubuntu container template first through Proxmox. With no
 arguments the script asks for a new container ID and a downloaded template.

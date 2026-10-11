@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# pct exec can provide a PATH that omits the official binary install directory.
+export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
 # Called inside a Debian/Ubuntu LXC. Uses Node's official binaries and checksums.
 if command -v node >/dev/null && [ "$(node -p 'const [major,minor]=process.versions.node.split(".").map(Number);Number(major>22||major===22&&minor>=19)')" -eq 1 ]; then exit 0; fi
 case "$(uname -m)" in x86_64) arch=x64 ;; aarch64) arch=arm64 ;; *) echo 'Unsupported Node architecture' >&2; exit 1 ;; esac
