@@ -118,7 +118,31 @@ Use volume backups and reserve the host's IP on your router.
 
 ### Proxmox LXC
 
-Run the installer **on the Proxmox host**, from a checkout of this repository.
+For automatic installation, paste this single command into the **Proxmox host's
+root shell**:
+
+```bash
+wget -O /root/homeboard-proxmox.sh https://raw.githubusercontent.com/MooreSi/HomeBoard/main/scripts/bootstrap-proxmox.sh && bash /root/homeboard-proxmox.sh
+```
+
+The standalone bootstrap installs Git, downloads HomeBoard and a Debian 12
+template, selects an unused LXC number and active storage with enough free space,
+and chooses the default-route bridge (falling back to `vmbr0`, then the first
+available bridge). It creates the guest with DHCP and port 8080 and prints the
+dashboard URLs. No installer prompts or prior repository checkout are required.
+It requires an x86_64 Proxmox host, internet access and working DHCP on the chosen
+bridge. Each run creates a new guest. Missing resources or command failures stop
+installation with an error; a failure after guest creation can leave that guest
+available for inspection. Automatic selections are tested with simulated Proxmox
+commands; installation on a real Proxmox host remains unverified.
+
+After downloading, inspect selections without installing anything:
+
+```bash
+bash /root/homeboard-proxmox.sh --dry-run
+```
+
+For manual options, run the installer **on the Proxmox host**, from a checkout of this repository.
 Download a Debian or Ubuntu container template first through Proxmox. With no
 arguments the script asks for a new container ID and a downloaded template.
 
