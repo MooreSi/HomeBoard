@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // Acceptance: extracting into a folder with spaces must serve the dashboard
-// and its JavaScript/CSS unchanged. No Microsoft account or network service
+// with build-stamped HTML and its JavaScript/CSS unchanged. No Microsoft account or network service
 // is used; the server gets fresh temporary data and an empty client ID.
 const source = fileURLToPath(new URL('../', import.meta.url));
 
@@ -36,7 +36,12 @@ test('dashboard assets are served from a project directory containing spaces', {
   await Promise.race([once(child.stdout, 'data'), exited.then(() => { throw Error('Server exited before startup'); })]);
   const response = await fetch(`http://127.0.0.1:${port}/`);
   assert.equal(response.status, 200, 'dashboard should load after extraction into a folder with spaces');
-  assert.equal(await response.text(), await fs.readFile(path.join(root, 'public/index.html'), 'utf8'));
+  const system = await (await fetch(`http://127.0.0.1:${port}/api/system`)).json();
+  assert.match(system.build, /^[a-zA-Z0-9_-]{1,64}$/);
+  const expectedHTML = (await fs.readFile(path.join(root, 'public/index.html'), 'utf8'))
+    .replace('</head>', `<meta name="homeboard-build" content="${system.build}"></head>`)
+    .replace(/(href|src)="(\/[^"?]+\.(?:css|js|mjs))"/g, `$1="$2?v=${system.build}"`);
+  assert.equal(await response.text(), expectedHTML);
   const script = await fetch(`http://127.0.0.1:${port}/app.js`);
   assert.equal(script.status, 200);
   assert.equal(await script.text(), await fs.readFile(path.join(root, 'public/app.js'), 'utf8'));

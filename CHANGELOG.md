@@ -1,5 +1,11 @@
 # Release notes
 
+## Unreleased · Safari tablet sizing · 11 October 2026
+
+- Dashboard sizing follows the usable visual viewport in CSS pixels, including browser controls, rotation and fullscreen changes, while preserving deliberate pinch zoom. Short tablet layouts compact the rail and share width between visible family cards.
+- Tablet Month keeps all six rows visible, prioritises readable appointment names and uses a +N button for additional appointments. Fixed month-date clicks failing to open Day view; cells and count buttons now open full timings.
+- Open dashboards detect updated builds on return to the page and periodically, preserving the selected calendar view, date, filters and URL. HTML/code assets have build identities and bypass stale HTTP caching; offline fallback remains available. Unstamped installations use a frontend content identity.
+
 ## Unreleased · Creative designer · 10 October 2026
 
 - Weather now sits to the right of the calendar below smart charging in every built-in theme. Compact forecast cards wrap within the rail, keep all forecast days visible and preserve space for loaded photos. Empty family strips collapse so the calendar can use the space.

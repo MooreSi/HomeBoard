@@ -54,3 +54,11 @@ installation. Set `PLAYWRIGHT_MODULE` to that package's absolute path; use
 Run `node --test tests/browser/release-03.mjs` separately from full API suites to
 avoid competing fixture port probes. Missing browser dependencies fail the run.
 See [v0.3 validation](docs/testing/VALIDATION-v0.3-designer.md) for commands and coverage.
+
+
+Tablet viewport checks must use the usable page area after Safari/browser controls,
+not the device's full physical screen resolution. Include touch/mobile emulation,
+DPR 2, reduced landscape heights, rotation and a populated household. Wait for
+viewport resize handling before measuring geometry. Verify Month appointment
+names as well as cell/date visibility; a grid that fits while clipping its contents
+is still a layout regression.

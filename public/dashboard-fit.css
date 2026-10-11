@@ -1,0 +1,57 @@
+/* Every visible family card shares the available width; content scrolls inside it. */
+body:not([data-custom-design=true]) .dashboard>.familyWidgets{display:grid!important;grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);overflow:hidden}
+body:not([data-custom-design=true]) .dashboard>.familyWidgets .familyWidget{display:flex;flex-direction:column;min-height:0;overflow:hidden;overflow-wrap:anywhere}
+body:not([data-custom-design=true]) .dashboard>.familyWidgets .familyWidget>header{flex-shrink:0}
+body:not([data-custom-design=true]) .dashboard>.familyWidgets .familyWidgetContent{min-height:0;flex:1;overflow:auto;overscroll-behavior:contain}
+/* Browser toolbars reduce the usable height on landscape tablets. */
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard{gap:6px!important;padding:8px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard .calendar{padding:8px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard .layout{gap:6px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard>.familyWidgets{flex:0 0 130px!important;gap:6px!important;padding:0!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard>.familyWidgets .familyWidget{padding:8px!important;font-size:11px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard>.familyWidgets .familyWidget>header{margin:0 0 4px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard>.familyWidgets .familyWidget h2{font-size:14px!important;line-height:1.2;margin:0}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard>.familyWidgets .familyWidget article{padding:3px 4px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard>.familyWidgets .familyWidget p{margin:3px 0}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard [data-family-panel=bins] .binCollection{padding-block:1px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard [data-family-panel=bins] .wheelieBin{width:14px!important;height:14px!important;flex-basis:14px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard [data-family-panel=bins] .binDate{gap:4px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard #newsWidget{min-height:0!important;height:42px;max-height:42px!important;padding:4px 8px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard #newsWidget article{font-size:13px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) aside{gap:6px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) .clockCard{flex-basis:68px;padding:4px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) .clockCard:has(#analog:not([hidden])){flex-basis:68px;grid-template-columns:54px minmax(0,1fr)}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) .analog{width:54px;height:54px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) .photo{flex-basis:60px;min-height:60px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget{flex-basis:110px;min-height:100px;padding:8px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget>header h2{font-size:15px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget .chargingSlot{padding-block:4px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #chargingWidget .chargingSlot p{font-size:10px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget{padding:6px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget h2{font-size:14px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget .widgetHeading{gap:2px;margin-bottom:4px}
+/* Keep every forecast day in a single row when vertical space is limited. */
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget .forecastDays{grid-template-columns:repeat(var(--forecast-count,7),minmax(0,1fr));gap:2px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget .forecastDay{padding:1px 0;gap:1px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget .forecastDay>strong{font-size:9px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget .weatherIcon{font-size:16px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget .forecastDay>b{font-size:11px;gap:1px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget .forecastDay>b small{font-size:9px}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget .forecastDay>span:not(.weatherIcon),body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard:has(#weatherWidget:not([hidden])) #weatherWidget .forecastDay>small{font-size:8px;overflow-wrap:anywhere}
+/* Month cells prioritise readable appointment names instead of clipped timestamps. */
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard #calendar .monthDay{font-size:10px;line-height:1;padding:2px!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard #calendar .monthDay button{display:block;font-size:14px!important;line-height:1!important;width:18px!important;min-width:18px!important;height:16px!important;min-height:16px!important;padding:0!important;margin:0!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard #calendar .monthDay .event{padding:1px 2px!important;margin:1px 0!important;line-height:1.1!important}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard #calendar .monthDay .event>time{display:none}
+body:not([data-custom-design=true])[data-dashboard-density=compact] .dashboard #calendar .monthDay .event>span{display:block;font-size:10px!important;line-height:1.1!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:1440px){
+ body:not([data-custom-design=true]) .dashboard #calendar .monthDay button{display:block;line-height:1!important}
+ body:not([data-custom-design=true]) .dashboard #calendar .monthDay .event:before,body:not([data-custom-design=true]) .dashboard #calendar .monthDay .event>time,body:not([data-custom-design=true]) .dashboard #calendar .monthDay .eventSource{display:none}
+ body:not([data-custom-design=true]) .dashboard #calendar .monthDay .event>span{display:block;font-size:10px!important;line-height:1.1!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+.dashboard .monthMore{display:none}
+@media(max-width:1440px){
+ body:not([data-custom-design=true]) .dashboard #calendar .monthDay{position:relative;cursor:pointer}
+ body:not([data-custom-design=true]) .dashboard #calendar .monthDay .event~.event,body:not([data-custom-design=true]) .dashboard #calendar .monthDay>small{display:none}
+ body:not([data-custom-design=true]) .dashboard #calendar .monthDay button.monthMore{display:block;position:absolute;top:2px;right:2px;font-size:9px!important;line-height:1!important;width:auto!important;min-width:16px!important;height:16px!important;min-height:16px!important;padding:1px 3px!important;margin:0!important;border-radius:8px;background:var(--event)}
+}

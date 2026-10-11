@@ -12,7 +12,7 @@
 .calendarFilters select{max-width:100%}
 .calendar .period h2{margin:0}
 body[data-custom-design=true] .dashboard .customDashboardGrid{height:100%!important}
-body[data-custom-design=true] .dashboard{height:100dvh!important;min-height:0!important;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important}
+body[data-custom-design=true] .dashboard{height:var(--dashboard-height,100dvh)!important;min-height:0!important;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important}
 body[data-custom-design=true] .customDashboardGrid>.calendar{overflow:hidden!important}
 body[data-custom-design=true] .customDashboardGrid>.calendar #calendar{overflow:auto!important;overscroll-behavior:contain}
 .clockCard{min-width:0;min-height:0}
@@ -38,7 +38,7 @@ body[data-custom-design=true][data-clock-layout=custom] .clockCard>:is(#clockDat
 }
 /* Built-in themes reflow into a bounded dashboard on tablets. Contents scroll inside cards. */
 @media(max-width:1440px){
- body:not([data-custom-design=true]) .dashboard{display:flex!important;flex-direction:column!important;height:100dvh!important;min-height:0!important;padding:8px!important;overflow:hidden!important;gap:8px}
+ body:not([data-custom-design=true]) .dashboard{display:flex!important;flex-direction:column!important;height:var(--dashboard-height,100dvh)!important;min-height:0!important;padding:8px!important;overflow:hidden!important;gap:8px}
  body:not([data-custom-design=true]) .dashboard>.layout{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(0,1fr)!important;flex:1;min-height:0;height:auto!important;gap:8px}
  body:not([data-custom-design=true]) .dashboard .calendar{display:flex!important;flex-direction:column;position:relative!important;inset:auto!important;height:auto!important;min-height:0!important;padding:12px!important;overflow:hidden!important}
  body:not([data-custom-design=true]) .dashboard #calendar{position:relative!important;inset:auto!important;flex:1;min-height:0;height:auto!important;overflow:auto!important;padding:0!important}

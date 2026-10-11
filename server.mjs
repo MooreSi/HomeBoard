@@ -18,6 +18,12 @@ import {Auth} from './lib/auth.mjs';
 import {Backup} from './lib/backup.mjs';
 import {News} from './lib/news.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url)),data=path.resolve(process.env.DATA_DIR||path.join(root,'data'));
+async function frontendBuild(){
+ const digest=crypto.createHash('sha1');
+ async function visit(dir){const entries=(await fs.readdir(dir,{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name));for(const entry of entries){const file=path.join(dir,entry.name);if(entry.isDirectory())await visit(file);else if(entry.isFile()&&/\.(html|css|js|mjs)$/.test(entry.name)){digest.update(path.relative(root,file)+'\0');digest.update(await fs.readFile(file));digest.update('\0');}}}
+ await visit(path.join(root,'public'));return digest.digest('hex');
+}
+const displayBuild=/^[a-zA-Z0-9_-]{1,64}$/.test(process.env.HOMEBOARD_COMMIT||'')&&!['unknown','development'].includes(process.env.HOMEBOARD_COMMIT)?process.env.HOMEBOARD_COMMIT:await frontendBuild();
 const packageInfo=JSON.parse(await fs.readFile(path.join(root,'package.json'),'utf8'));
 await fs.mkdir(path.join(data,'photos'),{recursive:true});
 let settings={...defaults,...await readJSON(data,'settings.json',{})};
@@ -101,7 +107,7 @@ const server=http.createServer(async(req,res)=>{let unlock;try{
  if(u.pathname.startsWith('/folder-photos/')&&req.method==='GET'){const photo=await photos.read(u.pathname.slice(15));res.writeHead(200,{'Content-Type':photo.type,'X-Content-Type-Options':'nosniff','Cache-Control':'no-cache'});return res.end(photo.body);}
  if(u.pathname==='/api/photos'&&req.method==='POST'){const b=await body(req);if(b[0]!==0xff||b[1]!==0xd8)throw Error('Upload a JPEG image');const name=crypto.randomUUID()+'.jpg';await fs.writeFile(path.join(data,'photos',name),b,{mode:0o600});return json(res,201,{url:'/photos/'+name});}
  if(u.pathname==='/api/photos/delete'&&req.method==='POST'){const {url}=await payload(req);if(!/^\/photos\/[a-f0-9-]+\.jpg$/.test(url))throw Error('Invalid photo (folder photos are read-only)');await fs.rm(path.join(data,url.slice(1)),{force:true});return json(res,200,{ok:true});}
- if(u.pathname==='/api/system'&&req.method==='GET'){const port=server.address().port;return json(res,200,{version:packageInfo.version,commit:process.env.HOMEBOARD_COMMIT||null,urls:[...new Set([`http://${req.headers.host||'localhost:'+port}`,...(process.env.LAN_URLS?process.env.LAN_URLS.split(',').filter(x=>/^https?:\/\/[^\s]+$/.test(x)):Object.values(os.networkInterfaces()).flat().filter(x=>x&&!x.internal&&x.family==='IPv4').map(x=>`http://${x.address}:${port}`))])]});}
+ if(u.pathname==='/api/system'&&req.method==='GET'){const port=server.address().port;return json(res,200,{version:packageInfo.version,build:displayBuild,commit:process.env.HOMEBOARD_COMMIT||null,urls:[...new Set([`http://${req.headers.host||'localhost:'+port}`,...(process.env.LAN_URLS?process.env.LAN_URLS.split(',').filter(x=>/^https?:\/\/[^\s]+$/.test(x)):Object.values(os.networkInterfaces()).flat().filter(x=>x&&!x.internal&&x.family==='IPv4').map(x=>`http://${x.address}:${port}`))])]});}
  if(u.pathname.startsWith('/api/'))return json(res,req.method==='GET'?404:405,{error:'Unknown API route or method'});
  if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});
  const isPhoto=u.pathname.startsWith('/photos/'),base=isPhoto?data:path.join(root,'public');
@@ -109,7 +115,8 @@ const server=http.createServer(async(req,res)=>{let unlock;try{
  const file=path.resolve(base,'.'+decodeURIComponent(route));if(!file.startsWith(base+path.sep))return json(res,403,{error:'Forbidden'});
  // Only the public tree and uploaded photos are available, never runtime data.
  if(isPhoto&&!/^\/photos\/[a-f0-9-]+\.jpg$/.test(u.pathname))return json(res,404,{error:'Photo not found'});
- const b=await fs.readFile(file),ext=path.extname(file),types={'.png':'image/png','.webmanifest':'application/manifest+json','.json':'application/json','.ttf':'font/ttf','.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.svg':'image/svg+xml','.jpg':'image/jpeg'};
- res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'self'"});res.end(b);
+ let b=await fs.readFile(file);const ext=path.extname(file),types={'.png':'image/png','.webmanifest':'application/manifest+json','.json':'application/json','.ttf':'font/ttf','.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.svg':'image/svg+xml','.jpg':'image/jpeg'};
+ if(!isPhoto&&ext==='.html')b=Buffer.from(b.toString().replace('</head>',`<meta name="homeboard-build" content="${displayBuild}"></head>`).replace(/(href|src)="(\/[^"?]+\.(?:css|js|mjs))"/g,`$1="$2?v=${displayBuild}"`));
+ res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream','Cache-Control':!isPhoto&&['.html','.css','.js','.mjs'].includes(ext)?'no-store':'no-cache','X-HomeBoard-Build':displayBuild,'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; img-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'self'"});res.end(b);
  }catch(e){json(res,e.status||(e.code==='ENOENT'?404:400),{error:e.code==='ENOENT'?'Not found':e.message});}finally{unlock?.();}});
 server.listen(Number(process.env.PORT||8080),process.env.HOST||'0.0.0.0',()=>{console.log('HomeBoard listening on port '+server.address().port);if(process.send)process.send({type:'ready',port:server.address().port});});

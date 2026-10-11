@@ -1,5 +1,17 @@
 # HomeBoard v0.3 validation · 9 October 2026
 
+## Safari browser controls and stale-page refinement · 11 October 2026
+
+- Final verification: 81 JavaScript files checked; 151/151 API/unit tests passed locally and in the production image. Chrome and WebKit each passed all 43 browser scenarios without failures or skips. Shell syntax, Docker build and disposable-container boot/assets/persistence/admin checks passed across two restarts. Synthetic screenshots were reviewed at 1024×620 and 800×600.
+
+- The supplied iPad image still contains the removed 3-week choice and weather eyebrow. Read-only checks confirmed localhost and the LAN endpoint served the same current build, so the image shows an older document rather than the latest markup. Open dashboards now detect a build change on `pageshow`, visibility changes and periodic checks. A fresh navigation is still needed once to replace a document running code from before this update.
+- Layout uses the visible viewport height in CSS pixels, never physical screen pixels or a multiplication by devicePixelRatio. Resize, rotation, fullscreen and returning to Safari update the height. Pinch zoom retains the underlying page layout. Browser viewport guidance: [WebKit dynamic viewport units](https://webkit.org/blog/12445/new-webkit-features-in-safari-15-4/) and [VisualViewport API](https://developer.mozilla.org/en-US/docs/Web/API/VisualViewport).
+- Touch/mobile emulation at DPR 2 covers 1024×620 and 1180×650 usable landscape areas and 768×880 portrait, across all 17 themes, with Month, a long weather place name, five visible family cards, three bins, a synthetic JPEG and news. An 800×600 boundary also includes seven forecast days and charging. Every month has 42 visible cells with readable rows and a visible first appointment name. Card and month detectors include deliberately displaced elements.
+- Browser API boundary tests simulate Safari's visible height shrinking while the layout viewport remains larger, and ensure deliberate pinch zoom does not halve the page layout. A real fixture-server restart with a new build verifies automatic page replacement while preserving the selected month/date, calendar filter and screen query.
+- Red/green regressions cover stale asset retrieval, absent build identity, live-page updates, measured viewport height, off-screen family cards, a clipped narrow charging/weather rail and clipped appointment titles. Month-date tapping also exposed an assignment to a shadowed constant; clicking a date or the +N summary now opens Day with full timings. Existing geometry assertions retain their tolerances and wait for the new asynchronous viewport update before measurement.
+- No production accounts or personal photos are used in browser automation. Physical iPad/Safari and Android device checks remain unverified; browser emulation is explicitly separate from physical testing.
+
+
 ## Weather rail and populated dashboard refinement · 10 October 2026
 
 - Final verification: 77 JavaScript files checked; 137/137 API/unit tests passed locally and in the production image. Chrome and WebKit each passed all 39 browser scenarios, with zero failures or skips. Shell syntax, Docker build and disposable-container boot/static-asset/persistence/admin checks passed across two restarts.
