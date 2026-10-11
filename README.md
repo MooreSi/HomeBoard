@@ -158,6 +158,15 @@ npm. Rerunning the bootstrap would create another guest.
 pct exec 100 -- env PATH=/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin /usr/local/bin/node /opt/homeboard/scripts/setup.mjs local --service --port 8080
 ```
 
+If an older installer reports that `homeboard-dashboard.service` has a bad unit
+file setting, repair the quoted path directives in that existing guest. Replace
+`100` with its LXC number. This validates the repaired unit and restarts the
+service; it preserves application files and settings.
+
+```bash
+pct exec 100 -- bash -c 'sed -i -E "s/^(WorkingDirectory|EnvironmentFile)=\"(.*)\"$/\1=\2/" /etc/systemd/system/homeboard-dashboard.service && systemd-analyze verify /etc/systemd/system/homeboard-dashboard.service && systemctl daemon-reload && systemctl restart homeboard-dashboard'
+```
+
 For manual options, run the installer **on the Proxmox host**, from a checkout of this repository.
 Download a Debian or Ubuntu container template first through Proxmox. With no
 arguments the script asks for a new container ID and a downloaded template.

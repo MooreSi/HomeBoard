@@ -6,6 +6,11 @@ import {fileURLToPath} from 'node:url';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const args=process.argv.slice(2),mode=args.shift();
 const help='Usage: npm run setup -- local|docker [--port 8080] [--photos /absolute/folder] [--service] [--dry-run]\nFor Proxmox run bash scripts/install-lxc.sh on the Proxmox host.';
+export function createSystemdUnit({root,nodePath,port,user,envFile}) {
+  const escape=p=>'"'+p.replaceAll('\\','\\\\').replaceAll('"','\\"')+'"';
+  return `[Unit]\nDescription=HomeBoard family dashboard\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=simple\nUser=${user}\nWorkingDirectory=${root}\nEnvironment=HOST=0.0.0.0\nEnvironment=PORT=${port}\nEnvironment=${escape('DATA_DIR='+path.join(root,'data'))}\nEnvironmentFile=${envFile}\nExecStart=${escape(nodePath)} ${escape(path.join(root,'scripts','runner.mjs'))}\nRestart=on-failure\nRestartSec=5\nNoNewPrivileges=true\nPrivateTmp=true\n\n[Install]\nWantedBy=multi-user.target\n`;
+}
+
 async function main(){
  if(!mode||mode==='--help'){console.log(help);return;}if(!['local','docker'].includes(mode))throw Error(help);
  let port=Number(process.env.DASHBOARD_PORT||8080),photos='',service=false,dry=false;
@@ -40,10 +45,9 @@ async function main(){
  const [nodeMajor,nodeMinor]=process.versions.node.split('.').map(Number);if(nodeMajor<22||nodeMajor===22&&nodeMinor<19)throw Error('Install Node.js 22.19 or later (Node 24 recommended)');run(os.platform()==='win32'?'npm.cmd':'npm',['ci','--omit=dev']);
  if(service){if(process.getuid?.()!==0)throw Error('Run service installation as root (sudo node scripts/setup.mjs local --service)');
   run('systemctl',['--version']);const user='homeboard';if(capture('id',[user]).status!==0)run('useradd',['--system','--home-dir',root,'--shell','/usr/sbin/nologin',user]);run('chown',['-R',user+':'+user,path.join(root,'data')]);
-  const escape=p=>'"'+p.replaceAll('\\','\\\\').replaceAll('"','\\"')+'"';
-  const unit=`[Unit]\nDescription=HomeBoard family dashboard\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=simple\nUser=${user}\nWorkingDirectory=${escape(root)}\nEnvironment=HOST=0.0.0.0\nEnvironment=PORT=${port}\nEnvironment=DATA_DIR=${path.join(root,'data')}\nEnvironmentFile=${escape(envFile)}\nExecStart=${escape(process.execPath)} ${escape(path.join(root,'scripts','runner.mjs'))}\nRestart=on-failure\nRestartSec=5\nNoNewPrivileges=true\nPrivateTmp=true\n\n[Install]\nWantedBy=multi-user.target\n`;
-  await fs.writeFile('/etc/systemd/system/homeboard-dashboard.service',unit);run('systemctl',['daemon-reload']);run('systemctl',['enable','--now','homeboard-dashboard']);run('systemctl',['restart','homeboard-dashboard']);await check();addresses();return;
+  const unit=createSystemdUnit({root,nodePath:process.execPath,port,user,envFile});
+  await fs.writeFile('/etc/systemd/system/homeboard-dashboard.service',unit);run('systemd-analyze',['verify','/etc/systemd/system/homeboard-dashboard.service']);run('systemctl',['daemon-reload']);run('systemctl',['enable','--now','homeboard-dashboard']);run('systemctl',['restart','homeboard-dashboard']);await check();addresses();return;
  }
  const child=spawn(process.execPath,['--env-file=.env','scripts/runner.mjs'],{cwd:root,env:{...process.env,HOST:'0.0.0.0',PORT:String(port)},stdio:'inherit'});child.on('error',e=>{console.error(e.message);process.exitCode=1;});child.on('exit',code=>{process.exitCode=code||0;});process.on('SIGINT',()=>child.kill('SIGINT'));process.on('SIGTERM',()=>child.kill('SIGTERM'));await check();addresses();console.log('Keep this terminal open. Press Ctrl+C to stop.');
 }
-main().catch(e=>{console.error(e.message);process.exitCode=1;});
+if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)) main().catch(e=>{console.error(e.message);process.exitCode=1;});
