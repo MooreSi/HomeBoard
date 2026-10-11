@@ -130,8 +130,12 @@ template, selects an unused LXC number and active storage with enough free space
 and chooses the default-route bridge (falling back to `vmbr0`, then the first
 available bridge). It creates the guest with DHCP and port 8080 and prints the
 dashboard URLs. No installer prompts or prior repository checkout are required.
-It requires an x86_64 Proxmox host, internet access and working DHCP on the chosen
-bridge. Each run creates a new guest. Missing resources or command failures stop
+It requires an x86_64 Proxmox VE 8 or 9 host (Debian bookworm or trixie), internet
+access and working DHCP on the chosen bridge. Download tools are installed using
+a temporary source list containing only official, signed Debian repositories and
+an isolated package index. Unavailable enterprise or third-party repositories do
+not block this step, and the host's APT repository configuration is left intact.
+Each run creates a new guest. Missing resources or command failures stop
 installation with an error; a failure after guest creation can leave that guest
 available for inspection. Automatic selections are tested with simulated Proxmox
 commands; installation on a real Proxmox host remains unverified.

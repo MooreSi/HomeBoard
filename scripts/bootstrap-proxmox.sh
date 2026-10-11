@@ -28,9 +28,33 @@ bridge=$(printf '%s\n' "$bridges" | awk -v route="$route_bridge" 'NF {if(!first)
 
 if [ "$dry" = false ]; then
   export DEBIAN_FRONTEND=noninteractive
-  echo 'Installing download tools and refreshing the template catalogue...'
-  apt-get update
-  apt-get install -y git ca-certificates
+  # Use only signed Debian sources for these tools. Host enterprise and third-party
+  # repositories and cached indexes must not participate in this installation.
+  codename=$(sh -c '. /etc/os-release; printf "%s" "${VERSION_CODENAME:-}"')
+  case "$codename" in
+    bookworm|trixie) ;;
+    *) fail "Unsupported Debian release: $codename (expected bookworm or trixie)." ;;
+  esac
+  work=$(mktemp -d /tmp/homeboard-install.XXXXXX)
+  trap 'rm -rf "$work"' EXIT
+  chmod 755 "$work"
+  mkdir -p "$work/sources.list.d" "$work/lists/partial"
+  cat > "$work/debian.list" <<SOURCES
+deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian $codename main
+deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian $codename-updates main
+deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg] http://security.debian.org/debian-security $codename-security main
+SOURCES
+  apt_options=(
+    -o "Dir::Etc::sourcelist=$work/debian.list"
+    -o "Dir::Etc::sourceparts=$work/sources.list.d"
+    -o "Dir::State::lists=$work/lists"
+    -o 'Dir::Cache::pkgcache='
+    -o 'Dir::Cache::srcpkgcache='
+    -o 'APT::Update::Error-Mode=any'
+  )
+  echo 'Installing download tools from signed Debian repositories and refreshing the template catalogue...'
+  apt-get "${apt_options[@]}" update
+  apt-get "${apt_options[@]}" install -y git ca-certificates
   pveam update
 fi
 # Debian 12 works with both Proxmox VE 8 and 9.
@@ -42,8 +66,6 @@ echo "Plan: HomeBoard LXC $ctid, template $templates:vztmpl/$template, storage $
 if [ "$dry" = true ]; then exit 0; fi
 
 pveam download "$templates" "$template"
-work=$(mktemp -d /tmp/homeboard-install.XXXXXX)
-trap 'rm -rf "$work"' EXIT
 git clone --depth 1 --branch main https://github.com/MooreSi/HomeBoard.git "$work/HomeBoard"
 bash "$work/HomeBoard/scripts/install-lxc.sh" \
   --id "$ctid" --template "$templates:vztmpl/$template" \
