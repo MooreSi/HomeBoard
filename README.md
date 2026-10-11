@@ -128,8 +128,10 @@ wget -O /root/homeboard-proxmox.sh https://raw.githubusercontent.com/MooreSi/Hom
 The standalone bootstrap installs Git, downloads HomeBoard and a Debian 12
 template, selects an unused LXC number and active storage with enough free space,
 and chooses the default-route bridge (falling back to `vmbr0`, then the first
-available bridge). It creates the guest with DHCP and port 8080 and prints the
-dashboard URLs. No installer prompts or prior repository checkout are required.
+available bridge). It creates the guest with DHCP and port 8080. After setup
+finishes, a final completion message shows the guest's dashboard URL with its IP
+address and port, for example `http://192.168.1.100:8080`. No installer prompts or
+prior repository checkout are required.
 It requires an x86_64 Proxmox VE 8 or 9 host (Debian bookworm or trixie), internet
 access and working DHCP on the chosen bridge. Download tools are installed using
 a temporary source list containing only official, signed Debian repositories and
