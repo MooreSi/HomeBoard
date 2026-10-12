@@ -31,3 +31,39 @@ test('a failed startup can be retried without leaving an unusable staged checkou
 test('a newly installed base checkout takes precedence over an older saved update pointer',async t=>{
  const f=await managedFixture(t);f.manager.beginUpdate();await f.manager.job;await f.manager.stop();await f.git(['fetch','origin',f.latestCommit],f.root);await f.git(['checkout','--detach',f.latestCommit],f.root);await f.manager.init();assert.equal(f.manager.active.root,f.root);assert.equal(f.manager.snapshot().currentCommit,f.latestCommit);assert.equal(JSON.parse(await fs.readFile(path.join(f.data,'updates/state.json'),'utf8')).activeCommit,null);
 });
+
+test('an LXC source archive with build metadata checks GitHub without requiring a local Git checkout',async t=>{
+ const f=await managedFixture(t,{archive:true});const pid=f.manager.active.child.pid;
+ const result=await f.json('/api/update/check');
+ assert.equal(result.currentCommit,f.oldCommit);assert.equal(result.latestCommit,f.latestCommit);
+ assert.equal(result.available,true);assert.equal(result.enabled,true);
+ assert.equal(f.manager.active.child.pid,pid);assert.deepEqual(await f.json('/preferences'),{name:'Kept family'});
+});
+test('an LXC source archive installs a verified update and preserves its settings and source metadata',async t=>{
+ const f=await managedFixture(t,{archive:true});f.manager.beginUpdate();await f.manager.job;
+ assert.equal((await f.json('/api/system')).commit,f.latestCommit);assert.equal(f.manager.snapshot().phase,'complete');
+ assert.deepEqual(await f.json('/preferences'),{name:'Kept family'});
+ assert.equal(JSON.parse(await fs.readFile(path.join(f.root,'build-info.json'),'utf8')).commit,f.oldCommit);
+ assert.equal(JSON.parse(await fs.readFile(path.join(f.data,'updates/state.json'),'utf8')).activeCommit,f.latestCommit);
+});
+test('service updates use a writable data cache when npm cannot write to the application home',async t=>{
+ const f=await managedFixture(t,{archive:true});const tools=path.join(f.data,'npm-tools'),log=path.join(f.data,'npm-calls.jsonl');await fs.mkdir(tools);
+ const {spawnSync}=await import('node:child_process');
+ const locate=spawnSync('/bin/sh',['-c','command -v npm'],{encoding:'utf8'});assert.equal(locate.status,0);
+ const wrapper=`#!${process.execPath}
+import fs from 'node:fs';import path from 'node:path';import {spawnSync} from 'node:child_process';
+const cache=process.env.npm_config_cache;
+if(!cache){console.error('EACCES: service account cannot write to its root-owned application home');process.exit(243);}
+fs.mkdirSync(cache,{recursive:true});fs.writeFileSync(path.join(cache,'fixture-write-check'),'writable');
+fs.appendFileSync(process.env.SERVICE_NPM_LOG,JSON.stringify({args:process.argv.slice(2),cache})+'\\n');
+const result=spawnSync(process.env.ACTUAL_NPM,process.argv.slice(2),{stdio:'inherit'});process.exit(result.status??1);
+`;
+ await fs.writeFile(path.join(tools,'npm'),wrapper,{mode:0o755});
+ f.manager.env={...f.manager.env,HOME:f.root,PATH:tools+path.delimiter+process.env.PATH,ACTUAL_NPM:locate.stdout.trim(),SERVICE_NPM_LOG:log};
+ f.manager.beginUpdate();await f.manager.job;
+ assert.equal((await f.json('/api/system')).commit,f.latestCommit);
+ const calls=(await fs.readFile(log,'utf8')).trim().split('\n').map(JSON.parse);
+ assert.deepEqual(calls,[{args:['ci','--omit=dev'],cache:path.join(f.data,'updates','npm-cache')},{args:['run','verify'],cache:path.join(f.data,'updates','npm-cache')}]);
+ assert.equal(await fs.readFile(path.join(f.data,'updates','npm-cache','fixture-write-check'),'utf8'),'writable');
+ assert.deepEqual(await f.json('/preferences'),{name:'Kept family'});
+});

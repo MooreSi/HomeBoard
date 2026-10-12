@@ -4,7 +4,7 @@ import path from 'node:path';
 import {pathToFileURL,fileURLToPath} from 'node:url';
 import {ManagedApp,command} from '../../lib/managed-app.mjs';
 const channel=pathToFileURL(fileURLToPath(new URL('../../lib/update-channel.mjs',import.meta.url))).href;
-export async function managedFixture(t,{failure=null}={}){
+export async function managedFixture(t,{failure=null,archive=false}={}){
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'homeboard managed '));let manager;t.after(async()=>{await manager?.stop();await fs.rm(dir,{recursive:true,force:true});});
  const repo=path.join(dir,'repository'),root=path.join(dir,'installed'),data=path.join(dir,'data');await fs.mkdir(repo);await fs.mkdir(data);await fs.writeFile(path.join(data,'settings.json'),JSON.stringify({name:'Kept family'}),{mode:0o600});
  const git=(args,cwd=repo)=>command('git',args,{cwd});await git(['init','--initial-branch=main']);
@@ -15,6 +15,7 @@ export async function managedFixture(t,{failure=null}={}){
   await git(['add','.']);await git(['-c','user.name=HomeBoard Test','-c','user.email=fixture@example.test','commit','-m','Fixture '+version]);return git(['rev-parse','HEAD']);
  }
  const oldCommit=await write('0.1.0');await command('git',['clone',repo,root],{cwd:dir});const latestCommit=await write('0.2.0',failure);
+ if(archive){await fs.rm(path.join(root,'.git'),{recursive:true,force:true});await fs.writeFile(path.join(root,'build-info.json'),JSON.stringify({commit:oldCommit}));}
  manager=new ManagedApp({root,data,repository:pathToFileURL(repo).href,env:{...process.env,HOST:'127.0.0.1',PORT:'0'},log:()=>{}});await manager.init();
  const json=async p=>(await fetch(`http://127.0.0.1:${manager.active.port}${p}`)).json();
  return {manager,root,data,oldCommit,latestCommit,json,git};

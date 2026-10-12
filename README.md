@@ -411,7 +411,33 @@ Without Homebrew, install Apple's Xcode Command Line Tools first. GitHub access
 uses the public repository and requires no GitHub token. Docker updates run inside
 the container; the Docker socket is not mounted. Installed versions, update
 state and backups live under `data/updates`, so they survive container recreation.
-A newer image/base checkout takes precedence when you explicitly reinstall.
+A newer image/base checkout takes precedence when you explicitly reinstall. LXC
+source archives use their recorded build revision and do not require a local
+`.git` directory. Only native Git checkouts undergo the local-change check.
+Git failures report useful DNS, certificate, connectivity or ownership guidance
+without exposing raw command output or credentials.
+The updater stores its npm cache under `data/updates/npm-cache`, which remains
+writable when the service account's home is the root-owned application directory.
+
+If an older Proxmox installation reports `git failed (exit 128)` when checking
+for updates, repair its update controller from the **Proxmox host shell**. Replace
+`100` with your LXC number. The command checks the downloaded module before
+replacing it, keeps a backup and restarts the dashboard; settings and photos are
+preserved. Then refresh Settings, click **Check for updates**, and use
+**Update & restart** to install the full latest version.
+
+```bash
+pct exec 100 -- bash -c '
+set -e
+cd /opt/homeboard/lib
+curl -fsSL "https://raw.githubusercontent.com/MooreSi/HomeBoard/main/lib/managed-app.mjs" -o .managed-app-fix.mjs
+/usr/local/bin/node --check .managed-app-fix.mjs
+cp -n managed-app.mjs managed-app.mjs.before-update-fix
+chmod 644 .managed-app-fix.mjs
+mv .managed-app-fix.mjs managed-app.mjs
+systemctl restart homeboard-dashboard
+'
+```
 
 Updates cover application source and npm dependencies. A release requiring a
 newer Node runtime stops with an actionable message; run the installer/rebuild
