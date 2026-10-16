@@ -1,6 +1,6 @@
 # HomeBoard
 
-A self-hosted family dashboard with a separate settings page, read-only Calendar Links from Outlook, Google or Apple calendars, seventeen themes plus a visual Custom Design editor, a photo slideshow, OpenWeather forecasts and RSS news.
+A self-hosted family dashboard with a separate settings page, read-only Calendar Links from Outlook, Google or Apple calendars, private iCloud Calendar connections, seventeen themes plus a visual Custom Design editor, a photo slideshow, OpenWeather forecasts and RSS news.
 Open `/` for the display and `/settings` to configure it. Settings are shared
 across displays and persist on the server. The dashboard has no upload controls.
 
@@ -206,6 +206,22 @@ The LXC script's syntax and plan are tested. Creating a real guest remains to be
 verified on a Proxmox host; this Mac is not a Proxmox host.
 
 ## Settings
+
+### Private iCloud Calendar
+
+Under **Settings → Calendar connections → iCloud Calendar**, enter your Apple
+Account email and an [app-specific password](https://support.apple.com/en-us/102654).
+Create one at Apple Account → Sign-In and Security → App-Specific Passwords;
+Apple requires two-factor authentication. HomeBoard discovers your calendars over
+CalDAV. Choose which calendars to display and save the selection. Connecting or
+replacing an account initially selects all its calendars.
+
+HomeBoard only reads appointments, including recurring and all-day events, and
+applies the appointment privacy setting. Credentials stay in the server's private
+`secrets.json`; they are never returned to the browser. Events are cached for five
+minutes; provider failures are reported and an existing cache may be shown as stale.
+Disconnect removes credentials and clears cached appointments. Reconnect if Apple
+revokes the password (including after changing your Apple Account password).
 
 ### Calendar Link
 

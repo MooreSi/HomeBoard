@@ -1,3 +1,4 @@
+import {calendarCredentials} from './lib/icloud-calendar-config.mjs';
 import {Octopus} from './lib/octopus.mjs';
 import {newsFeeds} from './lib/news-feeds.mjs';
 import http from 'node:http';
@@ -43,7 +44,7 @@ const calendars=new Calendars(data,()=>settings,()=>secrets),album=new ICloudAlb
 const octopus=new Octopus(()=>settings,()=>secrets);
 const family=new Family(data),auth=new Auth(data),backup=new Backup(data,()=>({settings,secrets}));
 await Promise.all([calendars.init(),weather.init(),news.init(),family.init(),auth.init()]);
-function publicSettings(){return {...settings,calendarFeedConfigured:!!secrets.calendarFeedUrl,icloudAlbumConfigured:!!secrets.icloudAlbumUrl,googleSecretConfigured:!!secrets.googleClientSecret,octopusKeyConfigured:!!secrets.octopusApiKey,octopusAccountConfigured:!!secrets.octopusAccountId,weatherKeyConfigured:!!secrets.weatherApiKey};}
+function publicSettings(){return {...settings,icloudCalendarConfigured:!!secrets.icloudCalendar,calendarFeedConfigured:!!secrets.calendarFeedUrl,icloudAlbumConfigured:!!secrets.icloudAlbumUrl,googleSecretConfigured:!!secrets.googleClientSecret,octopusKeyConfigured:!!secrets.octopusApiKey,octopusAccountConfigured:!!secrets.octopusAccountId,weatherKeyConfigured:!!secrets.weatherApiKey};}
 async function body(req,limit=12*1024*1024){let size=0,chunks=[];for await(const c of req){size+=c.length;if(size>limit)throw Error('Maximum upload size is 12 MB');chunks.push(c);}return Buffer.concat(chunks);}
 async function payload(req){return JSON.parse((await body(req,65536)).toString());}
 function json(res,status,value){res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(value));}
@@ -57,7 +58,7 @@ async function update(patch){const nextSecrets={...secrets},clean={...patch};for
  const next=validateSettings(clean,settings);
  if(next.microsoftClientId!==settings.microsoftClientId||next.microsoftTenant!==settings.microsoftTenant)await calendars.disconnect('microsoft');
  if(next.googleClientId!==settings.googleClientId||next.googleRedirectUri!==settings.googleRedirectUri||nextSecrets.googleClientSecret!==secrets.googleClientSecret)await calendars.disconnect('google');
- if(next.privacy!==settings.privacy||nextSecrets.calendarFeedUrl!==secrets.calendarFeedUrl||JSON.stringify(next.calendarFeeds)!==JSON.stringify(settings.calendarFeeds)||JSON.stringify(nextSecrets.calendarFeeds)!==JSON.stringify(secrets.calendarFeeds))await calendars.clearCache();
+ if(JSON.stringify(next.icloudCalendarIds)!==JSON.stringify(settings.icloudCalendarIds)||next.privacy!==settings.privacy||nextSecrets.calendarFeedUrl!==secrets.calendarFeedUrl||JSON.stringify(next.calendarFeeds)!==JSON.stringify(settings.calendarFeeds)||JSON.stringify(nextSecrets.calendarFeeds)!==JSON.stringify(secrets.calendarFeeds))await calendars.clearCache();
  await saveJSON(data,'secrets.json',nextSecrets);await saveJSON(data,'settings.json',next);secrets=nextSecrets;settings=next;
  return publicSettings();
 }
@@ -71,7 +72,7 @@ const server=http.createServer(async(req,res)=>{let unlock;try{
  if(u.pathname==='/api/auth/logout'&&req.method==='POST'){res.setHeader('Set-Cookie',auth.logout(req));return json(res,200,{ok:true});}
  if(req.method==='POST')auth.require(req);
  if(u.pathname==='/api/auth/disable'&&req.method==='POST'){res.setHeader('Set-Cookie',await auth.disable(req));return json(res,200,auth.status(req));}
- if(req.method==='GET'&&(u.pathname==='/api/settings'||/^\/api\/calendar\/(microsoft|google)\/list$/.test(u.pathname)||['/api/photos/uploads','/api/photos/folder'].includes(u.pathname)))auth.require(req);
+ if(req.method==='GET'&&(u.pathname==='/api/settings'||/^\/api\/calendar\/(microsoft|google|icloud)\/list$/.test(u.pathname)||['/api/photos/uploads','/api/photos/folder'].includes(u.pathname)))auth.require(req);
  if(u.pathname==='/api/family'&&req.method==='GET')return json(res,200,family.value);
  if(u.pathname==='/api/family'&&req.method==='POST')return json(res,200,await family.mutate(await payload(req)));
  if(u.pathname==='/api/display-settings'&&req.method==='GET'){const value=publicSettings();for(const k of ['photoFolder','microsoftClientId','microsoftTenant','googleClientId','googleRedirectUri','googleCalendarIds','microsoftCalendarIds'])delete value[k];return json(res,200,value);}
@@ -92,6 +93,9 @@ const server=http.createServer(async(req,res)=>{let unlock;try{
  if(u.pathname==='/api/calendar/google/connect'&&req.method==='POST'){const result=calendars.connectGoogle();res.setHeader('Set-Cookie',result.cookie);return json(res,200,{url:result.url});}
  if(u.pathname==='/api/calendar/google/callback'&&req.method==='GET'){res.setHeader('Referrer-Policy','no-referrer');await calendars.callbackGoogle(u,req.headers.cookie);res.writeHead(303,{Location:'/settings?connected=google','Set-Cookie':'homeboard_oauth=; HttpOnly; SameSite=Lax; Path=/api/calendar/google/callback; Max-Age=0'});return res.end();}
  if(u.pathname==='/api/calendar/google/disconnect'&&req.method==='POST'){await calendars.disconnect('google');return json(res,200,{ok:true});}
+ if(u.pathname==='/api/calendar/icloud/connect'&&req.method==='POST'){const credentials=calendarCredentials(await payload(req)),list=await calendars.icloud.discover(credentials);await calendars.clearCache();secrets={...secrets,icloudCalendar:credentials};settings={...settings,icloudCalendarIds:list.map(c=>c.id)};await saveJSON(data,'secrets.json',secrets);await saveJSON(data,'settings.json',settings);return json(res,200,{calendars:list});}
+ if(u.pathname==='/api/calendar/icloud/disconnect'&&req.method==='POST'){await calendars.clearCache();delete secrets.icloudCalendar;settings={...settings,icloudCalendarIds:[]};await saveJSON(data,'secrets.json',secrets);await saveJSON(data,'settings.json',settings);return json(res,200,{ok:true});}
+ if(u.pathname==='/api/calendar/icloud/list'&&req.method==='GET'){if(!secrets.icloudCalendar)throw Error('iCloud calendar is not connected');return json(res,200,await calendars.icloud.discover(secrets.icloudCalendar));}
  const calendarList=u.pathname.match(/^\/api\/calendar\/(microsoft|google)\/list$/);if(calendarList&&req.method==='GET')return json(res,200,await calendars.calendars(calendarList[1]));
  if(u.pathname==='/api/octopus'&&req.method==='GET')return json(res,200,await octopus.schedule());
  if(u.pathname==='/api/octopus/test'&&req.method==='POST')return json(res,200,await octopus.schedule({refresh:true}));

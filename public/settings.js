@@ -1,3 +1,4 @@
+import {setupICloudCalendar} from './icloud-calendar-settings.mjs';
 import {applyManagementAppearance,timezoneChoices} from './management.mjs';
 import {requireEditor} from './auth-ui.mjs';
 import {setupFamilySettings} from './family-settings.mjs';
@@ -33,7 +34,7 @@ const exportFields=fieldIds.filter(x=>!['photoFolder','octopusDeviceId'].include
 $('exportSettings').onclick=()=>{const current=collect(),safe=Object.fromEntries(exportFields.map(k=>[k,current[k]])),blob=new Blob([JSON.stringify({version:1,preferences:safe},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='homeboard-preferences.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('importSettings').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>65536)throw Error('Preference file is too large');const j=JSON.parse(await file.text());if(j.version!==1||!j.preferences||Object.keys(j.preferences).some(k=>!exportFields.includes(k)))throw Error('Not a valid HomeBoard display preference export');const updated=await post('/api/settings',j.preferences);populate(updated);await themeCards();toast('Display preferences imported and saved.');}catch(error){toast(error.message);}e.target.value='';};
 async function init(){const initial=await api('/api/settings');populate(initial);designEditor=setupDesignEditor(saved.customDesign,dirty,()=>$('theme').value);await Promise.all([themeCards(),newsChoices(),photoList()]);const system=await api('/api/system');$('networkAddresses').innerHTML=system.urls.map(x=>`<a class="address" href="${esc(x)}" target="_blank" rel="noopener">${esc(x)}</a>`).join('');}
-if(await requireEditor())init().then(async()=>{familySettings=await setupFamilySettings(designEditor);}).catch(e=>{toast(e.message);$('saveStatus').textContent='Settings could not load. Reload to try again.';});
+if(await requireEditor())init().then(async()=>{familySettings=await setupFamilySettings(designEditor);await setupICloudCalendar();}).catch(e=>{toast(e.message);$('saveStatus').textContent='Settings could not load. Reload to try again.';});
 
 let updateTimer,updateFailures=0,installingUpdate=false;
 const updatePhases={checking:'Checking GitHub…',downloading:'Downloading the update…',installing:'Installing dependencies…',verifying:'Running verification checks…',restarting:'Restarting HomeBoard…'};

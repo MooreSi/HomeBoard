@@ -1,7 +1,7 @@
 import {forecastIntervals} from './weather-fixture.mjs';
 import dns from 'node:dns/promises';
 import {syncBuiltinESMExports} from 'node:module';
-dns.lookup=async(host)=>{if(['feeds.bbci.co.uk','outlook.live.com','p00-sharedstreams.icloud.com','cvws.icloud-content.com'].includes(host))return [{address:'151.101.0.81',family:4}];if(host==='127.0.0.1')return [{address:'127.0.0.1',family:4}];throw Error('Unmocked DNS: '+host);};
+dns.lookup=async(host)=>{if(['feeds.bbci.co.uk','outlook.live.com','p00-sharedstreams.icloud.com','cvws.icloud-content.com','caldav.icloud.com','p01-caldav.icloud.com'].includes(host))return [{address:'151.101.0.81',family:4}];if(host==='127.0.0.1')return [{address:'127.0.0.1',family:4}];throw Error('Unmocked DNS: '+host);};
 syncBuiltinESMExports();
 // Fake only external HTTP. Unknown external URLs fail closed; local sockets remain real.
 import fs from 'node:fs/promises';
@@ -65,4 +65,19 @@ publicMock.get('https://outlook.live.com').intercept({path:'/owa/calendar/test/c
 publicMock.get('https://p00-sharedstreams.icloud.com').intercept({path:'/B00000000000000/sharedstreams/webstream',method:'POST',body:JSON.stringify({streamCtag:null})}).reply(200,{streamName:'Test album',photos:[{photoGuid:'photo-one',derivatives:{large:{checksum:'image-one',width:'1000',height:'800'}}}]}).persist();
 publicMock.get('https://p00-sharedstreams.icloud.com').intercept({path:'/B00000000000000/sharedstreams/webasseturls',method:'POST',body:JSON.stringify({photoGuids:['photo-one']})}).reply(200,{items:{'image-one':{url_location:'cvws.icloud-content.com',url_path:'/test.jpg'}}}).persist();
 publicMock.get('https://cvws.icloud-content.com').intercept({path:'/test.jpg'}).reply(200,Buffer.from([255,216,255,217]),{headers:{'content-type':'image/jpeg'}}).persist();
+// Synthetic iCloud CalDAV boundary; enforce authentication, methods and query range.
+const dav=(href,prop)=>`<d:multistatus xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav"><d:response><d:href>${href}</d:href><d:propstat><d:prop>${prop}</d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat></d:response></d:multistatus>`;
+for(const origin of ['https://caldav.icloud.com','https://p01-caldav.icloud.com'])publicMock.get(origin).intercept({path:/.*/,method:/PROPFIND|REPORT/}).reply(async options=>{
+ const control=JSON.parse(await fs.readFile(path.join(process.env.DATA_DIR,'provider-control.json'),'utf8').catch(e=>{if(e.code==='ENOENT')return '{}';throw e;}));
+ const headers=new Headers(options.headers);if(headers.get('authorization')!=='Basic '+Buffer.from('demo@example.com:aaaa-bbbb-cccc-dddd').toString('base64'))return {statusCode:401,data:'private provider detail'};
+ if(control.icloudRedirect)return {statusCode:307,data:'',responseOptions:{headers:{location:'https://example.com/steal'}}};
+ if(control.icloudMalformed)return {statusCode:207,data:'<d:multistatus>'};
+ const body=String(options.body);
+ if(options.method==='REPORT'&&control.icloudEmpty)return {statusCode:207,data:'<d:multistatus xmlns:d="DAV:"/>'};
+ if(options.method==='REPORT'){if(options.path!=='/123/calendars/home/'||!body.includes('start="20261009T000000Z" end="20261012T000000Z"'))throw Error('Unexpected iCloud event query');return control.icloudFail?{statusCode:503,data:'private detail'}:{statusCode:207,data:dav('/event.ics',`<c:calendar-data><![CDATA[${ics}]]></c:calendar-data>`)};}
+ if(options.path==='/'&&body.includes('current-user-principal'))return {statusCode:207,data:dav('/',`<d:current-user-principal><d:href>${control.icloudUnsafe?'https://example.com/steal':'/123/principal/'}</d:href></d:current-user-principal>`)};
+ if(options.path==='/123/principal/'&&body.includes('calendar-home-set'))return {statusCode:207,data:dav('/123/principal/','<c:calendar-home-set><d:href>https://p01-caldav.icloud.com/123/calendars/</d:href></c:calendar-home-set>')};
+ if(options.path==='/123/calendars/'&&headers.get('depth')==='1')return {statusCode:207,data:dav('/123/calendars/home/','<d:displayname>Demo family</d:displayname><d:resourcetype><d:collection/><c:calendar/></d:resourcetype>')};
+ throw Error('Unexpected CalDAV request');
+}).persist();
 Agent.prototype.dispatch=function(options,handler){if(options.body?.[Symbol.asyncIterator]){(async()=>{const chunks=[];for await(const chunk of options.body)chunks.push(Buffer.from(chunk));return publicMock.dispatch({...options,body:Buffer.concat(chunks).toString()},handler);})().catch(e=>handler.onResponseError(null,e));return true;}return publicMock.dispatch(options,handler);};
