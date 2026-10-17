@@ -192,7 +192,7 @@ test('Octopus settings accept private credentials and display discovered chargin
 
 test('Tablet dashboard uses its full canvas with calendar controls and fitted date items',async t=>{
  const a=await app(t),page=await browserPage(t,a);await page.locator('[data-starter=family]').click();await panelMenu(page,'clock');await page.getByRole('menuitem',{name:'Arrange date/time items…',exact:true}).click();await page.getByRole('button',{name:'Date and time on one line',exact:true}).click();await save(page);
- await page.goto(a.base+'/');await page.waitForLoadState('networkidle');assert.equal(await page.locator('.calendar #fullscreen').count(),1);assert.equal(await page.locator('.dashboard a[href="/family"]').count(),1);assert.equal(await page.locator('#fullscreen').evaluate(el=>el.previousElementSibling.id),'familyOrganiser');
+ await page.goto(a.base+'/');await page.waitForLoadState('networkidle');assert.equal(await page.locator('.calendar #fullscreen').count(),1);assert.equal(await page.locator('.dashboard a[href="/?organiser"]').count(),1);assert.equal(await page.locator('#fullscreen').evaluate(el=>el.previousElementSibling.id),'familyOrganiser');
  for(const viewport of [{width:768,height:1024},{width:1024,height:768},{width:820,height:1180},{width:1180,height:820},{width:800,height:1280},{width:1280,height:800},{width:1366,height:1024},{width:1024,height:1366},{width:600,height:960}]){
   await page.setViewportSize(viewport);await page.waitForFunction(h=>Math.round(document.querySelector('.dashboard').getBoundingClientRect().height)===h,viewport.height);
   await page.waitForFunction(()=>{const d=document.querySelector('#clockDate');return d.scrollWidth<=d.clientWidth+1&&d.scrollHeight<=d.clientHeight+1;});

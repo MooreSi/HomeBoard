@@ -5,3 +5,10 @@ test('Online versioned shell requests bypass the browser HTTP cache',async()=>{
  const listeners={},calls=[],bucket={put:async()=>{},match:async()=>null};const context={self:{addEventListener:(name,fn)=>listeners[name]=fn},location:{origin:'http://localhost'},URL,Headers,Response,Error,caches:{open:async()=>bucket},fetch:async(request,options)=>{calls.push({url:request.url,cache:options?.cache});return new Response(options?.cache==='no-store'?'fresh application':'stale application');}};
  vm.runInNewContext(await fs.readFile(new URL('../public/sw.js',import.meta.url),'utf8'),context);let response;listeners.fetch({request:new Request('http://localhost/app.js?v=demo-build-b'),respondWith:value=>response=value});assert.equal(await(await response).text(),'fresh application');assert.deepEqual(calls,[{url:'http://localhost/app.js?v=demo-build-b',cache:'no-store'}]);
 });
+test('Offline family dashboards retain the public theme catalogue needed to reproduce dashboard styling',async()=>{
+ const listeners={},cache=new Map(),bucket={put:async(r,v)=>cache.set(r.url,v.clone()),match:async r=>cache.get(r.url)?.clone(),keys:async()=>[...cache.keys()].map(url=>new Request(url)),delete:async()=>true};let offline=false;
+ const context={self:{addEventListener:(name,fn)=>listeners[name]=fn},location:{origin:'http://localhost'},URL,Headers,Response,Error,fetch:async()=>{if(offline)throw Error('offline');return Response.json([{id:'midnight',name:'Midnight'}]);},caches:{open:async()=>bucket}};
+ vm.runInNewContext(await fs.readFile(new URL('../public/sw.js',import.meta.url),'utf8'),context);
+ const dispatch=async()=>{let response;listeners.fetch({request:new Request('http://localhost/api/themes'),respondWith:r=>response=r});return response?await response:null;};
+ const online=await dispatch();assert.equal(online?.status,200);offline=true;const cached=await dispatch();assert.equal(cached?.status,200);assert.equal(cached.headers.get('X-HomeBoard-Offline'),'true');assert.deepEqual(await cached.json(),[{id:'midnight',name:'Midnight'}]);
+});

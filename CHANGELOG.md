@@ -1,5 +1,10 @@
 # Release notes
 
+## Unreleased
+
+- Corrected the Family organiser designer preview to show the family dashboard widgets instead of management forms. The family dashboard inherits the main dashboard’s screen theme, colours and typography while preserving its own saved layout and content positions.
+- Added dashboard navigation to the family display at `/?organiser`; management forms remain at `/family`. Theme changes are reflected in the preview immediately, and the public theme catalogue is cached for offline display.
+
 ## v0.3.1 · 17 October 2026
 
 - Added Family Hub, an eighteenth theme inspired by the supplied navy family dashboard, with a coloured time-aligned week, shared lists, photos, weather and news.

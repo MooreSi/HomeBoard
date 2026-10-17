@@ -1,6 +1,8 @@
 # Family Hub, designer composition and calendar provider validation
 
-Validated on 17 October 2026.
+Validated on 17 October 2026. The organiser preview described here was subsequently
+corrected to use dashboard widgets and shared main-screen styling; see the
+[organiser dashboard validation](VALIDATION-organiser-dashboard.md).
 
 ## Expected behaviour
 

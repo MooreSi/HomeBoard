@@ -21,13 +21,6 @@ body[data-reference-theme="family-hub"] .tickerTrack article{border-left:3px sol
 .hasContentLayout{position:relative!important}
 .hasContentLayout .familyWidgetContent:has([data-content-placed^="item:"]){position:static!important}
 [data-content-placed] h3,[data-content-placed] p,[data-content-placed] small{font-size:inherit!important}
-body.organiserDesigned #familyEditor{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(12,minmax(0,1fr));gap:var(--organiser-gap);height:max(720px,calc(100dvh - 48px));background:var(--organiser-bg);color:var(--organiser-text);padding:8px;isolation:isolate}
-body.organiserDesigned #familyEditor #people{grid-column:1/-1;grid-row:13;}
-body.organiserDesigned #familyEditor .settingsCard h2{color:inherit;font-size:1.3em}
-body.organiserDesigned #familyEditor :is(input,select,textarea){max-width:100%}
-body.designPreviewMode.organiserDesigned main{max-width:none;padding:0;margin:0}
-body.designPreviewMode.organiserDesigned main>:not(#familyEditor){display:none}
-body.designPreviewMode.organiserDesigned #familyEditor{height:100dvh;}
 .designCanvas[data-tool=content] iframe{pointer-events:none}
 .designCanvas[data-tool=content] .designPanelOverlay{display:none}
 .designContentItem{position:absolute!important;border:1px dashed #66d9ed!important;background:#29b6d90d!important;touch-action:none;min-width:0!important;min-height:0!important;padding:0!important;z-index:60;color:white!important}
@@ -65,3 +58,13 @@ body[data-reference-theme=family-hub] #weatherWidget[data-weather-style=cards] .
 /* The time axis carries timings; short cards reserve their height for titles. */
 body[data-reference-theme=family-hub] .hubEvent{padding:2px 3px;font-size:clamp(10px,.8vw,12px);line-height:1.1}
 body[data-reference-theme=family-hub] .hubEvent>time{display:none}
+
+.organiserNavigation{position:fixed;top:8px;left:8px;right:8px;height:48px;z-index:100;display:flex;align-items:center;gap:12px;padding:4px 12px;background:var(--design-surface);border:1px solid var(--line);border-radius:var(--design-radius);color:var(--design-text)}
+.organiserNavigation strong{flex:1;min-width:0}
+.organiserNavigation a{font-size:13px;white-space:nowrap}
+.organiserNavigation button{padding:4px 12px}
+body[data-dashboard-screen=family]:not(.designPreviewMode) .dashboard{padding-top:64px!important}
+body.designPreviewMode .organiserNavigation{display:none!important}
+@media(max-width:600px){.organiserNavigation{gap:6px;padding:4px 8px}.organiserNavigation strong{font-size:13px}.organiserNavigation a{font-size:11px}}
+
+body[data-dashboard-screen=family] .customDashboardGrid>:is(.clockCard,.calendar,.photo,#weatherWidget,#newsWidget,#chargingWidget){display:none!important}

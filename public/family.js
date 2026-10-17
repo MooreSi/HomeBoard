@@ -1,10 +1,8 @@
-import {applyOrganiserDesign} from './organiser-design.mjs';
 import {applyManagementAppearance} from './management.mjs';
 import {api,post,esc,zonedDate,addDays,weekday} from './display.mjs';
 import {authBanner} from './auth-ui.mjs';
 import {taskOccurs,completed,nextBin,countdownDate,daysBetween,newId} from './family-model.mjs';
 import {registerOffline} from './offline.mjs';
-let previewDesign=null;
 let family,pref,auth,today,mealWeek,saving=false;const $=id=>document.getElementById(id),status=message=>$('familyStatus').textContent=message;
 async function mutate(command){if(saving)return;saving=true;for(const el of document.querySelectorAll('#familyEditor input,#familyEditor button,#familyEditor textarea,#familyEditor select'))el.disabled=true;try{family=await post('/api/family',{revision:family.revision,...command});if(command.collection==='meals'&&command.item?.date)mealWeek=addDays(command.item.date,-((weekday(command.item.date)+6)%7));render();status('Saved across your home displays.');}catch(e){status(e.message);family=await api('/api/family');auth=await authBanner('#familyAuth');render();}finally{saving=false;}}
 const peopleOptions=()=>'<option value="">Anyone</option>'+family.people.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
@@ -28,13 +26,9 @@ function render(){const f=family,person=id=>f.people.find(p=>p.id===id)?.name||'
  for(const el of document.querySelectorAll('[data-list]'))el.onchange=()=>mutate({collection:'lists',action:'toggle',id:el.dataset.list,itemId:el.dataset.item});
  for(const el of document.querySelectorAll('[data-task]'))el.onchange=()=>mutate({action:'complete',id:el.dataset.task,date:today,step:Number(el.dataset.step)});
  for(const el of document.querySelectorAll('[data-ingredients]'))el.onclick=()=>mutate({collection:'meals',action:'ingredients',id:el.dataset.ingredients,listId:f.lists.find(x=>x.title.toLowerCase()==='shopping')?.id});
- applyOrganiserDesign(previewDesign||pref.familyDesign);
  if(!auth.editable)for(const el of document.querySelectorAll('#familyEditor input,#familyEditor button,#familyEditor textarea,#familyEditor select'))el.disabled=true;
 }
-const previewMode=new URLSearchParams(location.search).has('design-preview');
-if(previewMode){document.body.classList.add('designPreviewMode');window.addEventListener('message',async e=>{if(e.origin!==location.origin||e.source!==parent)return;if(e.data?.type==='homeboard-design-preview'){previewDesign=e.data.design;document.body.dataset.previewOrientation=e.data.orientation;applyOrganiserDesign(previewDesign);}if(e.data?.type==='homeboard-settings-updated'){pref=await api('/api/display-settings');applyOrganiserDesign(previewDesign||pref.familyDesign);}});}
-window.addEventListener('resize',()=>{if(pref)applyOrganiserDesign(previewDesign||pref.familyDesign);});
-async function init(){[family,pref,auth]=await Promise.all([api('/api/family'),api('/api/display-settings'),authBanner('#familyAuth')]);applyManagementAppearance(pref.managementAppearance);today=zonedDate(new Date(),pref.timezone);mealWeek=addDays(today,-((weekday(today)+6)%7));render();registerOffline();if(previewMode)parent.postMessage({type:'homeboard-design-preview-ready'},location.origin);}
+async function init(){[family,pref,auth]=await Promise.all([api('/api/family'),api('/api/display-settings'),authBanner('#familyAuth')]);applyManagementAppearance(pref.managementAppearance);today=zonedDate(new Date(),pref.timezone);mealWeek=addDays(today,-((weekday(today)+6)%7));render();registerOffline();}
 init().catch(e=>status(e.message));
 setInterval(async()=>{if(document.querySelector('#familyEditor :focus'))return;try{const value=await api('/api/family');if(value.revision!==family.revision){family=value;render();}const next=zonedDate(new Date(),pref.timezone);if(next!==today){today=next;render();}}catch{status('Offline · showing the last loaded family data. Editing needs a connection.');auth.editable=false;render();}},15000);
 

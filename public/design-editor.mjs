@@ -1,5 +1,5 @@
 import {contentTargets} from './panel-content.mjs';
-import {organiserPanels} from './organiser-design.mjs';
+import {organiserPanels,organiserStarter} from './organiser-design.mjs';
 import {validateDesign,exportDesign,importDesign,fonts,designerPanelNames as panelNames,designStarter,designPalettes,transformPanel,contentDesign as editorDesign,creativePanelStyle,designFromTheme,reorderPanel,transformCrop,compactFields,clockItemNames,defaultClockLayout} from './design.mjs';
 import {api,esc} from './display.mjs';
 
@@ -9,8 +9,7 @@ export function setupDesignEditor(initial,dirty,theme,initialFamily=null){
  let history=[structuredClone(design)],historyIndex=0,gesture=null,previewFrame=0,menuAnchor=null,styleClipboard=null,themeSources=[],tool=null,clockSelected='time';
  const names={calendar:'Calendar',clock:'Date & time',photo:'Photos',weather:'Weather',news:'News ticker',lists:'Shared lists',chores:'Chores',routines:'Routines',meals:'Meal plan',bins:'Bin collections',countdowns:'Countdowns',notices:'Noticeboard',charging:'Smart charging'};
  let target='main';
- const familyStarter=editorDesign(designStarter('family'));for(const ps of [familyStarter.panels,familyStarter.portraitPanels]){for(const name of panelNames)ps[name].visible=organiserPanels.includes(name);Object.assign(ps,{lists:{x:0,y:0,w:4,h:6,layer:0,visible:true},chores:{x:4,y:0,w:4,h:6,layer:0,visible:true},meals:{x:8,y:0,w:4,h:6,layer:0,visible:true},bins:{x:0,y:6,w:4,h:6,layer:0,visible:true},countdowns:{x:4,y:6,w:4,h:6,layer:0,visible:true},notices:{x:8,y:6,w:4,h:6,layer:0,visible:true}});}
- familyStarter.name='Family organiser';familyStarter.enabled=false;
+ const familyStarter=organiserStarter();
  const drafts={main:structuredClone(design),family:editorDesign(initialFamily||familyStarter)},histories={};
  const canvas=$('designCanvas');
  const toolHint=document.createElement('div');toolHint.className='designToolHint';toolHint.hidden=true;canvas.before(toolHint);
@@ -30,15 +29,22 @@ export function setupDesignEditor(initial,dirty,theme,initialFamily=null){
  }
  controls('designTypography',typography);controls('designStyle',surfaces);
  for(const key of Object.keys(design.colors)){const label=document.createElement('label');label.textContent=key==='event'?'Appointment background':key[0].toUpperCase()+key.slice(1);const el=document.createElement('input');el.type='color';el.id='design-colour-'+key;el.oninput=()=>{design.colors[key]=el.value;changed();};label.append(el);$('designColours').append(label);}
- function sendPreview(){$('designPreview').contentWindow?.postMessage({type:'homeboard-design-preview',design:{...design,enabled:true},orientation},location.origin);if(tool?.kind==='content')requestAnimationFrame(()=>requestAnimationFrame(paintContentItems));}
+ function sendPreview(){$('designPreview').contentWindow?.postMessage({type:'homeboard-design-preview',design:{...design,enabled:true},orientation,mainDesign:target==='family'?drafts.main:null,theme:theme()},location.origin);if(tool?.kind==='content')requestAnimationFrame(()=>requestAnimationFrame(paintContentItems));}
  function preview(){cancelAnimationFrame(previewFrame);previewFrame=requestAnimationFrame(sendPreview);}
  window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===$('designPreview').contentWindow&&e.data?.type==='homeboard-design-preview-ready')sendPreview();});
  function previewSize(){const sizes={desktop:[1920,1080],ipad:[1024,768],ipadpro:[1366,1024],android:[1280,800],fire10:[1920,1200],fire8:[1280,800],tablet10:[1920,1200],tablet11:[2360,1640],tablet12:[2560,1600],surface:[1920,1280],custom:[Math.max(320,Math.min(4096,Number($('designViewportWidth').value)||1920)),Math.max(320,Math.min(4096,Number($('designViewportHeight').value)||1200))],phone:[844,390]};const [w,h]=sizes[$('designDevice').value]||sizes.desktop;return orientation==='portrait'?[h,w]:[w,h];}
  function previewMetrics(){const [w,h]=previewSize(),scale=canvas.clientWidth/w,gap=(w<=1440?Math.min(design.gap,10):design.gap)*scale;return {w,h,scale,gap,width:(w-16)*scale,height:(h-16)*scale,pad:8*scale};}
  function sizePreview(){const [w,h]=previewSize();canvas.style.setProperty('--preview-aspect',w+'/'+h);const m=previewMetrics(),frame=$('designPreview');frame.style.setProperty('width',w+'px','important');frame.style.setProperty('height',h+'px','important');frame.style.transform='scale('+m.scale+')';$('designPreviewScale').textContent=w+' × '+h+' · '+Math.round(m.scale*100)+'%';}
  function panelRect(name){const p=panels()[name],m=previewMetrics();return {x:m.pad+(m.width+m.gap)*p.x/12,y:m.pad+(m.height+m.gap)*p.y/12,w:(m.width+m.gap)*p.w/12-m.gap,h:(m.height+m.gap)*p.h/12-m.gap};}
+ let inheritedTheme=null,inheritedThemeId='';
+ function syncFamilyAppearance(){
+  if(target!=='family')return;const id=theme(),info=themeSources.find(t=>t.id===id);
+  if(info&&id!==inheritedThemeId){inheritedTheme=editorDesign(designFromTheme(info));inheritedThemeId=id;}
+  const source=drafts.main.enabled?drafts.main:inheritedTheme||drafts.main;
+  for(const [key,value]of Object.entries(source))if(!['version','name','enabled','panels','portraitPanels','panelStyles','panelOptions','clockLayout','contentLayouts'].includes(key))design[key]=structuredClone(value);
+ }
  function paint(){
-  sizePreview();
+  syncFamilyAppearance();sizePreview();
   canvas.dataset.tool=tool?.kind||'';toolHint.hidden=!tool;if(tool){toolHint.replaceChildren(document.createTextNode(tool.kind==='content'?'Panel contents · select a highlighted section, drag to move, edges to resize. Arrows move; Shift + arrows resize. ':tool.kind==='crop'?'Crop mode · drag edges to trim; reset crop restores hidden content. ':'Date/time items · drag to move, edges to resize; arrows move, Shift + arrows resize. '));const done=document.createElement('button');done.type='button';done.textContent='Done editing';done.onclick=finishTool;toolHint.append(done);if(tool.kind==='content')contentControls();}
   canvas.dataset.orientation=orientation;canvas.style.setProperty('--canvas-accent',design.colors.accent);
   for(const b of canvas.querySelectorAll('[data-panel]')){const p=panels()[b.dataset.panel];
@@ -57,6 +63,7 @@ export function setupDesignEditor(initial,dirty,theme,initialFamily=null){
   $('designContrast').textContent=`Text contrast ${ratio.toFixed(1)}:1 · ${ratio<4.5?'Adjust text or surface colours for easier reading.':'Good contrast for ordinary text.'}`;preview();
  }
  function sync(){
+  syncFamilyAppearance();
   $('designEnabled').checked=design.enabled;$('designName').value=design.name;
   for(const el of document.querySelectorAll('[data-design-field]')){el.value=design[el.dataset.designField];el.setCustomValidity('');}
   for(const key of Object.keys(design.colors))$('design-colour-'+key).value=design.colors[key];
@@ -157,6 +164,7 @@ export function setupDesignEditor(initial,dirty,theme,initialFamily=null){
   ]);
  }
  function screenMenu(x,y,anchor){
+  if(target==='family'){$('designStatus').textContent='Family dashboard appearance follows the main dashboard. Switch to Main dashboard to change screen style.';return;}
   controlsMenu('Screen appearance',x,y,anchor,[
    {label:'Colour palette',value:'current',options:[['current','Current palette'],...Object.entries(designPalettes).map(([id,p])=>[id,p.name])],change:v=>{const p=designPalettes[v];if(p){design.colors={...p.colors};design.backdrop.from=p.from;design.backdrop.to=p.to;}}},
    {label:'Background',value:design.background,options:[['solid','Solid colour'],['gradient','Gradient'],['photo','Slideshow photo']],change:v=>design.background=v},
@@ -219,12 +227,12 @@ export function setupDesignEditor(initial,dirty,theme,initialFamily=null){
  $('designDevice').onchange=()=>{for(const id of ['designViewportWidth','designViewportHeight'])$(id).disabled=$('designDevice').value!=='custom';paint();};for(const id of ['designViewportWidth','designViewportHeight'])$(id).oninput=()=>paint();new ResizeObserver(()=>paint()).observe(canvas);
  $('designOverlay').onclick=()=>{if(design.panelStyles[selected].locked||selected==='photo'||target==='family')return;const photo=panels().photo;photo.visible=true;panels()[selected]={...panels()[selected],x:photo.x,y:photo.y,w:Math.min(4,photo.w),h:Math.min(3,photo.h),visible:true};const ordered=reorderPanel(panels(),selected,'front');if(orientation==='portrait')design.portraitPanels=ordered;else design.panels=ordered;const style=enablePanelStyle();style.opacity=65;changed();};
  $('designContent').onclick=()=>{tool={kind:'content',name:selected};paint();};
- $('designTarget').onchange=()=>{drafts[target]=structuredClone(design);histories[target]={history:structuredClone(history),historyIndex};target=$('designTarget').value;design=structuredClone(drafts[target]);history=histories[target]?.history||[structuredClone(design)];historyIndex=histories[target]?.historyIndex||0;selected=target==='family'?'bins':'calendar';tool=null;for(const option of $('designPanel').options)option.hidden=target==='family'&&!organiserPanels.includes(option.value);$('designOverlay').disabled=target==='family';$('designPreview').src=(target==='family'?'/family':'/')+'?design-preview';sync();};
+ $('designTarget').onchange=()=>{drafts[target]=structuredClone(design);histories[target]={history:structuredClone(history),historyIndex};target=$('designTarget').value;design=structuredClone(drafts[target]);history=histories[target]?.history||[structuredClone(design)];historyIndex=histories[target]?.historyIndex||0;selected=target==='family'?'bins':'calendar';tool=null;for(const option of $('designPanel').options)option.hidden=target==='family'&&!organiserPanels.includes(option.value);$('designOverlay').disabled=target==='family';$('designPreview').src=target==='family'?'/?organiser&design-preview':'/?design-preview';$('designScreenStyle').disabled=target==='family';$('designLoadTheme').disabled=target==='family';$('designThemeSource').disabled=target==='family';$('designStarters').hidden=target==='family';document.querySelector('.designerAppearance').hidden=target==='family';$('designAppearanceHint').hidden=target!=='family';sync();};
  $('designPanel').onchange=()=>select($('designPanel').value);$('designOrientation').onchange=()=>{orientation=$('designOrientation').value;paint();};
  $('designEnabled').onchange=()=>{design.enabled=$('designEnabled').checked;changed();};$('designName').onchange=()=>{const value=$('designName').value.trim();if(!value)return;design.name=value;changed();};
  for(const [id,key]of [['designX','x'],['designY','y'],['designW','w'],['designH','h'],['designLayer','layer']])$(id).onchange=()=>{if(design.panelStyles[selected].locked){paint();return;}const n=Number($(id).value)-(['x','y'].includes(key)?1:0);if(!Number.isInteger(n)||$(id).value===''){paint();return;}const p=panels()[selected];p[key]=Math.max(['w','h'].includes(key)?1:0,Math.min(key==='layer'?31:['x','y'].includes(key)?11:12,n));p.x=Math.min(p.x,12-p.w);p.y=Math.min(p.y,12-p.h);changed();};
  $('designVisible').onchange=()=>{panels()[selected].visible=$('designVisible').checked;changed();};
- $('panelStyleCustom').onchange=()=>{const s=design.panelStyles[selected];s.custom=$('panelStyleCustom').checked;if(s.custom){s.color=design.colors.text;s.background=design.colors.surface;}$('panelStyle-color').value=s.color;$('panelStyle-background').value=s.background;changed();};
+ $('panelStyleCustom').onchange=()=>{const s=design.panelStyles[selected];if(target==='family'&&$('panelStyleCustom').checked)enablePanelStyle();else s.custom=$('panelStyleCustom').checked;if(s.custom){s.color=design.colors.text;s.background=design.colors.surface;}$('panelStyle-color').value=s.color;$('panelStyle-background').value=s.background;changed();};
  for(const key of ['font','fontSize','color','background','align'])$('panelStyle-'+key).oninput=()=>{const value=key==='fontSize'?Number($('panelStyle-'+key).value):$('panelStyle-'+key).value;if(key==='fontSize'&&(!Number.isInteger(value)||value<8||value>72))return;design.panelStyles[selected][key]=value;changed();};
  for(const [id,key,value]of [['designAlignLeft','x',0],['designAlignTop','y',0]])$(id).onclick=()=>{if(design.panelStyles[selected].locked)return;panels()[selected][key]=value;changed();};$('designCenter').onclick=()=>{if(design.panelStyles[selected].locked)return;const p=panels()[selected];p.x=Math.floor((12-p.w)/2);changed();};
  $('designUndo').onclick=()=>{if(historyIndex){design=structuredClone(history[--historyIndex]);sync();dirty();}};$('designRedo').onclick=()=>{if(historyIndex<history.length-1){design=structuredClone(history[++historyIndex]);sync();dirty();}};
@@ -244,5 +252,5 @@ export function setupDesignEditor(initial,dirty,theme,initialFamily=null){
  api('/api/themes').then(values=>{themeSources=values;$('designThemeSource').replaceChildren(...values.map(t=>new Option(t.name,t.id)));}).catch(e=>$('designStatus').textContent=e.message);
  $('designLoadTheme').onclick=()=>{try{const t=themeSources.find(t=>t.id===$('designThemeSource').value);populate(designFromTheme(t));$('designStatus').textContent='Built-in theme loaded as a new editable copy. Save to your library to keep it.';}catch(e){$('designStatus').textContent=e.message;}};
  $('designPreview').onload=sendPreview;sync();
- return {value,mainValue:()=>target==='main'?value():validateDesign(drafts.main),familyValue:()=>target==='family'?value():validateDesign(drafts.family),populate,selectedBlock:()=>({type:selected,panel:structuredClone(panels()[selected]),style:structuredClone(design.panelStyles[selected])}),applyBlock:block=>{const locked=design.panelStyles[selected].locked;if(!locked)panels()[selected]=structuredClone(block.panel);design.panelStyles[selected]=Object.hasOwn(block.style,'headingSize')?structuredClone(block.style):creativePanelStyle(design,block.style);design.panelStyles[selected].locked=locked;design.panelOptions[selected].compactBackup=null;changed();}};
+ return {value,refreshPreview:()=>{syncFamilyAppearance();preview();},mainValue:()=>target==='main'?value():validateDesign(drafts.main),familyValue:()=>target==='family'?value():validateDesign(drafts.family),populate,selectedBlock:()=>({type:selected,panel:structuredClone(panels()[selected]),style:structuredClone(design.panelStyles[selected])}),applyBlock:block=>{const locked=design.panelStyles[selected].locked;if(!locked)panels()[selected]=structuredClone(block.panel);design.panelStyles[selected]=Object.hasOwn(block.style,'headingSize')?structuredClone(block.style):creativePanelStyle(design,block.style);design.panelStyles[selected].locked=locked;design.panelOptions[selected].compactBackup=null;changed();}};
 }

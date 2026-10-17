@@ -8,7 +8,7 @@ across displays and persist on the server. The dashboard has no upload controls.
 
 - Design directly on a live canvas: drag to move, pull edges/corners to resize, and right-click for size, placement, layers and appearance. The toolbar provides the same controls on phones and tablets.
 - Start with Studio, Family, Planner or Gallery; pick a coordinated palette, adjustable gradient or rotating photo background. Keep reusable designs in the visual library and share portable design files.
-- Dashboard themes affect the dashboard. Settings and the family organiser share an independent **Light / Dark / Auto** appearance.
+- The main dashboard and family dashboard share a theme. Settings and family management forms share an independent **Light / Dark / Auto** appearance.
 - Worldwide searchable timezone selection, twelve numbered settings sections, optional admin passwords and tidier dashboard cards.
 - Portrait layouts work on tablets and phones; custom calendar controls keep their own space.
 
@@ -319,7 +319,8 @@ to fit its panel or individual item slots when resized, including after rotating
 a tablet. Reset date/time arrangement restores the normal composition.
 
 Dashboard settings and fullscreen controls sit in the calendar toolbar. The family
-organiser opens through Settings. Custom designs use their saved portrait and
+dashboard opens from the shortcut immediately before fullscreen; its Manage family
+link opens the organiser configuration forms. Custom designs use their saved portrait and
 landscape layouts; tablet themes reflow into the available browser height, with
 long panel contents scrolling within cards. All seven week/month columns fit
 the calendar width. Tablet Upcoming uses compact rows, Month fits all six weeks,
@@ -482,11 +483,17 @@ high-temperature chart. **Family tools → Show only the next bin collection**
 shows the earliest scheduled day, including every bin collected together.
 
 In Custom Design, choose **Main dashboard** or **Family organiser**. Each has its
-own draft, history and saved layout. The organiser supports shared lists,
-chores/routines, meals, bins, countdowns and notices; profiles stay accessible
-below the designed sections. Enable the custom design for the selected screen
-and save changes to apply it. Built-in management Light / Dark / Auto still
-styles the surrounding controls.
+own draft, history and saved layout. The family preview shows the actual family
+dashboard widgets: shared lists, chores, routines, meals, bins, countdowns and
+notices. Its screen theme, colours and typography follow the main dashboard;
+explicit panel styles and content placement remain editable. Switch to Main
+dashboard to change the shared screen appearance. Enable the custom layout for
+the selected screen and save changes to apply it.
+
+Open `/?organiser` for the family dashboard, or use the dashboard shortcut before
+fullscreen. Its **Manage family** link opens `/family` for profiles and editing
+forms. These management forms keep the separate Light / Dark / Auto appearance
+and are not shown in the design preview.
 
 Preview presets include **Amazon Fire 10 · 1920 × 1200**, additional tablet
 aspect ratios and a custom usable viewport. Preset dimensions are page pixels,
