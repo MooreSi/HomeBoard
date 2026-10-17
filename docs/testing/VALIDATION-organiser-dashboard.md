@@ -16,9 +16,9 @@ and deliberate panel overrides remain independent. New panel overrides start
 with the shared appearance, including heading/body/secondary colours.
 
 The main dashboard shortcut opens `/?organiser`. That screen has navigation back
-to the dashboard, **Manage family** at `/family`, settings and fullscreen. The
-management forms retain Light / Dark / Auto styling and remain available for
-profiles and household edits. Default dashboard layouts include all seven family
+to the dashboard, fullscreen and settings. The management forms at `/family`
+retain Light / Dark / Auto styling and remain available for profiles and household
+edits. Default dashboard layouts include all seven family
 widgets, including separate chores and routines. Existing saved family layouts
 are preserved. The public theme catalogue is cached for offline dashboard use.
 
@@ -68,3 +68,26 @@ The configuration forms themselves are still checked independently.
 No live external accounts or physical Fire/iPad/Android devices were used.
 WebKit/device rendering and live integrations remain unverified. No production
 household data or credentials were accessed, and no coverage ratchet is claimed.
+
+## Family dashboard overlay controls correction
+
+The family dashboard and designer preview now show exactly three labelled
+controls at the top: **Main Dashboard**, **Full Screen** and **Settings**.
+Fullscreen changes the middle button to **Exit Full Screen** and updates its
+pressed state. The toolbar floats above the grid, follows the shared appearance,
+and uses at least 44 × 44 page pixels for each control.
+
+The new browser regression first failed against the former labels and extra
+management link. An intentionally incorrect expected label also failed after the
+fix; it was restored. Checks exercise actual main/settings navigation, browser
+fullscreen entry/exit, designer preview visibility, and button bounds and hit
+testing at 1920 × 1200, 1200 × 1920, 1024 × 650 and 390 × 844. The earlier card
+bounds check now expects the first row at exactly 8 pixels from the top, replacing
+the former reserved-toolbar-space requirement to match the requested overlay.
+All seven card bounds and existing shared appearance checks remain asserted.
+
+Overlay verification: full Chrome browser suite **58 passed, 0 failed, 0 skipped**;
+`npm run verify` checked 99 JavaScript files and **185 tests passed, 0 failed,
+0 skipped**. Installer shell syntax and whitespace checks passed. Docker was not
+rebuilt for this browser-only correction; server and packaging are unchanged.
+Physical tablet and live integration checks remain unverified.

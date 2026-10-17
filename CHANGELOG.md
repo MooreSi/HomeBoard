@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added three labelled overlay controls to the family dashboard and its designer preview: Main Dashboard, Full Screen / Exit Full Screen, and Settings. The toolbar floats over the layout and keeps touch-sized controls at tablet and narrow-screen widths.
+
 - Corrected the Family organiser designer preview to show the family dashboard widgets instead of management forms. The family dashboard inherits the main dashboard’s screen theme, colours and typography while preserving its own saved layout and content positions.
 - Added dashboard navigation to the family display at `/?organiser`; management forms remain at `/family`. Theme changes are reflected in the preview immediately, and the public theme catalogue is cached for offline display.
 

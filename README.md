@@ -319,10 +319,12 @@ to fit its panel or individual item slots when resized, including after rotating
 a tablet. Reset date/time arrangement restores the normal composition.
 
 Dashboard settings and fullscreen controls sit in the calendar toolbar. The family
-dashboard opens from the shortcut immediately before fullscreen; its Manage family
-link opens the organiser configuration forms. Custom designs use their saved portrait and
-landscape layouts; tablet themes reflow into the available browser height, with
-long panel contents scrolling within cards. All seven week/month columns fit
+dashboard opens from the shortcut immediately before fullscreen. Its top overlay has
+**Main Dashboard**, **Full Screen** (or **Exit Full Screen**) and **Settings** controls,
+including in the designer preview. Settings provides access to family management.
+Custom designs use their saved portrait and landscape layouts; tablet themes
+reflow into the available browser height, with long panel contents scrolling
+within cards. All seven week/month columns fit
 the calendar width. Tablet Upcoming uses compact rows, Month fits all six weeks,
 and bin typography and ticker icons adapt to their available card space.
 Bin cards show matching wheelie bins and ordinal month dates.
@@ -491,9 +493,10 @@ dashboard to change the shared screen appearance. Enable the custom layout for
 the selected screen and save changes to apply it.
 
 Open `/?organiser` for the family dashboard, or use the dashboard shortcut before
-fullscreen. Its **Manage family** link opens `/family` for profiles and editing
-forms. These management forms keep the separate Light / Dark / Auto appearance
-and are not shown in the design preview.
+fullscreen. Its top overlay provides **Main Dashboard**, **Full Screen** and
+**Settings**. Open `/family` for profiles and editing forms. These management
+forms keep the separate Light / Dark / Auto appearance and are not shown in the
+design preview.
 
 Preview presets include **Amazon Fire 10 · 1920 × 1200**, additional tablet
 aspect ratios and a custom usable viewport. Preset dimensions are page pixels,

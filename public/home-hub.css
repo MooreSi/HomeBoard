@@ -59,12 +59,7 @@ body[data-reference-theme=family-hub] #weatherWidget[data-weather-style=cards] .
 body[data-reference-theme=family-hub] .hubEvent{padding:2px 3px;font-size:clamp(10px,.8vw,12px);line-height:1.1}
 body[data-reference-theme=family-hub] .hubEvent>time{display:none}
 
-.organiserNavigation{position:fixed;top:8px;left:8px;right:8px;height:48px;z-index:100;display:flex;align-items:center;gap:12px;padding:4px 12px;background:var(--design-surface);border:1px solid var(--line);border-radius:var(--design-radius);color:var(--design-text)}
-.organiserNavigation strong{flex:1;min-width:0}
-.organiserNavigation a{font-size:13px;white-space:nowrap}
-.organiserNavigation button{padding:4px 12px}
-body[data-dashboard-screen=family]:not(.designPreviewMode) .dashboard{padding-top:64px!important}
-body.designPreviewMode .organiserNavigation{display:none!important}
-@media(max-width:600px){.organiserNavigation{gap:6px;padding:4px 8px}.organiserNavigation strong{font-size:13px}.organiserNavigation a{font-size:11px}}
-
+.organiserNavigation{position:fixed;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));max-width:calc(100% - 16px);z-index:1000;display:flex;align-items:center;gap:6px;padding:4px;background:var(--design-surface);border:1px solid var(--line);border-radius:var(--design-radius);color:var(--design-text);box-shadow:0 2px 12px #0003}
+.organiserNavigation :is(a,button){min-width:44px;min-height:44px;padding:8px 12px;font-size:13px;white-space:nowrap;background:var(--design-surface);color:var(--design-text);border-color:var(--line)}
+@media(max-width:600px){.organiserNavigation{gap:4px}.organiserNavigation :is(a,button){padding:8px;font-size:12px}}
 body[data-dashboard-screen=family] .customDashboardGrid>:is(.clockCard,.calendar,.photo,#weatherWidget,#newsWidget,#chargingWidget){display:none!important}
