@@ -54,3 +54,6 @@ body[data-custom-design=true][data-clock-layout=custom] .clockCard>[data-clock-i
 body[data-custom-design=true][data-clock-layout=custom] [data-clock-visible=false]{display:none!important;}
 
 body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"],[data-design-version="6"],[data-design-version="7"]) .customDashboardGrid>[data-panel-styled=true][data-panel-heading=false] :is(.period>h2,.tickerLabel,#placeholder>span){display:none!important}
+
+/* Surface alpha must win over the legacy solid panel background. */
+body[data-custom-design=true]:is([data-design-version="4"],[data-design-version="5"],[data-design-version="6"],[data-design-version="7"]) .dashboard .customDashboardGrid>[data-panel-styled=true]{background:var(--panel-surface)!important}

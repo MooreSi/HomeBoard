@@ -3,7 +3,7 @@ export function observeClock(card){
  let pending=false;
  const schedule=()=>{if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;fit();});};
  const fit=()=>{
-  const texts=[...card.querySelectorAll('#clock,#clockDate,#clockZone,#clockSeconds')];
+  const texts=[...card.querySelectorAll('#clock:not([data-content-placed]),#clockDate:not([data-content-placed]),#clockZone:not([data-content-placed]),#clockSeconds:not([data-content-placed])')];
   for(const el of texts)el.style.removeProperty('font-size');
   const visible=texts.filter(el=>el.getClientRects().length&&getComputedStyle(el).display!=='none');
   const sizes=visible.map(el=>parseFloat(getComputedStyle(el).fontSize));

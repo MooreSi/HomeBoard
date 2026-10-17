@@ -36,3 +36,15 @@ test('Reference week uses a time axis and positions appointments by time while p
  const html=hubWeekHTML([{subject:'Demo school',start:{dateTime:'2026-10-12T08:00:00Z'},end:{dateTime:'2026-10-12T09:00:00Z'}}],'2026-10-12',{timezone:'UTC',hour12:false,privacy:false},'2026-10-12');
  assert.match(html,/class="hubTimeAxis"/);assert.match(html,/08:00/);assert.match(html,/Demo school/);assert.match(html,/--event-top:6\.666/);assert.match(html,/data-date="2026-10-12"/);
 });
+
+test('Individual text styles accept supported fonts and colours, reject unsafe styles and persist across restart',async t=>{
+ const d=design.contentDesign(design.designStarter('family'));d.contentLayouts.bins['text:demo-bin:0']={x:8,y:22,w:65,h:15,fontSize:29,font:'mono',color:'#fedcba'};
+ assert.deepEqual(design.validateDesign(d),d);
+ for(const change of [{font:'url(https://invalid.test)'},{color:'red'},{fontSize:0},{x:99,w:5},{unknown:true}]){const invalid=structuredClone(d);Object.assign(invalid.contentLayouts.bins['text:demo-bin:0'],change);assert.throws(()=>design.validateDesign(invalid),/content/);}
+ const a=await app(t),response=await a.post('/api/settings',{customDesign:d});assert.equal(response.status,200,await response.clone().text());await a.restart();assert.deepEqual((await a.json('/api/settings')).customDesign,d);
+});
+
+test('Content style validation rejects null records and non-string font and colour values',()=>{
+ const base=design.contentDesign(design.designStarter('family')),position={x:0,y:0,w:50,h:20,fontSize:20};
+ for(const value of [null,[],{...position,font:['mono']},{...position,color:['#ffffff']}]){const d=structuredClone(base);d.contentLayouts.bins.heading=value;assert.throws(()=>design.validateDesign(d),/Invalid design content/);}
+});

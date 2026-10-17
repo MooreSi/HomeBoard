@@ -504,13 +504,30 @@ not a promise of the usable area on every model: device scaling and browser bars
 can reduce that area. Set a custom width/height for the actual browser viewport.
 Both landscape and portrait layouts are saved.
 
-Select a panel and choose **Overlay on photo** to place it over the photo with a
-higher layer and a translucent surface. Use **Edit panel contents** to select
-headings, text groups or individual bin cards, drag them and resize with the edge
-handles. Arrow keys move the selected content; Shift + arrows resize it. Text
-size is in the editing toolbar. Reset panel contents restores normal flow.
-Positions are percentages within the panel and bin cards retain their schedule
-identity when dates or ordering change.
+Select a panel and choose **Overlay on photo** to place it above the photo.
+**Transparent panel background** removes that panel's surface, border and shadow
+without fading its text or weather graphics. The switch works on every panel,
+including family organiser widgets. For partial transparency, open **Panel
+properties & exact placement** and set **Background opacity (%)** from 0 to 100.
+
+Choose **Select text**, then click the outlined text in the canvas. You can also
+double-click a panel to enter text selection. The controls above the canvas show
+**Selected text**, **Selected text font**, **Selected text size**, colour and exact
+position/size percentages. Drag a text outline to move it and drag its edges to
+resize its box; arrow keys move it and Shift + arrows resize it. Whole headings,
+content sections and bin cards remain available through **Edit panel contents**
+and the Selected text list. **Reset panel contents** restores normal flow.
+Text positions and fonts are saved separately from panel geometry; bin text uses
+the bin's identity so collection reordering preserves its edits.
+
+Select **Weather** in the designer to show **Weather panel presentation** next
+to the panel controls. Choose **Compact forecast**, **Detailed forecast cards**,
+**Graphical weather scenes** or **Temperature chart** for an immediate preview
+of the connected forecast. The same preference is in **Settings → Weather →
+Weather presentation**. Save changes to apply the chosen style to the dashboard.
+Weather must be enabled and connected for live forecast graphics to appear.
+See the [text, transparency and weather validation](docs/testing/VALIDATION-designer-text-surfaces.md)
+for regression checks and device verification limits.
 
 ### Private calendar provider selector
 

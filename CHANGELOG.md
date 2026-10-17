@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added visible Select text controls and double-click selection in Custom Design, with individual text fonts, sizes, colours, movement and box resizing saved independently of panels and bin cards.
+- Added a Transparent panel background switch for every panel plus an accessible background opacity control; corrected a style override that prevented fully transparent surfaces.
+- Added Weather panel presentation in the designer, with immediate compact, detailed card, graphical scene and temperature chart previews linked to the Weather settings preference.
+
 - Added three labelled overlay controls to the family dashboard and its designer preview: Main Dashboard, Full Screen / Exit Full Screen, and Settings. The toolbar floats over the layout and keeps touch-sized controls at tablet and narrow-screen widths.
 
 - Corrected the Family organiser designer preview to show the family dashboard widgets instead of management forms. The family dashboard inherits the main dashboard’s screen theme, colours and typography while preserving its own saved layout and content positions.
