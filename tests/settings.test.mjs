@@ -22,8 +22,8 @@ test('invalid timezone rejects the entire preferences update',async t=>{
 test('slideshow timer rejects zero instead of silently accepting it',async t=>{
  const a=await app(t);assert.equal((await a.post('/api/settings',{photoInterval:0})).status,400);
 });
-test('seventeen distinct researched themes retain the ten original choices',async t=>{
- const a=await app(t);const r=await a.request('/api/themes');assert.equal(r.status,200);const themes=await r.json();assert.equal(themes.length,17);assert.equal(new Set(themes.map(x=>x.id)).size,17);assert.deepEqual(themes.slice(0,10).map(x=>x.id),['homeboard','midnight','chalkboard','coastal','forest','sunset','minimal','lavender','aurora','gallery']);
+test('eighteen distinct themes retain the ten original choices',async t=>{
+ const a=await app(t);const r=await a.request('/api/themes');assert.equal(r.status,200);const themes=await r.json();assert.equal(themes.length,18);assert.equal(new Set(themes.map(x=>x.id)).size,18);assert.deepEqual(themes.slice(0,10).map(x=>x.id),['homeboard','midnight','chalkboard','coastal','forest','sunset','minimal','lavender','aurora','gallery']);
 });
 test('Showcase theme is listed, styled and persists after restart',async t=>{
  const a=await app(t);const themes=await a.json('/api/themes');const showcase=themes.find(x=>x.id==='showcase');

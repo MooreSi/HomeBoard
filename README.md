@@ -1,6 +1,6 @@
 # HomeBoard
 
-A self-hosted family dashboard with a separate settings page, read-only Calendar Links from Outlook, Google or Apple calendars, private iCloud Calendar connections, seventeen themes plus a visual Custom Design editor, a photo slideshow, OpenWeather forecasts and RSS news.
+A self-hosted family dashboard with a separate settings page, read-only Calendar Links from Outlook, Google or Apple calendars, private iCloud Calendar connections, eighteen themes plus a visual Custom Design editor, a photo slideshow, OpenWeather forecasts and RSS news.
 Open `/` for the display and `/settings` to configure it. Settings are shared
 across displays and persist on the server. The dashboard has no upload controls.
 
@@ -463,8 +463,56 @@ release tags, and run only when you click the install button.
 
 ## Release and licence
 
-This source version is **HomeBoard v0.3.0**. Published downloads are listed on the [GitHub releases page](https://github.com/MooreSi/HomeBoard/releases).
+This source version is **HomeBoard v0.3.1**. Published downloads are listed on the [GitHub releases page](https://github.com/MooreSi/HomeBoard/releases).
 Earlier validation files retain their development-build labels. HomeBoard is
 licensed under the [MIT licence](LICENSE), copyright © 2026 Simon Moore.
 Third-party npm dependencies retain their own licences in their installed
 packages, including node-ical (Apache-2.0), Undici and fast-xml-parser (MIT).
+
+
+### Family Hub and extended designer
+
+Choose **Family Hub** in Themes for the reference-style navy display: a clock and
+weather strip, a time-aligned coloured family week, shared lists, photos and news.
+Photos and live feeds use your configured sources; the theme does not include
+sample personal photos or silently enable integrations.
+
+Weather settings offer compact, detailed cards, graphical SVG scenes and a
+high-temperature chart. **Family tools → Show only the next bin collection**
+shows the earliest scheduled day, including every bin collected together.
+
+In Custom Design, choose **Main dashboard** or **Family organiser**. Each has its
+own draft, history and saved layout. The organiser supports shared lists,
+chores/routines, meals, bins, countdowns and notices; profiles stay accessible
+below the designed sections. Enable the custom design for the selected screen
+and save changes to apply it. Built-in management Light / Dark / Auto still
+styles the surrounding controls.
+
+Preview presets include **Amazon Fire 10 · 1920 × 1200**, additional tablet
+aspect ratios and a custom usable viewport. Preset dimensions are page pixels,
+not a promise of the usable area on every model: device scaling and browser bars
+can reduce that area. Set a custom width/height for the actual browser viewport.
+Both landscape and portrait layouts are saved.
+
+Select a panel and choose **Overlay on photo** to place it over the photo with a
+higher layer and a translucent surface. Use **Edit panel contents** to select
+headings, text groups or individual bin cards, drag them and resize with the edge
+handles. Arrow keys move the selected content; Shift + arrows resize it. Text
+size is in the editing toolbar. Reset panel contents restores normal flow.
+Positions are percentages within the panel and bin cards retain their schedule
+identity when dates or ordering change.
+
+### Private calendar provider selector
+
+Calendar connections now offer iCloud, Microsoft 365 / Outlook (personal,
+Microsoft 365 Family, or work/school), and Google in one provider selector.
+iCloud uses an Apple app-specific password. Microsoft and Google use their
+supported OAuth sign-in flows; app passwords are not supported by these calendar
+APIs. The existing ICS Calendar Link remains available without account sign-in.
+
+For Microsoft, enter the registered application's client ID, enable public client
+flows and choose compatible supported account types. For Google, enable Calendar
+API, configure a Web OAuth client, provide its client ID/secret and register the
+exact HTTPS (or localhost HTTP) callback URL. After sign-in, choose the calendars
+to display. Disconnecting removes the saved provider token and cached events.
+Do not enter an ordinary account password or an app password in OAuth fields.

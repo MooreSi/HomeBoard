@@ -1,3 +1,4 @@
+import {setupCalendarProvider} from './calendar-provider-settings.mjs';
 import {api,post,esc} from './display.mjs';
 export async function setupICloudCalendar(){
  const $=id=>document.getElementById(id);let settings=await api('/api/settings');
@@ -15,4 +16,5 @@ export async function setupICloudCalendar(){
  $('icloudSelectionSave').onclick=async()=>{try{await post('/api/settings',{icloudCalendarIds:[...$('icloudCalendars').querySelectorAll('input:checked')].map(el=>el.value)});status('Calendar selection saved.');}catch(e){status(e.message);}};
  $('icloudDisconnect').onclick=async()=>{try{await post('/api/calendar/icloud/disconnect',{});await show();$('icloudEmail').value='';$('icloudPassword').value='';status('iCloud calendar disconnected.');}catch(e){status(e.message);}};
  try{await show();}catch(e){status(e.message);}
+ await setupCalendarProvider(settings);
 }

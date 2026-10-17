@@ -8,8 +8,8 @@ export function upgradeDesign(value){const d=structuredClone(value||newDesign())
 export function newDesign(){return {version:1,name:'My HomeBoard',enabled:false,font:'roboto',headingFont:'roboto',fontSize:16,headingSize:30,fontWeight:400,lineHeight:1.4,letterSpacing:0,gap:16,padding:16,radius:16,borderWidth:0,opacity:95,shadow:'soft',background:'solid',colors:{background:'#10151c',surface:'#1d2735',text:'#ffffff',muted:'#b8c5d8',accent:'#8db8ff',event:'#263348'},panels:{calendar:{x:4,y:0,w:8,h:10,layer:0,visible:true},clock:{x:0,y:0,w:4,h:3,layer:1,visible:true},photo:{x:0,y:3,w:4,h:7,layer:0,visible:true},weather:{x:0,y:10,w:6,h:2,layer:0,visible:true},news:{x:6,y:10,w:6,h:2,layer:0,visible:true}}};}
 function exact(value,keys,subject){if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).length!==keys.length||keys.some(k=>!Object.hasOwn(value,k)))throw Error('Invalid design '+subject);}
 export function validateDesign(d){
- if(d===null)return null;const base=newDesign(),v2=d.version>=2;exact(d,[...Object.keys(base),...(v2?['portraitPanels','panelStyles']:[]),...(d.version>=3?['backdrop']:[]),...(d.version>=5?['panelOptions','clockLayout']:[])],'fields');
- if(![1,2,3,4,5,6].includes(d.version)||typeof d.enabled!=='boolean'||typeof d.name!=='string'||!d.name.trim()||d.name.length>60)throw Error('Invalid design name or version');
+ if(d===null)return null;const base=newDesign(),v2=d.version>=2;exact(d,[...Object.keys(base),...(v2?['portraitPanels','panelStyles']:[]),...(d.version>=3?['backdrop']:[]),...(d.version>=5?['panelOptions','clockLayout']:[]),...(d.version>=7?['contentLayouts']:[])],'fields');
+ if(![1,2,3,4,5,6,7].includes(d.version)||typeof d.enabled!=='boolean'||typeof d.name!=='string'||!d.name.trim()||d.name.length>60)throw Error('Invalid design name or version');
  if(!Object.hasOwn(fonts,d.font)||!Object.hasOwn(fonts,d.headingFont))throw Error('Invalid design font');
  const bounds={fontSize:[12,36],headingSize:[16,72],fontWeight:[300,800],lineHeight:[1,2],letterSpacing:[-1,5],gap:[0,40],padding:[0,48],radius:[0,48],borderWidth:[0,4],opacity:[20,100]};
  for(const [key,[min,max]]of Object.entries(bounds))if(typeof d[key]!=='number'||!Number.isFinite(d[key])||d[key]<min||d[key]>max)throw Error('Invalid design '+key);
@@ -18,14 +18,16 @@ export function validateDesign(d){
  if(d.version>=3){exact(d.backdrop,['from','to','angle','overlay'],'backdrop');if(!/^#[a-f\d]{6}$/i.test(d.backdrop.from)||!/^#[a-f\d]{6}$/i.test(d.backdrop.to)||!Number.isInteger(d.backdrop.angle)||d.backdrop.angle<0||d.backdrop.angle>360||!Number.isInteger(d.backdrop.overlay)||d.backdrop.overlay<0||d.backdrop.overlay>90)throw Error('Invalid design backdrop');}
  const names=d.version>=6?designerPanelNames:v2?panelNames:basePanels;exact(d.panels,names,'panels');if(v2){exact(d.portraitPanels,names,'portrait panels');exact(d.panelStyles,names,'panel styles');for(const s of Object.values(d.panelStyles))validatePanelStyle(s,d.version>=4);}for(const p of [...Object.values(d.panels),...(v2?Object.values(d.portraitPanels):[])]){exact(p,['x','y','w','h','layer','visible'],'panel');if(typeof p.visible!=='boolean'||['x','y','w','h','layer'].some(k=>!Number.isInteger(p[k]))||p.x<0||p.y<0||p.w<1||p.h<1||p.x+p.w>12||p.y+p.h>12||p.layer<0||p.layer>(d.version>=5?31:10))throw Error('Invalid design panel position');}
  if(d.version>=5)validatePanelTools(d);
+ if(d.version>=7)validateContentLayouts(d);
  return structuredClone(d);
 }
 export function exportDesign(d){return {format:'homeboard-design',version:1,design:validateDesign(d)};}
 export function importDesign(value){exact(value,['format','version','design'],'file');if(value.format!=='homeboard-design'||value.version!==1||value.design===null)throw Error('Unsupported HomeBoard design file');return validateDesign(value.design);}
+import {applyContentLayouts} from './panel-content.mjs';
 let homes,grid,themeHome;
 export function applyDesign(d){
  const body=document.body,root=document.querySelector('.dashboard');if(!root)return;
- if(!d?.enabled){applyClockLayout(null);if(homes){for(const {el,parent,next}of homes){parent.insertBefore(el,next?.parentNode===parent?next:null);const home=homes.find(h=>h.el===el);if(home.style===null)el.removeAttribute('style');else el.setAttribute('style',home.style);if(el.dataset.familyPanel)el.hidden=el.dataset.familyEmpty==='true';if(home.name==='charging')el.hidden=el.dataset.chargingEnabled!=='true';delete el.dataset.designPanel;delete el.dataset.designVisible;}grid.remove();homes=null;}if(themeHome!==undefined){body.dataset.theme=themeHome;themeHome=undefined;}delete body.dataset.customDesign;delete body.dataset.designVersion;return;}
+ if(!d?.enabled){applyContentLayouts(null);applyClockLayout(null);if(homes){for(const {el,parent,next}of homes){parent.insertBefore(el,next?.parentNode===parent?next:null);const home=homes.find(h=>h.el===el);if(home.style===null)el.removeAttribute('style');else el.setAttribute('style',home.style);if(el.dataset.familyPanel)el.hidden=el.dataset.familyEmpty==='true';if(home.name==='charging')el.hidden=el.dataset.chargingEnabled!=='true';delete el.dataset.designPanel;delete el.dataset.designVisible;}grid.remove();homes=null;}if(themeHome!==undefined){body.dataset.theme=themeHome;themeHome=undefined;}delete body.dataset.customDesign;delete body.dataset.designVersion;return;}
  validateDesign(d);if(body.dataset.theme!=='custom')themeHome=body.dataset.theme;body.dataset.theme='custom';body.dataset.customDesign='true';body.dataset.designVersion=String(d.version);
  if(!homes){const elements={calendar:root.querySelector('section.calendar'),clock:root.querySelector('.clockCard'),photo:root.querySelector('.photo'),weather:document.getElementById('weatherWidget'),news:document.getElementById('newsWidget'),charging:document.getElementById('chargingWidget')};for(const el of document.querySelectorAll('[data-family-panel]'))elements[el.dataset.familyPanel]=el;homes=Object.entries(elements).map(([name,el])=>({name,el,parent:el.parentNode,next:el.nextSibling,style:el.getAttribute('style')}));grid=document.createElement('div');grid.className='customDashboardGrid';root.append(grid);for(const {el}of homes)grid.append(el);}
  const c=d.colors;for(const [key,value]of Object.entries(c))root.style.setProperty('--design-'+key,value);
@@ -34,6 +36,7 @@ export function applyDesign(d){
  root.dataset.designBackground=d.background;
  applyClockLayout(d);
  for(const {name,el}of homes){const crop=d.panelOptions?.[name]?.crop;el.style.clipPath=crop&&Object.values(crop).some(v=>v)?`inset(${crop.top}% ${crop.right}% ${crop.bottom}% ${crop.left}% round ${d.panelStyles[name].custom?d.panelStyles[name].radius:d.radius}px)`:"";const p=d.panels[name]||{x:0,y:0,w:4,h:4,layer:0,visible:false},portrait=d.portraitPanels?.[name]||p;el.dataset.designPanel=name;if(el.dataset.familyPanel||name==='charging')el.hidden=false;el.style.gridColumn=`${p.x+1} / span ${p.w}`;el.style.gridRow=`${p.y+1} / span ${p.h}`;el.style.setProperty('--landscape-column',`${p.x+1} / span ${p.w}`);el.style.setProperty('--landscape-row',`${p.y+1} / span ${p.h}`);el.style.zIndex=p.layer;el.dataset.designVisible=String(p.visible);el.dataset.portraitVisible=String(portrait.visible);el.style.setProperty('--portrait-column',`${portrait.x+1} / span ${portrait.w}`);el.style.setProperty('--portrait-row',`${portrait.y+1} / span ${portrait.h}`);const s=d.panelStyles?.[name];if(s?.custom){el.style.setProperty('--panel-font',s.font==='inherit'?fonts[d.font]:fonts[s.font]);el.style.setProperty('--panel-size',s.fontSize+'px');el.style.setProperty('--panel-color',s.color);el.style.setProperty('--panel-background',s.background);el.style.setProperty('--panel-align',s.align);el.dataset.panelStyled='true';if(d.version>=4){for(const [key,value]of Object.entries(s)){if(typeof value==='number')el.style.setProperty('--panel-'+key,value+(['headingSize','secondarySize','padding','radius','borderWidth','letterSpacing','contentGap'].includes(key)?'px':''));}for(const role of ['heading','secondary']){el.style.setProperty('--panel-'+role+'Font',s[role+'Font']==='inherit'?(role==='heading'?fonts[d.headingFont]:s.font==='inherit'?fonts[d.font]:fonts[s.font]):fonts[s[role+'Font']]);el.style.setProperty('--panel-'+role+'Color',s[role+'Color']);el.style.setProperty('--panel-'+role+'Align',s[role+'Align']);}for(const role of ['heading','font','secondary']){el.style.setProperty('--panel-'+role+'Italic',s[role+'Italic']?'italic':'normal');el.style.setProperty('--panel-'+role+'Decoration',s[role+'Decoration']);}el.style.setProperty('--panel-borderColor',s.borderColor);el.style.setProperty('--panel-surface',s.backgroundMode==='gradient'?`linear-gradient(${s.gradientAngle}deg,${s.background+Math.round(s.opacity*2.55).toString(16).padStart(2,'0')},${s.gradientTo+Math.round(s.opacity*2.55).toString(16).padStart(2,'0')})`:s.background+Math.round(s.opacity*2.55).toString(16).padStart(2,'0'));el.style.setProperty('--panel-shadow',s.shadow==='deep'?'0 12px 36px #0008':s.shadow==='soft'?'0 4px 18px #0003':'none');el.dataset.panelHeading=String(s.showHeading);el.dataset.panelOverflow=s.overflow;el.dataset.panelVertical=s.verticalAlign;}}else delete el.dataset.panelStyled;}
+ applyContentLayouts(d);
 }
 
 // Integer grid geometry is shared by mouse, touch, keyboard and exact controls.
@@ -92,12 +95,14 @@ export function designFromTheme(t){
  const d=designStarter(t.layout==='gallery'?'gallery':'studio');d.name=(t.name+' · my design').slice(0,60);const light=['homeboard','coastal','minimal','lavender','gallery','folio','portrait'].includes(t.id);
  d.colors={background:t.colors[0],surface:light?'#ffffff':t.colors[2],text:light?'#26382e':'#eff6ff',muted:light?'#586b60':'#b2c5df',accent:t.colors[1],event:t.colors[2]};d.backdrop={from:t.colors[0],to:t.colors[2],angle:135,overlay:45};d.background=['backdrop','glass'].includes(t.layout)?'photo':['wall','showcase'].includes(t.layout)?'gradient':'solid';d.font='system';d.headingFont=['homeboard','gallery','folio','portrait'].includes(t.id)?'serif':'system';
  const panel=(x,y,w,h)=>({x,y,w,h,layer:0,visible:true});for(const ps of [d.panels,d.portraitPanels])for(const name of panelNames)ps[name].visible=false;
- if(['calendar','wall','editorial'].includes(t.layout))Object.assign(d.panels,{calendar:panel(0,2,12,10),clock:panel(0,0,12,2)});
+ if(t.id==='family-hub')Object.assign(d.panels,{clock:panel(0,0,5,2),weather:panel(5,0,7,2),calendar:panel(0,2,7,7),lists:panel(7,2,5,7),photo:panel(0,9,7,3),news:panel(7,9,5,3)});
+ else if(['calendar','wall','editorial'].includes(t.layout))Object.assign(d.panels,{calendar:panel(0,2,12,10),clock:panel(0,0,12,2)});
  else if(t.layout==='gallery')Object.assign(d.panels,{photo:panel(0,0,7,10),clock:panel(0,10,7,2),calendar:panel(7,0,5,12)});
  else if(['rail','showcase'].includes(t.layout))Object.assign(d.panels,{clock:panel(0,0,4,3),photo:panel(0,3,4,9),calendar:panel(4,0,8,12)});
  else if(t.layout==='poster')Object.assign(d.panels,{photo:panel(0,0,12,4),clock:panel(0,4,12,2),calendar:panel(0,6,12,6)});
  else Object.assign(d.panels,{calendar:panel(0,0,8,12),clock:panel(8,0,4,3),photo:panel(8,3,4,9)});
  Object.assign(d.portraitPanels,{photo:panel(0,0,12,4),clock:panel(0,4,12,2),calendar:panel(0,6,12,6)});if(['calendar','wall','editorial'].includes(t.layout))Object.assign(d.portraitPanels,{photo:{...d.portraitPanels.photo,visible:false},clock:panel(0,0,12,2),calendar:panel(0,2,12,10)});
+ if(t.id==='family-hub'){d.radius=14;d.gap=12;d.padding=12;d.headingSize=24;Object.assign(d.portraitPanels,{clock:panel(0,0,5,2),weather:panel(5,0,7,2),calendar:panel(0,2,12,5),lists:panel(0,7,6,3),photo:panel(6,7,6,3),news:panel(0,10,12,2)});}
  return creativeDesign(d);
 }
 
@@ -123,3 +128,17 @@ function applyClockLayout(d){
 }
 
 export function chargingDesign(value){const d=panelToolsDesign(value);if(d.version>=6)return d;d.version=6;d.panels.charging={x:8,y:8,w:4,h:4,layer:1,visible:false};d.portraitPanels.charging={x:0,y:9,w:12,h:3,layer:1,visible:false};d.panelStyles.charging=creativePanelStyle(d);d.panelOptions.charging={crop:{top:0,right:0,bottom:0,left:0},compactBackup:null};return validateDesign(d);}
+
+// Version 7 adds safe, percentage-based placement of content inside a panel.
+export function contentDesign(value){const d=chargingDesign(value);if(d.version>=7)return d;d.version=7;d.contentLayouts=Object.fromEntries(designerPanelNames.map(n=>[n,{}]));return validateDesign(d);}
+function validateContentLayouts(d){
+ exact(d.contentLayouts,designerPanelNames,'content layouts');
+ for(const items of Object.values(d.contentLayouts)){
+  if(!items||typeof items!=='object'||Array.isArray(items)||Object.keys(items).length>100)throw Error('Invalid design content');
+  for(const [key,p]of Object.entries(items)){
+   if(!/^(heading|body|secondary|item:[a-zA-Z0-9_-]{1,80})$/.test(key))throw Error('Invalid design content key');
+   exact(p,['x','y','w','h','fontSize'],'content item');
+   if(Object.values(p).some(v=>!Number.isFinite(v))||p.x<0||p.y<0||p.w<1||p.h<1||p.x+p.w>100||p.y+p.h>100||p.fontSize<8||p.fontSize>96)throw Error('Invalid design content position');
+  }
+ }
+}

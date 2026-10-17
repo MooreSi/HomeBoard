@@ -1,0 +1,67 @@
+/* Family Hub uses real household content in the reference's six-panel composition. */
+body[data-reference-theme="family-hub"]{background:#041323;color:#edf6ff}
+body[data-reference-theme="family-hub"] .customDashboardGrid{background:radial-gradient(ellipse at top right,#0c3045,transparent 70%),#041323;gap:12px!important;height:100%!important}
+body[data-reference-theme="family-hub"] .customDashboardGrid>[data-design-panel]{background:linear-gradient(140deg,#102b3cf5,#0a1c2af5)!important;border:1px solid #34526970!important;box-shadow:0 4px 16px #0003;border-radius:14px!important;padding:12px!important}
+body[data-reference-theme="family-hub"] .customDashboardGrid>.clockCard{background:transparent!important;border:0!important;box-shadow:none;display:flex!important;flex-direction:column;justify-content:center;align-items:flex-start}
+body[data-reference-theme="family-hub"] #clockDate{order:-1;font-size:16px!important;margin:0 0 4px!important}
+body[data-reference-theme="family-hub"] #clock{font-size:clamp(30px,4vw,64px)!important;font-weight:400;line-height:1.1}
+body[data-reference-theme="family-hub"] #clockZone{display:none}
+body[data-reference-theme="family-hub"] .calendar nav{flex-wrap:wrap;gap:4px}
+body[data-reference-theme="family-hub"] .calendar .period{margin:4px 0}
+body[data-reference-theme="family-hub"] .calendar .period h2{font-size:20px!important}
+body[data-reference-theme="family-hub"] .calendarFilters{display:none}
+body[data-reference-theme="family-hub"] .customDashboardGrid>.photo{padding:0!important}
+body[data-reference-theme="family-hub"] .familyWidget h2{font-size:20px;margin:0 0 12px}
+body[data-reference-theme="family-hub"] .familyWidgetContent article{background:none;border-bottom:1px solid #ffffff12;padding:6px 2px}
+body[data-reference-theme="family-hub"] .familyWidgetContent p{margin:8px 0}
+body[data-reference-theme="family-hub"] #newsWidget{display:flex!important;flex-direction:column;gap:4px;min-height:0}
+body[data-reference-theme="family-hub"] .tickerViewport{overflow:auto;min-height:0}
+body[data-reference-theme="family-hub"] .tickerTrack{display:flex!important;flex-direction:column;animation:none!important;transform:none!important;gap:6px}
+body[data-reference-theme="family-hub"] .tickerTrack article{border-left:3px solid #5ccef0;padding:4px 8px;min-width:0;width:auto;font-size:13px!important}
+.hasContentLayout{position:relative!important}
+.hasContentLayout .familyWidgetContent:has([data-content-placed^="item:"]){position:static!important}
+[data-content-placed] h3,[data-content-placed] p,[data-content-placed] small{font-size:inherit!important}
+body.organiserDesigned #familyEditor{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(12,minmax(0,1fr));gap:var(--organiser-gap);height:max(720px,calc(100dvh - 48px));background:var(--organiser-bg);color:var(--organiser-text);padding:8px;isolation:isolate}
+body.organiserDesigned #familyEditor #people{grid-column:1/-1;grid-row:13;}
+body.organiserDesigned #familyEditor .settingsCard h2{color:inherit;font-size:1.3em}
+body.organiserDesigned #familyEditor :is(input,select,textarea){max-width:100%}
+body.designPreviewMode.organiserDesigned main{max-width:none;padding:0;margin:0}
+body.designPreviewMode.organiserDesigned main>:not(#familyEditor){display:none}
+body.designPreviewMode.organiserDesigned #familyEditor{height:100dvh;}
+.designCanvas[data-tool=content] iframe{pointer-events:none}
+.designCanvas[data-tool=content] .designPanelOverlay{display:none}
+.designContentItem{position:absolute!important;border:1px dashed #66d9ed!important;background:#29b6d90d!important;touch-action:none;min-width:0!important;min-height:0!important;padding:0!important;z-index:60;color:white!important}
+.designContentItem[aria-pressed=true]{border:2px solid #ffcf59!important;background:#ffcf5915!important}
+.designContentItem>span:first-child{position:absolute;top:0;left:0;font-size:10px;background:#12384d;color:#fff;max-width:100%;overflow:hidden;white-space:nowrap}
+body[data-reference-theme=family-hub] .hubWeek{display:grid;grid-template-columns:38px repeat(7,minmax(0,1fr));height:100%;min-height:300px;gap:0;font-size:clamp(10px,.9vw,16px)}
+.hubDay,.hubAxisColumn{display:flex;flex-direction:column;min-width:0;min-height:0}
+.hubDayHead{min-height:52px;flex:0 0 52px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;border-bottom:1px solid #ffffff20;font-size:12px}
+.hubDayHead strong{font-weight:500}
+.hubDayBody,.hubTimeAxis{flex:1;position:relative;min-height:0}
+.hubDayBody{border-left:1px solid #ffffff12;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(100% / var(--hub-hours) - 1px),#ffffff0b calc(100% / var(--hub-hours) - 1px),#ffffff0b calc(100% / var(--hub-hours)))}
+.hubTimeAxis>span{position:absolute;left:0;font-size:10px;color:#a9c1d2;transform:translateY(-50%)}
+.hubEvent{background:var(--event-color);border:1px solid #ffffff15;border-radius:5px;color:white;position:absolute;top:var(--event-top);left:var(--event-left);height:var(--event-height);width:calc(var(--event-width) - 3px);padding:5px;overflow:auto;line-height:1.25;box-sizing:border-box;min-height:24px;scrollbar-width:thin}
+.hubEvent>time{display:block;font-size:10px;opacity:.85;margin-bottom:2px}
+.hubEvent>span{overflow-wrap:anywhere}
+.hubAllDay{position:static;width:100%;height:auto;min-height:0;font-size:10px}
+.hubToday{background:#168bd71f;border:1px solid #279de755;border-radius:5px}
+body[data-reference-theme=family-hub] .calendar:has(.hubWeek) .calendarPage{height:100%;min-height:300px}
+body[data-reference-theme=family-hub] .loadCalendarMore{margin:8px auto;padding:6px 10px;font-size:11px}
+body[data-reference-theme=family-hub] .tickerGroup{display:flex!important;flex-direction:column!important;gap:8px!important;align-items:stretch!important;width:100%!important}
+body[data-reference-theme=family-hub] .tickerGroup[aria-hidden=true]{display:none!important}
+body[data-reference-theme=family-hub] .tickerLabel{display:flex!important;gap:6px;align-items:center}
+body[data-reference-theme=family-hub] .tickerLabel .eyebrow,body[data-reference-theme=family-hub] #newsStatus{display:none}
+body[data-reference-theme=family-hub] #newsTitle{font-size:16px!important;margin:0}
+body[data-reference-theme=family-hub] #newsSource{justify-content:flex-start;font-size:12px}
+body[data-reference-theme=family-hub] #tickerPause{align-self:flex-end;padding:4px;font-size:12px;flex:0 0 auto}
+body[data-reference-theme=family-hub] .calendar::before{content:'Family Calendar';font-size:18px;font-weight:600;margin-bottom:6px}
+body[data-reference-theme=family-hub] .hubWeek:has(.hubAllDay) .hubDayHead{flex-basis:90px;min-height:90px;overflow:auto;justify-content:flex-start;padding-top:6px}
+body[data-reference-theme=family-hub] :is(#weatherWidget,#newsWidget)[hidden]{display:none!important}
+body[data-reference-theme=family-hub] #weatherWidget[data-weather-style=chart] #forecast{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px}
+body[data-reference-theme=family-hub] #weatherWidget[data-weather-style=chart] .forecastChart{display:block!important;max-height:100%;height:80px}
+body[data-reference-theme=family-hub] #weatherWidget[data-weather-style=chart] .forecastDays{display:none!important}
+body[data-reference-theme=family-hub] #weatherWidget[data-weather-style=cards] .weatherNow{display:none!important}
+body[data-reference-theme=family-hub] #weatherWidget[data-weather-style=cards] .forecastDay :is(small,span:not(.weatherIcon)){display:block}
+/* The time axis carries timings; short cards reserve their height for titles. */
+body[data-reference-theme=family-hub] .hubEvent{padding:2px 3px;font-size:clamp(10px,.8vw,12px);line-height:1.1}
+body[data-reference-theme=family-hub] .hubEvent>time{display:none}

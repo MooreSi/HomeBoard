@@ -4,7 +4,7 @@ test('news presets include requested sources and retain a custom feed option',as
 });
 test('Calendar Link settings need no account sign-in controls',async t=>{
  const a=await app(t);const html=await(await a.request('/settings')).text();assert.match(html,/<h3>Calendar Link<\/h3>/);assert.match(html,/No Microsoft or Google sign-in/);
- const loginControls=source=>/id="(?:microsoftConnect|googleConnect|microsoftClientId|googleClientId)"/.test(source);assert.equal(loginControls('<button id="microsoftConnect">Connect</button>'),true);assert.equal(loginControls(html),false);
+ const loginControls=source=>/id="(?:microsoftConnect|googleConnect|microsoftClientId|googleClientId)"/.test(source);assert.equal(loginControls('<button id="microsoftConnect">Connect</button>'),true);const quickConnect=html.match(/<div class="connectionCard quickConnect">([\s\S]*?)<div class="connectionCard">/);assert.ok(quickConnect,'Calendar Link card must exist');assert.equal(loginControls(quickConnect[1]),false);assert.match(html,/id="calendarProvider"/);assert.match(html,/id="microsoftConnect"/);assert.match(html,/id="googleConnect"/);
 });
 test('weather location supports suggestions and offers automatic/basic forecasts',async t=>{
  const a=await app(t);const html=await(await a.request('/settings')).text();assert.match(html,/id="locationQuery"[^>]*role="combobox"/);assert.match(html,/id="locationResults"[^>]*role="listbox"/);assert.match(html,/option value="auto"/);assert.match(html,/option value="basic"/);

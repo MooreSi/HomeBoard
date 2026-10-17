@@ -1,14 +1,23 @@
 # Release notes
 
-## Unreleased · Safari tablet sizing · 11 October 2026
+## v0.3.1 · 17 October 2026
+
+- Added Family Hub, an eighteenth theme inspired by the supplied navy family dashboard, with a coloured time-aligned week, shared lists, photos, weather and news.
+- Added four weather presentations, including graphical scenes, and a toggle to show only the next bin collection, including bins collected together.
+- Expanded the designer with Fire 10 (1920 × 1200), additional tablet and custom viewport previews, photo overlays, and movable/resizable text groups and bin cards. Dashboard and family organiser layouts now have separate drafts and histories.
+- Added a family organiser shortcut immediately before fullscreen and a private-calendar provider selector: iCloud app-specific passwords, plus supported Microsoft 365/Outlook and Google secure sign-in flows. Microsoft and Google calendar APIs use OAuth rather than app passwords.
+- Included the richer panel typography, cropping, layering, clock composition and direct Octopus smart charging introduced since v0.3.0, alongside Safari viewport, calendar density, stale-build refresh and Proxmox installation/update fixes.
+- Validation: 182 automated tests locally and in Docker, 53 Chrome browser checks, and Docker boot/restart/persistence smoke checks passed. Live calendar account consent and physical Fire/iPad/Android checks remain unverified. See [validation details](docs/testing/VALIDATION-family-hub.md).
+
+### Safari tablet sizing · 11 October 2026
 
 - Dashboard sizing follows the usable visual viewport in CSS pixels, including browser controls, rotation and fullscreen changes, while preserving deliberate pinch zoom. Short tablet layouts compact the rail and share width between visible family cards.
 - Tablet Month keeps all six rows visible, prioritises readable appointment names and uses a +N button for additional appointments. Fixed month-date clicks failing to open Day view; cells and count buttons now open full timings.
 - Open dashboards detect updated builds on return to the page and periodically, preserving the selected calendar view, date, filters and URL. HTML/code assets have build identities and bypass stale HTTP caching; offline fallback remains available. Unstamped installations use a frontend content identity.
 
-## Unreleased · Creative designer · 10 October 2026
+### Creative designer · 10 October 2026
 
-- Weather now sits to the right of the calendar below smart charging in every built-in theme. Compact forecast cards wrap within the rail, keep all forecast days visible and preserve space for loaded photos. Empty family strips collapse so the calendar can use the space.
+- Weather sits to the right of the calendar below smart charging in the seventeen rail-based themes; Family Hub uses its reference-style header strip. Compact forecast cards wrap within the rail, keep all forecast days visible and preserve space for loaded photos. Empty family strips collapse so the calendar can use the space.
 - Fixed stale charging slots retaining an active highlight and custom date/time compositions hiding digital time when the global preference was analog. Forecast chart accessibility labels now reflect five-day or seven-day data.
 
 - Removed the redundant weather eyebrow and 3-week calendar choice. Old stored rolling preferences fall back to Week in the display and settings.
@@ -16,7 +25,7 @@
 - Added compact tablet Upcoming rows, a complete six-row Month grid, adaptive bin typography and ticker icons sized to their panel.
 - Smart charging prioritises schedules without a next-charge countdown or explanatory footer; stale/error states and current-slot labels remain.
 
-- Added responsive tablet dashboards, full-height custom canvases and calendar-toolbar settings/fullscreen controls. The dashboard family shortcut has been removed; use Settings.
+- Added responsive tablet dashboards, full-height custom canvases and calendar-toolbar settings/fullscreen controls. The dashboard family shortcut now sits immediately before fullscreen.
 - Date/time text fits resized panels and individual slots; a right-click preset places date and time on one line without changing the portable design schema.
 - Bin collections now have stripe padding, matching wheelie-bin icons and ordinal month dates. News tickers identify the selected publisher with locally bundled icons.
 - Week/month grids fit all seven columns within tablet calendars; long card contents retain internal scrolling.
@@ -36,7 +45,7 @@
 
 - Added independent heading, body and secondary font families, sizes, weights, italic styles, decorations, colours and alignment in right-click menus.
 - Added panel-specific padding, item spacing, line/letter spacing, surface gradients/opacity, borders, corners, shadows, vertical alignment, heading visibility and overflow controls, plus a compact preset for small widgets.
-- Added editable copies of all seventeen built-in themes. Copies preserve their palettes and adapt their compositions to the editable grid; default themes are never overwritten.
+- Added editable copies of all eighteen built-in themes. Copies preserve their palettes and adapt their compositions to the editable grid; default themes are never overwritten.
 - Added copy/paste panel styles, position locks, copy-to-other-orientation and an interactive preview without editing handles. Layout commands live in a submenu to keep the main context menu manageable.
 - Introduced validated design schema 4 while retaining older designs, portable files and reusable blocks.
 

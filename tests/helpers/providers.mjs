@@ -25,7 +25,7 @@ globalThis.fetch=async(input,options={})=>{
   if(!b.query.includes('flexPlannedDispatches(')||b.variables.deviceId!=='demo-car')throw Error('Unexpected Octopus query');return ok({data:{flexPlannedDispatches:[{start:'2099-12-10T23:00:00Z',end:'2099-12-11T01:00:00Z',type:'SMART',energyAddedKwh:'-12'}]}});
  }
  if(u.hostname==='login.microsoftonline.com'){
-  if(!u.pathname.startsWith('/common/'))throw Error('Microsoft must support work/school and personal accounts');
+  if(!/^\/(common|consumers|organizations)\/oauth2\/v2\.0\/(devicecode|token)$/.test(u.pathname))throw Error('Unexpected Microsoft account authority or OAuth endpoint');
   if(u.pathname.endsWith('/devicecode')){const p=new URLSearchParams(options.body);if(!p.get('scope').includes('Calendars.ReadBasic'))throw Error('Missing read-only scope');return ok({device_code:'fake-device',user_code:'TEST-CODE',verification_uri:'https://microsoft.com/devicelogin',expires_in:600,interval:1});}
   return ok({access_token:'secret-ms-access',refresh_token:'secret-ms-refresh',expires_in:3600});
  }

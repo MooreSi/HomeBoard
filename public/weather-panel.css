@@ -58,3 +58,26 @@ body:not([data-custom-design=true]) #weatherWidget .attribution{font-size:9px;li
  body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden])) [data-family-panel=bins] .wheelieBin{width:var(--bin-icon,17px);height:var(--bin-icon,17px);flex-basis:var(--bin-icon,17px)}
  body:not([data-custom-design=true]) .dashboard:has(#weatherWidget:not([hidden]))>.newsWidget{position:relative!important;inset:auto!important;flex:0 0 auto;min-height:0;max-height:80px;width:auto!important;margin:0!important;padding:10px!important;display:flex;align-items:center;gap:10px;overflow:hidden}
 }
+/* Explicit presentation preferences apply to built-in and custom layouts. */
+body #weatherWidget[data-weather-style=cards] :is(.weatherNow,.forecastChart){display:none!important}
+body #weatherWidget[data-weather-style=cards] .forecastDays{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(70px,1fr))!important;gap:8px!important}
+body #weatherWidget[data-weather-style=cards] .forecastDay{padding:10px!important;border:1px solid #ffffff20;border-radius:12px;background:color-mix(in srgb,var(--muted) 10%,transparent)}
+body #weatherWidget[data-weather-style=cards] .forecastDay .weatherIcon{font-size:36px!important}
+body #weatherWidget[data-weather-style=graphical] .forecastChart{display:none!important}
+body #weatherWidget[data-weather-style=graphical] .weatherNow{display:flex!important;align-items:center;gap:12px}
+body #weatherWidget[data-weather-style=graphical] .weatherNow>.weatherIcon{width:64px;height:64px;flex-shrink:0}
+body #weatherWidget[data-weather-style=graphical] .weatherScene{width:100%;height:100%;filter:drop-shadow(0 3px 5px #0003)}
+body #weatherWidget[data-weather-style=graphical] .forecastDay .weatherIcon{width:42px;height:42px}
+body #weatherWidget[data-weather-style=chart] .forecastChart{display:block!important;width:100%;max-height:120px}
+body #weatherWidget[data-weather-style=chart] .weatherNow{display:flex!important;gap:8px}
+body[data-reference-theme=family-hub] #weatherWidget{padding:8px!important;display:flex!important;align-items:center;gap:10px}
+body[data-reference-theme=family-hub] #weatherWidget .widgetHeading,body[data-reference-theme=family-hub] #weatherWidget .attribution{display:none}
+body[data-reference-theme=family-hub] #weatherWidget #forecast{display:flex;gap:16px;align-items:center;width:100%;height:100%}
+body[data-reference-theme=family-hub] #weatherWidget .forecastChart{display:none!important}
+body[data-reference-theme=family-hub] #weatherWidget .weatherNow{display:flex!important;align-items:center;flex-wrap:wrap;gap:6px;min-width:100px}
+body[data-reference-theme=family-hub] #weatherWidget .weatherNowLabel{display:none}
+body[data-reference-theme=family-hub] #weatherWidget .weatherNow strong{font-size:30px}
+body[data-reference-theme=family-hub] #weatherWidget .forecastDays{display:flex!important;flex:1;justify-content:space-around}
+body[data-reference-theme=family-hub] #weatherWidget .forecastDay{display:flex;flex-direction:column;align-items:center}
+body[data-reference-theme=family-hub] #weatherWidget .forecastDay :is(small,span:not(.weatherIcon)){display:none}
+body[data-reference-theme=family-hub] #weatherWidget .weatherIcon{width:30px;height:30px}
