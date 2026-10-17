@@ -16,7 +16,7 @@ See the [custom designer guide](docs/CUSTOM-DESIGN.md) and [v0.3 validation](doc
 
 ## v0.22 · Family organisation and dependable displays
 
-- Multiple private ICS Calendar Links with names, colours, family assignments and dashboard filters.
+- Multiple private ICS Calendar Links with names, colours, family assignments and dashboard filters configured in Settings.
 - `/family`: profiles, shared shopping/checklists, notices, recurring chores with points, visual routines, weekly meals and ingredients-to-shopping, bin reminders with holiday exceptions, and annual countdowns.
 - Named scheduled screens, ordered playlists and pinned screen URLs. Custom Design adds independent portrait layouts, per-panel styling, alignment tools, reusable panel templates and a Family organiser starter layout.
 - Phone-friendly management and an installable web app. Set an admin password at `/login` to protect editing; viewing remains available on your home network. No password is preset. Sessions expire after eight hours and server restart.
@@ -528,6 +528,35 @@ Weather presentation**. Save changes to apply the chosen style to the dashboard.
 Weather must be enabled and connected for live forecast graphics to appear.
 See the [text, transparency and weather validation](docs/testing/VALIDATION-designer-text-surfaces.md)
 for regression checks and device verification limits.
+
+### Calendar space, bin layouts and charging
+
+The dashboard calendar has one control row followed by its events. The duplicated
+range heading and calendar/person dropdowns have been removed. Set **Calendar
+shown on dashboard** and **Person shown on dashboard** under **Settings →
+Calendars → Dashboard calendar filters**, then save. Navigation keeps the viewed
+period available to assistive technology without displaying another date range.
+
+Choose **Bin presentation** in **Settings → Family tools**, or select Bins in
+Custom Design and use **Bin panel presentation**. Choices are vertical cards,
+horizontal cards, upcoming icons in the panel, and upcoming icons in the top
+header. Icon modes include every bin collected on the earliest upcoming date,
+with accessible names and no visible colour labels or dates. Header mode removes
+the separate bin card. **Bin icon size (px)** controls icon size from 12–96 pixels;
+the designer exposes the same setting. Resize the panel using its edges or exact
+width/height controls. Horizontal rows scroll when their cards exceed the width.
+
+**Delete panel** in the designer toolbar and panel menu removes the selected
+panel from both landscape and portrait. Undo restores it; Add panel can put it
+back into the selected orientation. Household records and the panel's saved
+styles remain intact.
+
+Charging uses the rendered card size to adjust typography and spacing. Compact
+cards prioritise slot times and scroll remaining schedule details inside the
+panel; larger cards display the device summary and larger text. Connection and
+empty-schedule messages remain available when there are no slots.
+See [calendar, bins and charging validation](docs/testing/VALIDATION-calendar-bins-charging.md)
+for checks and device/container verification limits.
 
 ### Private calendar provider selector
 

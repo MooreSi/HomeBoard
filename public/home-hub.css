@@ -71,3 +71,41 @@ body[data-dashboard-screen=family] .customDashboardGrid>:is(.clockCard,.calendar
 .designContentItem[data-content-key^="text:"]{border-color:#ffd166!important}
 .designContentItem[data-content-key^="text:"]>span:first-child{max-width:100%;font-size:9px;opacity:0;transition:opacity .1s}
 .designContentItem[data-content-key^="text:"]:is(:hover,:focus,[aria-pressed=true])>span:first-child{opacity:1}
+
+/* Calendar controls use one toolbar; the rest of the panel belongs to events. */
+body .dashboard .calendar{display:flex!important;flex-direction:column!important}
+body .dashboard .calendar>nav{position:relative!important;inset:auto!important;flex-shrink:0;margin-bottom:8px!important}
+body .dashboard .calendar>#calendar{position:relative!important;inset:auto!important;flex:1;min-height:0;height:auto!important;max-height:none!important;overflow:auto}
+.calendarStatus{font-size:10px;color:var(--muted)}
+.calendarStatus:empty{display:none}
+.headerBins{display:flex;align-items:center;gap:4px;flex-shrink:0;max-width:40%;overflow:auto}
+.headerBins .wheelieBin{height:var(--header-bin-size,32px);width:calc(var(--header-bin-size,32px)*.84);flex-shrink:0}
+body[data-bins-presentation=header] .dashboard [data-family-panel=bins]{display:none!important}
+body .dashboard [data-family-panel=bins][data-bin-presentation=horizontal] .familyWidgetContent{display:flex!important;flex-direction:row;gap:8px;overflow:auto;min-height:0}
+body .dashboard [data-family-panel=bins][data-bin-presentation=horizontal] .binCollection{flex:1 0 90px;min-width:90px;margin:0;overflow-wrap:anywhere}
+body .dashboard [data-family-panel=bins][data-bin-presentation=icons]>header{display:none!important}
+body .dashboard [data-family-panel=bins][data-bin-presentation=icons] .familyWidgetContent{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;height:100%;min-height:0}
+body .dashboard [data-family-panel=bins][data-bin-presentation=icons] .wheelieBin{height:min(var(--bin-icon-size,32px),100%);width:auto;max-width:100%;flex:0 1 auto}
+/* Charging adapts its type and spacing to the actual card, with all slots accessible. */
+body .dashboard #chargingWidget{display:flex!important;flex-direction:column;min-width:0;min-height:0;overflow:hidden!important}
+body .dashboard #chargingWidget>header{flex:0 0 auto;margin:0 0 4px!important}
+body .dashboard #chargingWidget>.familyWidgetContent{flex:1;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain}
+body .dashboard #chargingWidget .chargingSlot{padding:5px 0;overflow-wrap:anywhere}
+body .dashboard #chargingWidget :is(h3,p,small){overflow-wrap:anywhere;white-space:normal}
+body .dashboard #chargingWidget :is(.chargingSlot h3,.chargingSummary h3){font-size:var(--charging-size,14px)!important;line-height:1.15!important;margin:0!important}
+body .dashboard #chargingWidget>header h2{font-size:var(--charging-heading,18px)!important;line-height:1.15!important;margin:0!important}
+body .dashboard #chargingWidget :is(p,small){font-size:clamp(9px,calc(var(--charging-size,14px)*.8),14px)!important;line-height:1.2!important;margin:2px 0!important}
+body .dashboard #chargingWidget[data-charging-density=compact]{padding:6px!important}
+body .dashboard #chargingWidget[data-charging-density=compact] .chargingSummary:has(~.chargingSlot){display:none}
+
+body[data-bins-presentation=icons] .dashboard [data-family-panel=bins][data-bin-presentation=icons] .familyWidgetContent .wheelieBin{height:min(var(--bin-icon-size,32px),100%)!important;width:auto!important;flex-basis:auto!important}
+.organiserNavigation:has(.headerBins:not([hidden])){flex-wrap:wrap}
+#designBinControls{display:flex;align-items:end;gap:8px}
+
+body .dashboard #chargingWidget[hidden]{display:none!important}
+
+.headerBins[data-floating=true]{position:fixed;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));max-width:calc(100% - 16px);padding:4px;z-index:1000;border-radius:12px;background:var(--design-surface,var(--card))}
+/* Layout visibility wins over calendar/charging flex rules in each orientation. */
+@media(orientation:landscape){body[data-custom-design=true]:not(.designPreviewMode) .customDashboardGrid>:is([data-design-panel],#chargingWidget)[data-design-visible=false]{display:none!important}}
+@media(orientation:portrait){body[data-custom-design=true]:not(.designPreviewMode) .customDashboardGrid>:is([data-design-panel],#chargingWidget)[data-portrait-visible=false]{display:none!important}}
+body.designPreviewMode[data-preview-orientation=landscape] .customDashboardGrid>:is([data-design-panel],#chargingWidget)[data-design-visible=false],body.designPreviewMode[data-preview-orientation=portrait] .customDashboardGrid>:is([data-design-panel],#chargingWidget)[data-portrait-visible=false]{display:none!important}

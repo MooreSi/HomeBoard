@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Removed the duplicate calendar range and moved calendar/person filters into Settings, giving events more dashboard space.
+- Added vertical, horizontal and upcoming-icon bin layouts, including icons in the top header, with adjustable icon size and immediate designer previews.
+- Added Delete panel for both layout orientations with Undo/restoration, and made charging typography and spacing adapt to its panel with scrollable schedule details.
+
 - Added visible Select text controls and double-click selection in Custom Design, with individual text fonts, sizes, colours, movement and box resizing saved independently of panels and bin cards.
 - Added a Transparent panel background switch for every panel plus an accessible background opacity control; corrected a style override that prevented fully transparent surfaces.
 - Added Weather panel presentation in the designer, with immediate compact, detailed card, graphical scene and temperature chart previews linked to the Weather settings preference.
