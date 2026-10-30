@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added automatic activity emoji to appointment titles (football, dentist, flights and more) and tidier birthdays: "Astrid's Birthday" shows as 🎂 Astrid, with an age when the title includes a birth year. Private appointments stay masked; switch it off under Calendar connections.
 - Removed the duplicate calendar range and moved calendar/person filters into Settings, giving events more dashboard space.
 - Added vertical, horizontal and upcoming-icon bin layouts, including icons in the top header, with adjustable icon size and immediate designer previews.
 - Added Delete panel for both layout orientations with Undo/restoration, and made charging typography and spacing adapt to its panel with scrollable schedule details.

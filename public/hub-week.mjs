@@ -1,4 +1,5 @@
 import {esc,addDays,onDay,parts,stamp} from './display.mjs';
+import {eventTitle} from './event-title.mjs';
 // The reference theme keeps appointments aligned to a shared local-time axis.
 export function hubWeekHTML(events,start,pref,today){
  const minute=(date,key,end=false)=>{const p=parts(date,pref.timezone),day=`${p.year}-${p.month}-${p.day}`;return day<key?0:day>key?1440:Number(p.hour)*60+Number(p.minute)+(end&&p.second!=='00'?1:0);};
@@ -7,7 +8,7 @@ export function hubWeekHTML(events,start,pref,today){
  const from=Math.min(7,...timed.map(e=>Math.floor(e.start/60))),to=Math.max(22,...timed.map(e=>Math.ceil(e.end/60))),span=(to-from)*60;
  const ticks=Array.from({length:Math.floor((to-Math.ceil(from/2)*2)/2)+1},(_,i)=>Math.ceil(from/2)*2+i*2);
  const colors=['#158ee1','#22a56b','#8961c9','#c34a9a','#df9a35','#db6363','#2da7a4'];
- const title=e=>pref.privacy||e.sensitivity==='private'?'Private appointment':e.subject;
+ const title=e=>eventTitle(e,pref);
  const color=e=>e.color||colors[[...String(e.subject)].reduce((n,c)=>n+c.charCodeAt(0),0)%colors.length];
  const event=(e,style='')=>`<div class="hubEvent ${e.isAllDay?'hubAllDay':''}" style="--event-color:${esc(color(e))};${style}" title="${esc(e.isAllDay?'All day':stamp(e).toLocaleTimeString('en-GB',{timeZone:pref.timezone,hour:'2-digit',minute:'2-digit',hour12:pref.hour12}))} · ${esc(title(e))}">${e.isAllDay?'':`<time>${stamp(e).toLocaleTimeString('en-GB',{timeZone:pref.timezone,hour:'2-digit',minute:'2-digit',hour12:pref.hour12})}</time>`}<span>${esc(title(e))}</span></div>`;
  return `<div class="hubWeek" style="--hub-hours:${to-from}"><div class="hubAxisColumn"><div class="hubDayHead"></div><div class="hubTimeAxis">${ticks.map(h=>`<span style="top:${(h-from)/(to-from)*100}%">${String(h).padStart(2,'0')}:00</span>`).join('')}</div></div>${days.map(d=>{

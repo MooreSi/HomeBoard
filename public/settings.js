@@ -5,7 +5,7 @@ import {setupFamilySettings} from './family-settings.mjs';
 import {setupDesignEditor} from './design-editor.mjs';
 import {api,post,esc} from './display.mjs';
 const $=id=>document.getElementById(id);let familySettings,designEditor,saved,location,newsFeeds=[],locationTimer,locationRequest=0;
-const fieldIds=['calendarFilter','personFilter','binsPresentation','binsIconSize','octopusEnabled','octopusDeviceId','managementAppearance','name','theme','timezone','dateFormat','clock','hour12','privacy','defaultView','photoSource','photoFolder','photoInterval','photoTransition','photoDuration','photoOrder','photoFit','binsNextOnly','weatherStyle','weatherEnabled','weatherUnits','weatherApi','newsEnabled','newsUrl','newsLimit','nightEnabled','nightStart','nightEnd','nightBrightness'];
+const fieldIds=['calendarFilter','personFilter','binsPresentation','binsIconSize','octopusEnabled','octopusDeviceId','managementAppearance','name','theme','timezone','dateFormat','clock','hour12','privacy','eventEmoji','defaultView','photoSource','photoFolder','photoInterval','photoTransition','photoDuration','photoOrder','photoFit','binsNextOnly','weatherStyle','weatherEnabled','weatherUnits','weatherApi','newsEnabled','newsUrl','newsLimit','nightEnabled','nightStart','nightEnd','nightBrightness'];
 const numeric=new Set(['binsIconSize','photoInterval','photoDuration','newsLimit','nightBrightness']);
 function toast(message){$('toast').textContent=message;$('toast').style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').style.display='none',7000);}
 function dirty(){ $('saveStatus').textContent='Unsaved changes';}
